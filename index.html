@@ -14,25 +14,11 @@
     text-align: center; 
     padding: 80px 20px 60px; 
   }
-  .logo-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px; /* minder ruimte */
-  }
-  header img { 
-    max-width: 220px; /* groter logo */
-    height: auto;
-  }
-  header h1 { 
-    font-size: 40px; /* iets kleiner dan eerst */
-    font-weight: 700; 
-  }
+  .logo-title { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  header img { max-width: 220px; height: auto; }
+  header h1 { font-size: 40px; font-weight: 700; }
   header p { font-size: 20px; opacity: 0.9; margin: 16px 0 24px; }
-  header button { 
-    padding: 14px 28px; font-size: 16px; border: none; border-radius: 8px; 
-    background: #0b0b10; color: #fff; cursor: pointer; transition: 0.3s; 
-  }
+  header button { padding: 14px 28px; font-size: 16px; border: none; border-radius: 8px; background: #0b0b10; color: #fff; cursor: pointer; transition: 0.3s; }
   header button:hover { background: #1a1c26; }
 
   /* --- Fun Fact Section --- */
@@ -59,28 +45,55 @@
   .stat-card p { font-size: 20px; margin-bottom: 12px; }
   .currency-select { margin-top: 8px; padding: 6px 12px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; }
 
-  /* CoinMarketCap Card */
-  .cmc-card { 
-    background: linear-gradient(145deg, #2e1a4f, #7b61ff); 
-    color: #e6eef8; 
-    padding: 12px; 
-    font-size: 18px;
-  }
+  .cmc-card { background: linear-gradient(145deg, #2e1a4f, #7b61ff); color: #e6eef8; padding: 12px; font-size: 18px; }
 
   /* --- Donation Card --- */
   #zec-donation {
-    text-align: center;
-    margin: 40px auto;
-    max-width: 320px;
-    background: #0f1116;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-    color: #e6eef8;
+    text-align: center; margin: 40px auto; max-width: 320px;
+    background: #0f1116; border-radius: 16px; padding: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); color: #e6eef8;
   }
   #zec-donation h3 { color:#7b61ff; margin-bottom:16px; font-size:20px; }
   #zec-donation p { font-size:14px; word-break:break-all; margin-bottom:0; }
   #zec-donation img { width:200px; height:200px; margin-bottom:12px; border-radius:12px; }
+
+  /* --- Memory Game --- */
+  #memory-game { max-width: 500px; margin: 60px auto; text-align: center; }
+  #memory-game h2 { color:#7b61ff; margin-bottom:20px; }
+  #game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-auto-rows: 100px;
+    gap: 12px;
+    justify-content: center;
+  }
+  #game-board .card {
+    width: 100px;
+    height: 100px;
+    perspective: 600px;
+    cursor: pointer;
+  }
+  #game-board .card-inner {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    border-radius: 12px;
+    position: relative; /* nu absoluut niet nodig voor flip */
+  }
+  #game-board .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+  .card-front, .card-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 12px;
+    backface-visibility: hidden;
+  }
+  .card-front { transform: rotateY(180deg); object-fit: cover; }
+  .card-back { background: #7b61ff; }
 
   /* --- Footer --- */
   footer { text-align: center; padding: 20px 20px 60px; font-size: 12px; color: #9aa0b4; }
@@ -88,10 +101,12 @@
   footer a:hover { text-decoration: underline; }
   .disclaimer { font-size: 10px; opacity: 0.7; margin-top: 12px; }
 
-  @media(max-width: 600px){ 
+  @media(max-width: 600px){
     header h1 { font-size: 28px; } 
     header p { font-size: 16px; } 
     .fun-fact p { font-size: 20px; } 
+    #game-board { grid-template-columns: repeat(4, 70px); grid-auto-rows: 70px; gap: 8px; }
+    #game-board .card { width: 70px; height: 70px; }
   }
 </style>
 </head>
@@ -122,17 +137,14 @@
       <option value="eth">ETH</option>
     </select>
   </div>
-
   <div class="stat-card">
     <strong>Next Halving</strong>
     <p id="halving">Calculating…</p>
   </div>
-
   <div class="stat-card">
     <strong>Hypothetical ZEC Price at BTC Market Cap</strong>
     <p id="hypoPrice">Fetching…</p>
   </div>
-
   <div class="stat-card cmc-card">
     <strong>CoinMarketCap Rank</strong>
     <p><a href="https://coinmarketcap.com/currencies/zcash/" target="_blank">#49</a></p>
@@ -141,8 +153,15 @@
 
 <section id="zec-donation">
   <h3>Support with Zcash</h3>
-  <img src="zec_qrcode.png" alt="Donate Zcash QR">
+  <img src="images/zec_qrcode.png" alt="Donate Zcash QR">
   <p>u1pxtmfpy6zw0kklrlagy06t5jj73e8etm9mgpzy85unn3zx58putaa990n5al46299dxj8uvpt34yrs2zcdrc76edsw5dqu3w3kdmellf5lzgwx5px5kaltx3xhyshmttaqjph3fkcntz5335vh94rxv4a32r75g4wt4lgnne7yl736rt</p>
+</section>
+
+<section id="memory-game">
+  <h2>ZEC Memory Game</h2>
+  <div id="game-board"></div>
+  <p id="game-message" style="margin-top:20px; font-size:18px;"></p>
+  <button onclick="startGame()" style="margin-top:20px; padding:12px 24px; font-size:16px; border:none; border-radius:8px; background:#7b61ff; color:#fff; cursor:pointer;">Restart Game</button>
 </section>
 
 <footer>
@@ -160,15 +179,36 @@
 <script>
 // --- Fun Facts ---
 const facts = [
-  'Zcash was the first cryptocurrency to implement zk-SNARKs.',
-  'Zcash has a fixed supply of 21 million coins, like Bitcoin.',
-  'Zcash launched in 2016 as a privacy-focused cryptocurrency.',
-  'Zcash allows both transparent and shielded transactions.',
-  'Zashi Wallet 2.4 supports decentralized BTC/USDC → ZEC swaps.',
-  'Zashi CrossPay enables shielded ZEC payments across chains.',
-  'Mobile wallets: Zashi, Gem Wallet, Zingo, Ywallet, Edge.',
-  'Desktop wallets: Exodus, Atomic Wallet, Zcash Full Node.',
-  'Hardware wallets: Keystone, Ledger, Trezor, NGRAVE ZERO.'
+  "Zcash was the first cryptocurrency to implement zk-SNARKs, enabling private transactions.",
+  "Users can choose between transparent and shielded addresses, offering flexibility in transaction privacy.",
+  "Shielded transactions hide the sender, recipient, and amount, ensuring complete confidentiality.",
+  "Zcash's privacy features comply with stringent regulatory standards, making it suitable for institutional use.",
+  "The use of zero-knowledge proofs ensures that transaction data remains private while still being verifiable.",
+  "Zcash's privacy model is optional, allowing users to choose their desired level of transparency.",
+  "The network's cryptographic innovations have been peer-reviewed by leading researchers in the field.",
+  "Zcash's commitment to privacy has been recognized by privacy advocates and organizations worldwide.",
+  "The protocol's design allows for future upgrades to enhance privacy features without compromising security.",
+  "Zcash's privacy features are built into the protocol, not reliant on external tools or mixers.",
+  "Zcash is supported by major exchanges like Coinbase and Gemini, providing easy access for users.",
+  "The Electric Coin Company (ECC) collaborates with various institutions to promote Zcash adoption.",
+  "Zcash has been integrated into several wallets, including Zashi, which enforces shielding by default.",
+  "The Zcash Foundation supports the development of the ecosystem through grants and community initiatives.",
+  "Zcash's open-source nature encourages innovation and contributions from developers worldwide.",
+  "The network's consensus mechanism, Proof-of-Work, ensures decentralization and security.",
+  "Zcash has been featured in educational content by platforms like Coinbase, reaching a broad audience.",
+  "The community actively participates in governance through the ZIP process, influencing the protocol's future.",
+  "Zcash's interoperability with other blockchains is being explored to enhance its utility.",
+  "The network's scalability solutions aim to handle increased transaction volumes efficiently.",
+  "Zcash offers a unique combination of privacy and transparency, catering to diverse user needs.",
+  "The fixed supply of 21 million coins ensures scarcity, potentially increasing value over time.",
+  "Zcash's privacy features make it ideal for protecting sensitive financial information.",
+  "The network's low transaction fees make it cost-effective for microtransactions.",
+  "Zcash's fast transaction speeds enhance user experience, especially in cross-border payments.",
+  "The growing adoption of Zcash indicates increasing trust and demand in the market.",
+  "Zcash's commitment to continuous development ensures it remains at the forefront of privacy technology.",
+  "The backing of reputable organizations adds credibility to Zcash's long-term viability.",
+  "Zcash's focus on user control over privacy aligns with the ethos of individual empowerment in the digital age.",
+  "Investing in Zcash supports the advancement of privacy technologies in the blockchain space."
 ];
 let currentFactIndex = null;
 const funFactText = document.getElementById('fun-fact-text');
@@ -183,7 +223,7 @@ function showNextFact(){
   },250);
 }
 
-// --- Live Price & Hypothetical BTC Market Cap ---
+// --- Live Price ---
 async function fetchPriceAndHypothetical(){
   const currency = document.getElementById('currency').value.toLowerCase();
   document.getElementById('price').innerText = 'Fetching…';
@@ -191,31 +231,18 @@ async function fetchPriceAndHypothetical(){
   try{
     const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=zcash,bitcoin&vs_currencies=${currency}&include_market_cap=true`);
     const data = await res.json();
-
-    // ZEC price
     let zecPrice = data?.zcash?.[currency];
     if(zecPrice !== undefined){
-      let formatted;
-      if(currency === 'btc' || currency === 'eth'){
-        formatted = zecPrice.toFixed(8) + ' ' + currency.toUpperCase();
-      } else {
-        const symbol = (currency==='usd'?'$':currency.toUpperCase()+' ');
-        formatted = symbol + zecPrice.toLocaleString(undefined,{maximumFractionDigits:2});
-      }
+      let formatted = (currency==='btc'||currency==='eth')? zecPrice.toFixed(8)+' '+currency.toUpperCase() : (currency==='usd'? '$':'') + zecPrice.toLocaleString(undefined,{maximumFractionDigits:2});
       document.getElementById('price').innerText = formatted;
     }
-
-    // Hypothetical price at BTC market cap
     const btcCap = data?.bitcoin?.[`${currency}_market_cap`];
     if(btcCap){
       const zecSupply = 16328269;
       const hypoPrice = btcCap / zecSupply;
-      document.getElementById('hypoPrice').innerText = hypoPrice.toLocaleString(undefined,{maximumFractionDigits:2}) + ' ' + currency.toUpperCase();
+      document.getElementById('hypoPrice').innerText = hypoPrice.toLocaleString(undefined,{maximumFractionDigits:2})+' '+currency.toUpperCase();
     }
-  }catch(e){
-    document.getElementById('price').innerText = 'Fetching…';
-    document.getElementById('hypoPrice').innerText = 'Fetching…';
-  }
+  }catch(e){ document.getElementById('price').innerText = 'Fetching…'; document.getElementById('hypoPrice').innerText = 'Fetching…'; }
 }
 
 // Halving countdown
@@ -223,10 +250,7 @@ const halvingDate = new Date('2028-11-18T00:00:00Z');
 function updateCountdown(){
   const now = new Date();
   const diff = halvingDate - now;
-  if(diff <= 0){
-    document.getElementById('halving').innerText = 'Halving occurred';
-    return;
-  }
+  if(diff <= 0){ document.getElementById('halving').innerText = 'Halving occurred'; return; }
   const d = Math.floor(diff/(1000*60*60*24));
   const h = Math.floor((diff/(1000*60*60))%24);
   const m = Math.floor((diff/(1000*60))%60);
@@ -238,6 +262,59 @@ fetchPriceAndHypothetical();
 setInterval(fetchPriceAndHypothetical,60000);
 updateCountdown();
 setInterval(updateCountdown,1000);
+
+// --- Memory Game ---
+const memImages = [
+    'images/zcash-card.png',
+  'images/ledger.png',
+  'images/keystone.png',
+  'images/zashi.png',
+  'images/zingo.png',
+  'images/trezor.png',
+  'images/exodus.png',
+  'images/edge.png'
+];
+
+let cards = [];
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
+let matches = 0;
+
+function startGame(){
+  const board = document.getElementById('game-board');
+  board.innerHTML = '';
+  document.getElementById('game-message').innerText = '';
+  firstCard = null; secondCard = null; lockBoard=false; matches=0;
+  cards = [...memImages,...memImages];
+  cards.sort(()=>0.5 - Math.random());
+  cards.forEach(imgSrc=>{
+    const card=document.createElement('div'); card.classList.add('card'); card.dataset.img=imgSrc;
+    const inner=document.createElement('div'); inner.classList.add('card-inner');
+    const front=document.createElement('img'); front.src=imgSrc; front.classList.add('card-front');
+    const back=document.createElement('div'); back.classList.add('card-back');
+    inner.appendChild(front); inner.appendChild(back); card.appendChild(inner);
+    card.addEventListener('click',()=>flipCard(card));
+    board.appendChild(card);
+  });
+}
+
+function flipCard(card){
+  if(lockBoard || card===firstCard || card.classList.contains('flipped')) return;
+  card.classList.add('flipped');
+  if(!firstCard){ firstCard=card; return; }
+  secondCard=card; lockBoard=true;
+  if(firstCard.dataset.img===secondCard.dataset.img){
+    matches++; firstCard=null; secondCard=null; lockBoard=false;
+    if(matches===memImages.length){ document.getElementById('game-message').innerText='🎉 You matched all ZEC cards! 🎉'; }
+  }else{
+    setTimeout(()=>{
+      firstCard.classList.remove('flipped'); secondCard.classList.remove('flipped'); firstCard=null; secondCard=null; lockBoard=false;
+    },1000);
+  }
+}
+
+startGame();
 </script>
 
 </body>
