@@ -157,6 +157,186 @@
   <p>u1pxtmfpy6zw0kklrlagy06t5jj73e8etm9mgpzy85unn3zx58putaa990n5al46299dxj8uvpt34yrs2zcdrc76edsw5dqu3w3kdmellf5lzgwx5px5kaltx3xhyshmttaqjph3fkcntz5335vh94rxv4a32r75g4wt4lgnne7yl736rt</p>
 </section>
 
+
+<section class="calculator">
+  <h2>ZEC DCA Calculator</h2>
+  <div class="calc-inputs">
+    <input type="number" id="dailyAmount" placeholder="Daily Investment (USD)" value="10"/>
+    <input type="number" id="duration" placeholder="Duration" value="30"/>
+    <select id="durationUnit">
+      <option value="days" selected>Days</option>
+      <option value="months">Months</option>
+      <option value="years">Years</option>
+    </select>
+    <button onclick="calculateDCA()">Calculate</button>
+  </div>
+  <div class="results" id="results">
+    <div class="result-line"><strong>Total Invested:</strong> <span id="invested">–</span></div>
+    <div class="result-line"><strong>Total Zcash Stacked:</strong> <span id="stacked">–</span></div>
+    <div class="result-line"><strong>Total Value Today:</strong> <span id="valueToday">–</span></div>
+    <div class="result-line"><strong>DCA USD/ZEC:</strong> <span id="dcaValue">–</span></div>
+    <div class="note" id="note"></div>
+  </div>
+  <p class="credit">Data powered by <a href="https://www.coingecko.com/" target="_blank">CoinGecko</a></p>
+</section>
+
+<style>
+  .calculator {
+    max-width: 700px;
+    margin: 40px auto; /* centers the calculator */
+    padding: 24px;
+    background: #0f1116;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    text-align: center; /* keep all elements centered */
+  }
+  .calc-inputs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center; /* center inputs */
+  }
+  .calc-inputs input, .calc-inputs select {
+    flex: 1 1 120px; /* allow shrinking and growing, min width 120px */
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+  }
+  .calc-inputs button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #7b61ff;
+    color: #fff;
+    cursor: pointer;
+  }
+  .results {
+    margin-top: 20px;
+    text-align: left; /* keep table aligned neatly */
+  }
+  .result-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #222;
+  }
+  .result-line strong {
+    color: #9aa0b4;
+  }
+  .note {
+    font-size: 12px;
+    color: #9aa0b4;
+    margin-top: 8px;
+    text-align: center;
+  }
+  .credit {
+    font-size: 12px;
+    color: #9aa0b4;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .credit a {
+    color: #7b61ff;
+    text-decoration: none;
+  }
+</style>
+
+<script>
+let lastFetchTime = 0;
+let cachedPrice = null;
+let isFetching = false;
+
+function getDays(duration, unit) {
+  if(unit === 'days') return duration;
+  if(unit === 'months') return duration * 30;
+  if(unit === 'years') return duration * 365;
+  return duration;
+}
+
+async function fetchDailyPrices(days){
+  const url = `https://api.coingecko.com/api/v3/coins/zcash/market_chart?vs_currency=usd&days=${days}&interval=daily`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
+  const data = await res.json();
+  if(!data.prices || data.prices.length === 0) throw new Error('No price data returned by API.');
+  let prices = data.prices.map(p => p[1]);
+  if(prices.length > days) prices = prices.slice(0, days); 
+  return prices;
+}
+
+async function fetchCurrentPrice(){
+  const now = Date.now();
+  if(cachedPrice && now - lastFetchTime < 60000) return cachedPrice;
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
+  const data = await res.json();
+  cachedPrice = data.zcash.usd;
+  lastFetchTime = now;
+  return cachedPrice;
+}
+
+async function calculateDCA(){
+  if(isFetching) { alert("Please wait a moment before recalculating."); return; }
+  isFetching = true;
+  setTimeout(()=>{isFetching=false},3000);
+
+  const dailyAmount = parseFloat(document.getElementById('dailyAmount').value);
+  const duration = parseInt(document.getElementById('duration').value);
+  const unit = document.getElementById('durationUnit').value;
+
+  if(isNaN(dailyAmount) || isNaN(duration) || dailyAmount<=0 || duration<=0){
+    alert("Please enter valid values for daily investment and duration.");
+    return;
+  }
+
+  // Max duration limits
+  const maxLimits = { days: 500, months: 16, years: 1 }; // 500 days max
+  if(duration > maxLimits[unit]){
+    alert(`Maximum duration for ${unit} is ${maxLimits[unit]}. Please enter a shorter period.`);
+    return;
+  }
+
+  const days = getDays(duration, unit);
+
+  document.getElementById('invested').innerText = 'Fetching…';
+  document.getElementById('stacked').innerText = 'Fetching…';
+  document.getElementById('valueToday').innerText = 'Fetching…';
+  document.getElementById('dcaValue').innerText = 'Fetching…';
+  document.getElementById('note').innerText = '';
+
+  try {
+    const prices = await fetchDailyPrices(days);
+    const currentPrice = await fetchCurrentPrice();
+
+    let totalZec = 0;
+    prices.forEach(price=>totalZec += dailyAmount/price);
+
+    const totalInvested = dailyAmount*prices.length;
+    const totalValueToday = totalZec*currentPrice;
+    const dcaValue = totalInvested/totalZec;
+
+    document.getElementById('invested').innerText = `$${totalInvested.toFixed(2)}`;
+    document.getElementById('stacked').innerText = totalZec.toFixed(6)+" ZEC";
+    document.getElementById('valueToday').innerText = `$${totalValueToday.toFixed(2)}`;
+    document.getElementById('dcaValue').innerText = `$${dcaValue.toFixed(2)} USD/ZEC`;
+    document.getElementById('note').innerText = `Calculation based on the past ${prices.length} days of ZEC prices (excluding today).`;
+  } catch(e){
+    document.getElementById('invested').innerText = 'Failed to fetch';
+    document.getElementById('stacked').innerText = 'Failed to fetch';
+    document.getElementById('valueToday').innerText = 'Failed to fetch';
+    document.getElementById('dcaValue').innerText = 'Failed to fetch';
+    document.getElementById('note').innerText = '';
+    console.error(e);
+    alert("Failed to fetch data: " + e.message);
+  }
+}
+</script>
+
+
+
+
 <section id="memory-game">
   <h2>ZEC Memory Game</h2>
   <div id="game-board"></div>
