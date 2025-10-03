@@ -12,31 +12,29 @@
   header {
     background: linear-gradient(135deg, #7b61ff, #2dd4bf);
     text-align: center;
-    padding: 80px 20px 60px;
+    padding: 50px 20px 50px;
   }
   .header-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px; 
+    gap: 6px;
     flex-wrap: wrap;
   }
   header img.logo {
-    height: 180px; 
+    height: 220px;
     width: auto;
     vertical-align: middle;
   }
   header h1 {
     font-size: 48px;
     font-weight: 700;
-    display: inline-block;
-    vertical-align: middle;
     margin: 0;
   }
   header p {
     font-size: 18px;
     opacity: 0.9;
-    margin: 24px 0;
+    margin: 16px 0 24px;
   }
   header button {
     padding: 14px 28px;
@@ -53,8 +51,8 @@
   /* --- Fun Fact --- */
   .fun-fact {
     max-width: 720px;
-    margin: -40px auto 60px;
-    padding: 40px 30px;
+    margin: -30px auto 50px;
+    padding: 30px 20px;
     text-align: center;
     background: linear-gradient(145deg, #2e1a4f, #7b61ff);
     border-radius: 25px;
@@ -70,24 +68,24 @@
   /* --- Stats Section --- */
   .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
     max-width: 1040px;
     margin: 40px auto;
-    padding: 0 20px;
+    padding: 0 16px;
   }
   .stat-card {
     background: #0f1116;
-    border-radius: 20px;
-    padding: 28px;
+    border-radius: 18px;
+    padding: 20px;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     transition: transform 0.3s;
   }
   .stat-card:hover { transform: translateY(-5px); }
-  .stat-card strong { display: block; font-size: 14px; color: #9aa0b4; margin-bottom: 10px; }
-  .stat-card p { font-size: 20px; margin-bottom: 14px; }
-  .currency-select { margin-top: 10px; padding: 7px 14px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; }
+  .stat-card strong { display: block; font-size: 13px; color: #9aa0b4; margin-bottom: 8px; }
+  .stat-card p { font-size: 18px; margin-bottom: 12px; }
+  .currency-select { margin-top: 8px; padding: 6px 12px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; }
 
   .cmc-card {
     background: linear-gradient(145deg, #2e1a4f, #7b61ff);
@@ -96,7 +94,7 @@
     border-radius: 20px;
   }
   .cmc-card p {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
     margin: 5px 0 0;
   }
@@ -104,29 +102,37 @@
   /* --- Donation Card --- */
   #zec-donation {
     text-align: center;
-    margin: 40px auto;
+    margin: 30px auto;
     max-width: 280px;
     background: #0f1116;
     border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
     color: #e6eef8;
   }
-  #zec-donation h3 { font-size:20px; color:#7b61ff; margin-bottom:16px; }
-  #zec-donation img { width:160px; height:160px; margin-bottom:12px; border-radius:12px; }
-  #zec-donation p { font-size:14px; word-break:break-all; margin-bottom:0; }
+  #zec-donation h3 { font-size:18px; color:#7b61ff; margin-bottom:14px; }
+  #zec-donation img { width:140px; height:140px; margin-bottom:10px; border-radius:12px; }
+  #zec-donation p { font-size:12px; word-break:break-all; margin-bottom:0; }
 
   /* --- Footer --- */
-  footer { text-align: center; padding: 20px 20px 60px; font-size: 12px; color: #9aa0b4; }
+  footer { text-align: center; padding: 20px 20px 50px; font-size: 12px; color: #9aa0b4; }
   footer a { color: #7b61ff; text-decoration: none; }
   footer a:hover { text-decoration: underline; }
   .disclaimer { font-size: 10px; opacity: 0.7; margin-top: 12px; }
 
+  /* --- Mobile --- */
   @media(max-width: 600px){
-    header h1 { font-size: 32px; }
-    header p { font-size: 16px; }
-    .fun-fact p { font-size: 20px; }
-    .cmc-card p { font-size: 20px; }
+    header img.logo { height: 160px; }
+    header h1 { font-size: 28px; }
+    header p { font-size: 15px; }
+    header button { font-size: 14px; padding: 10px 20px; }
+    .fun-fact { padding: 20px; }
+    .fun-fact p { font-size: 18px; }
+    .stat-card p { font-size: 16px; }
+    .cmc-card p { font-size: 18px; }
+    #zec-donation { max-width: 220px; padding: 14px; }
+    #zec-donation img { width:120px; height:120px; }
+    #zec-donation p { font-size:11px; }
   }
 </style>
 </head>
@@ -148,7 +154,7 @@
 <section class="stats">
   <div class="stat-card">
     <strong>Live ZEC Price</strong>
-    <p id="price">Loading…</p>
+    <p id="price">Fetching…</p>
     <select id="currency" class="currency-select" onchange="fetchPriceAndHypothetical()">
       <option value="usd" selected>USD</option>
       <option value="eur">EUR</option>
@@ -165,7 +171,7 @@
 
   <div class="stat-card">
     <strong>Hypothetical ZEC Price at BTC Market Cap</strong>
-    <p id="hypoPrice">Loading…</p>
+    <p id="hypoPrice">Fetching…</p>
   </div>
 
   <div class="stat-card cmc-card">
@@ -182,7 +188,7 @@
 
 <footer>
   Sources: 
-  <a href="https://forum.zcashcommunity.com/t/zashi-swaps-decentralized-on-ramp-is-live/52297" target="_blank">Zcash Community Forum</a>, 
+  <a href="https://forum.zcashcommunity.com/t/zashi-swaps-decentralized-on-ramp-is-live/52297" target="_blank">Zcash Forum</a>, 
   <a href="https://electriccoin.co/blog/private-cross-chain-payments-with-zashi-crosspay/" target="_blank">Electric Coin Company</a>, 
   <a href="https://apps.apple.com/ie/app/zashi-zcash-wallet/id1672392439" target="_blank">Zashi Wallet (App Store)</a>, 
   <a href="https://www.zcashcommunity.com/wallets/" target="_blank">Zcash Wallets</a>, 
@@ -196,18 +202,9 @@
 <script>
 const facts = [
   'Zcash was the first cryptocurrency to implement zk-SNARKs.',
-  'The ZEC ticker is used on exchanges for Zcash.',
-  'Zcash has a fixed supply of 21 million coins, like Bitcoin.',
   'Zcash launched in 2016 as a privacy-focused cryptocurrency.',
-  'Zcash allows both transparent and shielded transactions.',
-  'Zcash uses Equihash as its proof-of-work algorithm.',
-  'The Zcash network halving occurs roughly every 4 years.',
-  'Zcash has a decentralized governance model.',
-  'The shielded pool allows completely private transactions.',
-  'Zcash is open-source and community-driven.',
-  'Zcash wallets include desktop, mobile, and hardware support.',
-  'Zashi Wallet 2.4 supports decentralized crypto-to-ZEC swaps in-app.',
-  'Zashi CrossPay enables shielded ZEC payments to NEAR-supported cryptocurrencies.',
+  'Zashi Wallet now supports decentralized BTC/USDC swaps into ZEC.',
+  'Zashi CrossPay enables shielded ZEC payments across chains.',
   'Mobile wallets: Zashi, Gem Wallet, Zingo, Ywallet, Unstoppable, Edge.',
   'Desktop wallets: Exodus, Atomic Wallet, Zcash Full Node (Zcashd).',
   'Hardware wallets: Keystone, Ledger, Trezor, NGRAVE ZERO.'
@@ -228,45 +225,53 @@ function showNextFact() {
 }
 
 async function fetchPriceAndHypothetical(){
-  const currency = document.getElementById('currency').value;
-  try{
+  const currency = document.getElementById('currency').value.toLowerCase();
+  document.getElementById('price').innerText = 'Fetching…';
+  document.getElementById('hypoPrice').innerText = 'Fetching…';
+
+  try {
     const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=zcash,bitcoin&vs_currencies=${currency}&include_market_cap=true`);
     const data = await res.json();
 
-    if(data.zcash && data.zcash[currency] !== undefined){
-      let symbol = currency==='usd'?'$':currency.toUpperCase()+' ';
-      document.getElementById('price').innerText = symbol + data.zcash[currency].toLocaleString(undefined,{maximumFractionDigits:2});
-    } else { document.getElementById('price').innerText = 'Error'; }
+    const zecPrice = data?.zcash?.[currency];
+    document.getElementById('price').innerText = (zecPrice !== undefined) ? 
+      (currency==='usd'?'$':currency.toUpperCase()+' ') + zecPrice.toLocaleString(undefined,{maximumFractionDigits:2}) 
+      : 'Fetching…';
 
-    if(data.bitcoin && data.bitcoin[`${currency}_market_cap`] !== undefined){
-      const btcCap = data.bitcoin[`${currency}_market_cap`];
+    const btcCap = data?.bitcoin?.[`${currency}_market_cap`];
+    if(btcCap){
       const zecSupply = 16328269;
       const hypoPrice = btcCap / zecSupply;
       document.getElementById('hypoPrice').innerText = hypoPrice.toLocaleString(undefined,{maximumFractionDigits:2}) + ' ' + currency.toUpperCase();
-    } else { document.getElementById('hypoPrice').innerText = 'Error'; }
+    } else {
+      document.getElementById('hypoPrice').innerText = 'Fetching…';
+    }
+
   } catch(e){
-    document.getElementById('price').innerText = 'Error';
-    document.getElementById('hypoPrice').innerText = 'Error';
+    document.getElementById('price').innerText = 'Fetching…';
+    document.getElementById('hypoPrice').innerText = 'Fetching…';
   }
 }
 
-// Halving Countdown
 const halvingDate = new Date('2028-11-18T00:00:00Z');
 function updateCountdown(){
   const now = new Date();
   const diff = halvingDate - now;
-  if(diff<=0){ document.getElementById('halving').innerText='Halving occurred'; return; }
-  const d = Math.floor(diff/(1000*60*60*24));
-  const h = Math.floor((diff/(1000*60*60))%24);
-  const m = Math.floor((diff/(1000*60))%60);
-  const s = Math.floor((diff/1000)%60);
-  document.getElementById('halving').innerText=`${d}d ${h}h ${m}m ${s}s`;
+  if(diff <= 0){
+    document.getElementById('halving').innerText = 'Halving occurred';
+    return;
+  }
+  const d = Math.floor(diff / (1000*60*60*24));
+  const h = Math.floor((diff / (1000*60*60)) % 24);
+  const m = Math.floor((diff / (1000*60)) % 60);
+  const s = Math.floor((diff / 1000) % 60);
+  document.getElementById('halving').innerText = `${d}d ${h}h ${m}m ${s}s`;
 }
 
 fetchPriceAndHypothetical();
-setInterval(fetchPriceAndHypothetical,60000);
+setInterval(fetchPriceAndHypothetical, 60000);
 updateCountdown();
-setInterval(updateCountdown,1000);
+setInterval(updateCountdown, 1000);
 </script>
 
 </body>
