@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zcash is ZECtastic</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0b0b10; color: #e6eef8; line-height: 1.6; }
+
+  /* --- Hero Section --- */
+  header { background: linear-gradient(135deg, #7b61ff, #2dd4bf); text-align: center; padding: 100px 20px 60px; }
+  header h1 { font-size: 48px; font-weight: 700; margin-bottom: 16px; }
+  header p { font-size: 20px; opacity: 0.9; margin-bottom: 24px; }
+  header button { padding: 14px 28px; font-size: 16px; border: none; border-radius: 8px; background: #0b0b10; color: #fff; cursor: pointer; transition: 0.3s; }
+  header button:hover { background: #1a1c26; }
+  header img { max-width: 100px; margin-bottom: 20px; }
+
+  /* --- Fun Fact Section --- */
+  .fun-fact { max-width: 700px; margin: -40px auto 60px; padding: 40px 20px; text-align: center; background: linear-gradient(145deg, #2e1a4f, #7b61ff); border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transition: transform 0.2s; }
+  .fun-fact:hover { transform: translateY(-4px); }
+  .fun-fact p { font-size: 24px; font-weight: 500; }
+
+  /* --- Live Data Section --- */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+  .stat-card { background: #0f1116; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: 0.3s; }
+  .stat-card:hover { transform: translateY(-4px); }
+  .stat-card strong { display: block; font-size: 14px; color: #9aa0b4; margin-bottom: 8px; }
+  .stat-card p { font-size: 20px; margin-bottom: 12px; }
+  .currency-select { margin-top: 8px; padding: 6px 12px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; }
+
+  /* CoinMarketCap Gradient Card - smaller size */
+  .cmc-card { background: linear-gradient(135deg, #f7931a, #ffcd00); color: #0b0b10; padding: 16px; }
+
+  /* --- Donation Card --- */
+  #zec-donation {
+    text-align: center;
+    margin: 40px auto;
+    max-width: 320px;
+    background: #0f1116;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    color: #e6eef8;
+  }
+  #zec-donation h3 { color:#7b61ff; margin-bottom:16px; font-size:20px; }
+  #zec-donation p { font-size:14px; word-break:break-all; margin-bottom:0; }
+  #zec-donation img { width:200px; height:200px; margin-bottom:12px; border-radius:12px; }
+
+  /* --- Footer --- */
+  footer { text-align: center; padding: 20px 20px 60px; font-size: 12px; color: #9aa0b4; }
+  footer a { color: #7b61ff; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .disclaimer { font-size: 10px; opacity: 0.7; margin-top: 12px; }
+
+  @media(max-width: 600px){ header h1 { font-size: 32px; } header p { font-size: 16px; } .fun-fact p { font-size: 20px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="https://www.logo.wine/a/logo/Zcash/Zcash-Logo.wine.svg" alt="Zcash Logo">
+  <h1>Zcash is ZECtastic</h1>
+  <p>Explore the world of Zcash, one fact at a time.</p>
+  <button onclick="showNextFact()">Discover Fun Fact</button>
+</header>
+
+<section class="fun-fact" id="fun-fact-section">
+  <p id="fun-fact-text">Loading fun fact…</p>
+</section>
+
+<section class="stats">
+  <div class="stat-card">
+    <strong>Live ZEC Price</strong>
+    <p id="price">Loading…</p>
+    <select id="currency" class="currency-select" onchange="fetchPriceAndHypothetical()">
+      <option value="usd" selected>USD</option>
+      <option value="eur">EUR</option>
+      <option value="gbp">GBP</option>
+      <option value="btc">BTC</option>
+      <option value="eth">ETH</option>
+    </select>
+    <canvas id="priceChart" height="80"></canvas>
+  </div>
+
+  <div class="stat-card">
+    <strong>Next Halving</strong>
+    <p id="halving">Calculating…</p>
+  </div>
+
+  <div class="stat-card">
+    <strong>Hypothetical ZEC Price at BTC Market Cap</strong>
+    <p id="hypoPrice">Loading…</p>
+  </div>
+
+  <div class="stat-card cmc-card">
+    <strong>CoinMarketCap Rank</strong>
+    <p><a href="https://coinmarketcap.com/currencies/zcash/" target="_blank">#49</a></p>
+  </div>
+</section>
+
+<!-- --- Donation Card --- -->
+<section id="zec-donation">
+  <h3>Support with Zcash</h3>
+  <img src="zec_qrcode.png" alt="Donate Zcash QR">
+  <p>u1pxtmfpy6zw0kklrlagy06t5jj73e8etm9mgpzy85unn3zx58putaa990n5al46299dxj8uvpt34yrs2zcdrc76edsw5dqu3w3kdmellf5lzgwx5px5kaltx3xhyshmttaqjph3fkcntz5335vh94rxv4a32r75g4wt4lgnne7yl736rt</p>
+</section>
+
+<footer>
+  Sources: 
+  <a href="https://forum.zcashcommunity.com/t/zashi-swaps-decentralized-on-ramp-is-live/52297" target="_blank">Zcash Community Forum</a>, 
+  <a href="https://electriccoin.co/blog/private-cross-chain-payments-with-zashi-crosspay/" target="_blank">Electric Coin Company</a>, 
+  <a href="https://apps.apple.com/ie/app/zashi-zcash-wallet/id1672392439" target="_blank">Zashi Wallet (App Store)</a>, 
+  <a href="https://www.ainvest.com/news/zcash-rally-potential-overheating-risks-post-naval-ravikant-endorsement-era-2510/" target="_blank">Market News</a>, 
+  <a href="https://www.zcashcommunity.com/wallets/" target="_blank">Zcash Wallets</a>, 
+  <a href="https://www.coingecko.com/en/coins/zcash" target="_blank">CoinGecko</a>, 
+  <a href="https://z.cash" target="_blank">Zcash Official</a>
+  <div class="disclaimer">
+    This website is a non-official product and for informational purposes only. Designed by <a href="https://twitter.com/BTCTurtle" target="_blank">@BTCTurtle</a>.
+  </div>
+</footer>
+
+<script>
+// --- Fun Facts ---
+const facts = [
+  'Zcash was the first cryptocurrency to implement zk-SNARKs.',
+  'The ZEC ticker is used on exchanges for Zcash.',
+  'Zcash has a fixed supply of 21 million coins, like Bitcoin.',
+  'Zcash launched in 2016 as a privacy-focused cryptocurrency.',
+  'Zcash allows both transparent and shielded transactions.',
+  'Zcash uses Equihash as its proof-of-work algorithm.',
+  'The Zcash network halving occurs roughly every 4 years.',
+  'Zcash has a decentralized governance model.',
+  'The shielded pool allows completely private transactions.',
+  'Zcash is open-source and community-driven.',
+  'Zcash codebase is written in C++ and Rust.',
+  'Zcash improves privacy without compromising security.',
+  'Zcash has an active developer community on GitHub.',
+  'Zcash wallets include desktop, mobile, and hardware support.',
+  'Zcash has inspired multiple privacy-focused projects.',
+  'Zashi Wallet 2.4 now supports decentralized crypto-to-ZEC swaps, allowing BTC and USDC to ZEC conversion directly in-app.',
+  'Zashi CrossPay enables shielded ZEC payments to NEAR-supported cryptocurrencies, expanding privacy across chains.',
+  'Zashi integrated with Flexa, allowing instant ZEC spending at thousands of merchant locations.',
+  'In late 2025, Zcash experienced a price surge of 135-240%, driven by privacy demand and institutional adoption.',
+  'Zcash is used for financial inclusion, cross-border payments, and DeFi, providing real-world privacy-focused applications.',
+  'Mobile wallets: Zashi, Gem Wallet, Zingo, Ywallet, Unstoppable, Edge — all support shielded ZEC transactions.',
+  'Desktop wallets: Exodus, Atomic Wallet, Zcash Full Node (Zcashd) for advanced users with full node setup.',
+  'Hardware wallets: Keystone, Ledger, Trezor, NGRAVE ZERO — secure offline ZEC storage.',
+  'Zashi auto-shields transactions, supports memos, and provides a non-custodial user-friendly Zcash experience.',
+  'Gem Wallet focuses on privacy and anonymity for mobile Zcash users.',
+  'Exodus offers multi-currency support with an intuitive desktop interface including Zcash.',
+  'Keystone, Ledger and Trezor provide robust hardware security for shielded ZEC holdings.',
+  'NGRAVE ZERO ensures maximum security for offline Zcash storage.'
+
+];
+
+let currentFactIndex = Math.floor(Math.random() * facts.length);
+const funFactText = document.getElementById('fun-fact-text');
+
+function showNextFact(){
+  let nextIndex;
+  do { nextIndex = Math.floor(Math.random() * facts.length); } while(nextIndex === currentFactIndex);
+  currentFactIndex = nextIndex;
+  funFactText.innerText = facts[currentFactIndex];
+}
+
+showNextFact();
+
+// --- Price Chart & Live Data ---
+let chart;
+const priceHistory = [];
+const maxPoints = 20;
+
+function formatNumber(num){
+  return num.toLocaleString(undefined, {maximumFractionDigits:2});
+}
+
+async function fetchPriceAndHypothetical(){
+  const currency = document.getElementById('currency').value;
+  try{
+    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=zcash,bitcoin&vs_currencies=${currency}&include_market_cap=true`);
+    const data = await res.json();
+
+    if(data.zcash && data.zcash[currency] !== undefined){
+      let symbol = currency==='usd'?'$':currency.toUpperCase()+' ';
+      document.getElementById('price').innerText = symbol + data.zcash[currency];
+
+      if(priceHistory.length>=maxPoints) priceHistory.shift();
+      priceHistory.push(data.zcash[currency]);
+      updateChart();
+    }
+
+    if(data.bitcoin && data.bitcoin[`${currency}_market_cap`] !== undefined){
+      const btcCap = data.bitcoin[`${currency}_market_cap`];
+      const zecSupply = 16328269;
+      const hypoPrice = btcCap / zecSupply;
+      document.getElementById('hypoPrice').innerText = formatNumber(hypoPrice) + ' ' + currency.toUpperCase();
+    }
+
+  } catch(e){
+    document.getElementById('price').innerText = 'Error';
+    document.getElementById('hypoPrice').innerText = 'Error';
+  }
+}
+
+function updateChart(){
+  if(!chart){
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type:'line',
+      data:{ labels: priceHistory.map((_,i)=>i+1), datasets:[{ data: priceHistory, borderColor:'#7b61ff', backgroundColor:'rgba(123,97,255,0.2)', tension:0.3 }] },
+      options:{ responsive:true, animation:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{beginAtZero:false}}}
+    });
+  } else {
+    chart.data.datasets[0].data = priceHistory;
+    chart.data.labels = priceHistory.map((_,i)=>i+1);
+    chart.update();
+  }
+}
+
+// Halving Countdown
+const halvingDate = new Date('2028-11-18T00:00:00Z');
+function updateCountdown(){
+  const now = new Date();
+  const diff = halvingDate - now;
+  if(diff<=0){ document.getElementById('halving').innerText='Halving occurred'; return; }
+  const d = Math.floor(diff/(1000*60*60*24));
+  const h = Math.floor((diff/(1000*60*60))%24);
+  const m = Math.floor((diff/(1000*60))%60);
+  const s = Math.floor((diff/1000)%60);
+  document.getElementById('halving').innerText=`${d}d ${h}h ${m}m ${s}s`;
+}
+
+fetchPriceAndHypothetical();
+setInterval(fetchPriceAndHypothetical,60000);
+updateCountdown();
+setInterval(updateCountdown,1000);
+</script>
+
+</body>
+</html>
