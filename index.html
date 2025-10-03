@@ -8,146 +8,105 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Inter', sans-serif; background: #0b0b10; color: #e6eef8; line-height: 1.6; }
 
-  /* --- Header --- */
-  header {
-    background: linear-gradient(135deg, #7b61ff, #2dd4bf);
-    text-align: center;
-    padding: 50px 20px 50px;
+  /* --- Hero Section --- */
+  header { 
+    background: linear-gradient(135deg, #7b61ff, #2dd4bf); 
+    text-align: center; 
+    padding: 80px 20px 60px; 
   }
-  .header-container {
+  .logo-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
+    gap: 10px; /* minder ruimte */
   }
-  header img.logo {
-    height: 220px;
-    width: auto;
-    vertical-align: middle;
+  header img { 
+    max-width: 220px; /* groter logo */
+    height: auto;
   }
-  header h1 {
-    font-size: 48px;
-    font-weight: 700;
-    margin: 0;
+  header h1 { 
+    font-size: 40px; /* iets kleiner dan eerst */
+    font-weight: 700; 
   }
-  header p {
-    font-size: 18px;
-    opacity: 0.9;
-    margin: 16px 0 24px;
-  }
-  header button {
-    padding: 14px 28px;
-    font-size: 16px;
-    border: none;
-    border-radius: 10px;
-    background: #0b0b10;
-    color: #fff;
-    cursor: pointer;
-    transition: 0.3s;
+  header p { font-size: 20px; opacity: 0.9; margin: 16px 0 24px; }
+  header button { 
+    padding: 14px 28px; font-size: 16px; border: none; border-radius: 8px; 
+    background: #0b0b10; color: #fff; cursor: pointer; transition: 0.3s; 
   }
   header button:hover { background: #1a1c26; }
 
-  /* --- Fun Fact --- */
-  .fun-fact {
-    max-width: 720px;
-    margin: -30px auto 50px;
-    padding: 30px 20px;
-    text-align: center;
-    background: linear-gradient(145deg, #2e1a4f, #7b61ff);
-    border-radius: 25px;
-    box-shadow: 0 12px 36px rgba(0,0,0,0.45);
+  /* --- Fun Fact Section --- */
+  .fun-fact { 
+    max-width: 700px; margin: -40px auto 60px; padding: 40px 20px; 
+    text-align: center; background: linear-gradient(145deg, #2e1a4f, #7b61ff); 
+    border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); 
+    transition: transform 0.2s; 
   }
-  .fun-fact p {
-    font-size: 24px;
-    font-weight: 500;
-    transition: opacity 0.5s ease;
-    opacity: 1;
-  }
+  .fun-fact:hover { transform: translateY(-4px); }
+  .fun-fact p { font-size: 24px; font-weight: 500; transition: opacity 0.3s; }
 
-  /* --- Stats Section --- */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-    max-width: 1040px;
-    margin: 40px auto;
-    padding: 0 16px;
+  /* --- Live Data Section --- */
+  .stats { 
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+    gap: 24px; max-width: 1000px; margin: 40px auto; padding: 0 20px; 
   }
-  .stat-card {
-    background: #0f1116;
-    border-radius: 18px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    transition: transform 0.3s;
+  .stat-card { 
+    background: #0f1116; border-radius: 16px; padding: 24px; text-align: center; 
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: 0.3s; 
   }
-  .stat-card:hover { transform: translateY(-5px); }
-  .stat-card strong { display: block; font-size: 13px; color: #9aa0b4; margin-bottom: 8px; }
-  .stat-card p { font-size: 18px; margin-bottom: 12px; }
+  .stat-card:hover { transform: translateY(-4px); }
+  .stat-card strong { display: block; font-size: 14px; color: #9aa0b4; margin-bottom: 8px; }
+  .stat-card p { font-size: 20px; margin-bottom: 12px; }
   .currency-select { margin-top: 8px; padding: 6px 12px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; }
 
-  .cmc-card {
-    background: linear-gradient(145deg, #2e1a4f, #7b61ff);
-    color: #e6eef8;
-    padding: 10px;
-    border-radius: 20px;
-  }
-  .cmc-card p {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 5px 0 0;
+  /* CoinMarketCap Card */
+  .cmc-card { 
+    background: linear-gradient(145deg, #2e1a4f, #7b61ff); 
+    color: #e6eef8; 
+    padding: 12px; 
+    font-size: 18px;
   }
 
   /* --- Donation Card --- */
   #zec-donation {
     text-align: center;
-    margin: 30px auto;
-    max-width: 280px;
+    margin: 40px auto;
+    max-width: 320px;
     background: #0f1116;
-    border-radius: 18px;
-    padding: 18px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
     color: #e6eef8;
   }
-  #zec-donation h3 { font-size:18px; color:#7b61ff; margin-bottom:14px; }
-  #zec-donation img { width:140px; height:140px; margin-bottom:10px; border-radius:12px; }
-  #zec-donation p { font-size:12px; word-break:break-all; margin-bottom:0; }
+  #zec-donation h3 { color:#7b61ff; margin-bottom:16px; font-size:20px; }
+  #zec-donation p { font-size:14px; word-break:break-all; margin-bottom:0; }
+  #zec-donation img { width:200px; height:200px; margin-bottom:12px; border-radius:12px; }
 
   /* --- Footer --- */
-  footer { text-align: center; padding: 20px 20px 50px; font-size: 12px; color: #9aa0b4; }
+  footer { text-align: center; padding: 20px 20px 60px; font-size: 12px; color: #9aa0b4; }
   footer a { color: #7b61ff; text-decoration: none; }
   footer a:hover { text-decoration: underline; }
   .disclaimer { font-size: 10px; opacity: 0.7; margin-top: 12px; }
 
-  /* --- Mobile --- */
-  @media(max-width: 600px){
-    header img.logo { height: 160px; }
-    header h1 { font-size: 28px; }
-    header p { font-size: 15px; }
-    header button { font-size: 14px; padding: 10px 20px; }
-    .fun-fact { padding: 20px; }
-    .fun-fact p { font-size: 18px; }
-    .stat-card p { font-size: 16px; }
-    .cmc-card p { font-size: 18px; }
-    #zec-donation { max-width: 220px; padding: 14px; }
-    #zec-donation img { width:120px; height:120px; }
-    #zec-donation p { font-size:11px; }
+  @media(max-width: 600px){ 
+    header h1 { font-size: 28px; } 
+    header p { font-size: 16px; } 
+    .fun-fact p { font-size: 20px; } 
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-container">
-    <img src="https://www.logo.wine/a/logo/Zcash/Zcash-Logo.wine.svg" alt="Zcash Logo" class="logo">
+  <div class="logo-title">
+    <img src="https://www.logo.wine/a/logo/Zcash/Zcash-Logo.wine.svg" alt="Zcash Logo">
     <h1>is ZECtastic</h1>
   </div>
   <p>Explore the world of Zcash, one fact at a time.</p>
   <button onclick="showNextFact()">Discover Fun Fact</button>
 </header>
 
-<section class="fun-fact">
+<section class="fun-fact" id="fun-fact-section">
   <p id="fun-fact-text">Click the button above for some ZECtastic facts…</p>
 </section>
 
@@ -188,10 +147,9 @@
 
 <footer>
   Sources: 
-  <a href="https://forum.zcashcommunity.com/t/zashi-swaps-decentralized-on-ramp-is-live/52297" target="_blank">Zcash Forum</a>, 
-  <a href="https://electriccoin.co/blog/private-cross-chain-payments-with-zashi-crosspay/" target="_blank">Electric Coin Company</a>, 
-  <a href="https://apps.apple.com/ie/app/zashi-zcash-wallet/id1672392439" target="_blank">Zashi Wallet (App Store)</a>, 
-  <a href="https://www.zcashcommunity.com/wallets/" target="_blank">Zcash Wallets</a>, 
+  <a href="https://forum.zcashcommunity.com/" target="_blank">Zcash Forum</a>, 
+  <a href="https://electriccoin.co/blog/" target="_blank">Electric Coin Co</a>, 
+  <a href="https://www.zcashcommunity.com/wallets/" target="_blank">Wallets</a>, 
   <a href="https://www.coingecko.com/en/coins/zcash" target="_blank">CoinGecko</a>, 
   <a href="https://z.cash" target="_blank">Zcash Official</a>
   <div class="disclaimer">
@@ -200,59 +158,67 @@
 </footer>
 
 <script>
+// --- Fun Facts ---
 const facts = [
   'Zcash was the first cryptocurrency to implement zk-SNARKs.',
+  'Zcash has a fixed supply of 21 million coins, like Bitcoin.',
   'Zcash launched in 2016 as a privacy-focused cryptocurrency.',
-  'Zashi Wallet now supports decentralized BTC/USDC swaps into ZEC.',
+  'Zcash allows both transparent and shielded transactions.',
+  'Zashi Wallet 2.4 supports decentralized BTC/USDC → ZEC swaps.',
   'Zashi CrossPay enables shielded ZEC payments across chains.',
-  'Mobile wallets: Zashi, Gem Wallet, Zingo, Ywallet, Unstoppable, Edge.',
-  'Desktop wallets: Exodus, Atomic Wallet, Zcash Full Node (Zcashd).',
+  'Mobile wallets: Zashi, Gem Wallet, Zingo, Ywallet, Edge.',
+  'Desktop wallets: Exodus, Atomic Wallet, Zcash Full Node.',
   'Hardware wallets: Keystone, Ledger, Trezor, NGRAVE ZERO.'
 ];
-
 let currentFactIndex = null;
 const funFactText = document.getElementById('fun-fact-text');
-
-function showNextFact() {
+function showNextFact(){
   funFactText.style.opacity = 0;
-  setTimeout(() => {
+  setTimeout(()=>{
     let nextIndex;
     do { nextIndex = Math.floor(Math.random() * facts.length); } while(nextIndex === currentFactIndex);
     currentFactIndex = nextIndex;
     funFactText.innerText = facts[currentFactIndex];
     funFactText.style.opacity = 1;
-  }, 250);
+  },250);
 }
 
+// --- Live Price & Hypothetical BTC Market Cap ---
 async function fetchPriceAndHypothetical(){
   const currency = document.getElementById('currency').value.toLowerCase();
   document.getElementById('price').innerText = 'Fetching…';
   document.getElementById('hypoPrice').innerText = 'Fetching…';
-
-  try {
+  try{
     const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=zcash,bitcoin&vs_currencies=${currency}&include_market_cap=true`);
     const data = await res.json();
 
-    const zecPrice = data?.zcash?.[currency];
-    document.getElementById('price').innerText = (zecPrice !== undefined) ? 
-      (currency==='usd'?'$':currency.toUpperCase()+' ') + zecPrice.toLocaleString(undefined,{maximumFractionDigits:2}) 
-      : 'Fetching…';
+    // ZEC price
+    let zecPrice = data?.zcash?.[currency];
+    if(zecPrice !== undefined){
+      let formatted;
+      if(currency === 'btc' || currency === 'eth'){
+        formatted = zecPrice.toFixed(8) + ' ' + currency.toUpperCase();
+      } else {
+        const symbol = (currency==='usd'?'$':currency.toUpperCase()+' ');
+        formatted = symbol + zecPrice.toLocaleString(undefined,{maximumFractionDigits:2});
+      }
+      document.getElementById('price').innerText = formatted;
+    }
 
+    // Hypothetical price at BTC market cap
     const btcCap = data?.bitcoin?.[`${currency}_market_cap`];
     if(btcCap){
       const zecSupply = 16328269;
       const hypoPrice = btcCap / zecSupply;
       document.getElementById('hypoPrice').innerText = hypoPrice.toLocaleString(undefined,{maximumFractionDigits:2}) + ' ' + currency.toUpperCase();
-    } else {
-      document.getElementById('hypoPrice').innerText = 'Fetching…';
     }
-
-  } catch(e){
+  }catch(e){
     document.getElementById('price').innerText = 'Fetching…';
     document.getElementById('hypoPrice').innerText = 'Fetching…';
   }
 }
 
+// Halving countdown
 const halvingDate = new Date('2028-11-18T00:00:00Z');
 function updateCountdown(){
   const now = new Date();
@@ -261,17 +227,17 @@ function updateCountdown(){
     document.getElementById('halving').innerText = 'Halving occurred';
     return;
   }
-  const d = Math.floor(diff / (1000*60*60*24));
-  const h = Math.floor((diff / (1000*60*60)) % 24);
-  const m = Math.floor((diff / (1000*60)) % 60);
-  const s = Math.floor((diff / 1000) % 60);
-  document.getElementById('halving').innerText = `${d}d ${h}h ${m}m ${s}s`;
+  const d = Math.floor(diff/(1000*60*60*24));
+  const h = Math.floor((diff/(1000*60*60))%24);
+  const m = Math.floor((diff/(1000*60))%60);
+  const s = Math.floor((diff/1000)%60);
+  document.getElementById('halving').innerText=`${d}d ${h}h ${m}m ${s}s`;
 }
 
 fetchPriceAndHypothetical();
-setInterval(fetchPriceAndHypothetical, 60000);
+setInterval(fetchPriceAndHypothetical,60000);
 updateCountdown();
-setInterval(updateCountdown, 1000);
+setInterval(updateCountdown,1000);
 </script>
 
 </body>
