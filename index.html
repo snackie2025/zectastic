@@ -6,14 +6,10 @@
 <title>Zcash is ZECtastic</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: #0b0b10; color: #e6eef8; line-height: 1.6; }
+  body { font-family: 'Inter', sans-serif; background: #0b0b10; color: #e6eef8; line-height: 1.6; overflow-x: hidden; }
 
-  /* --- Hero Section --- */
-  header { 
-    background: linear-gradient(135deg, #7b61ff, #2dd4bf); 
-    text-align: center; 
-    padding: 80px 20px 60px; 
-  }
+  /* Hero Section */
+  header { background: linear-gradient(135deg, #7b61ff, #2dd4bf); text-align: center; padding: 80px 20px 60px; }
   .logo-title { display: flex; align-items: center; justify-content: center; gap: 10px; }
   header img { max-width: 220px; height: auto; }
   header h1 { font-size: 40px; font-weight: 700; }
@@ -21,25 +17,14 @@
   header button { padding: 14px 28px; font-size: 16px; border: none; border-radius: 8px; background: #0b0b10; color: #fff; cursor: pointer; transition: 0.3s; }
   header button:hover { background: #1a1c26; }
 
-  /* --- Fun Fact Section --- */
-  .fun-fact { 
-    max-width: 700px; margin: -40px auto 60px; padding: 40px 20px; 
-    text-align: center; background: linear-gradient(145deg, #2e1a4f, #7b61ff); 
-    border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); 
-    transition: transform 0.2s; 
-  }
+  /* Fun Fact Section */
+  .fun-fact { max-width: 700px; margin: -40px auto 60px; padding: 40px 20px; text-align: center; background: linear-gradient(145deg, #2e1a4f, #7b61ff); border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transition: transform 0.2s; }
   .fun-fact:hover { transform: translateY(-4px); }
   .fun-fact p { font-size: 24px; font-weight: 500; transition: opacity 0.3s; }
 
-  /* --- Live Data Section --- */
-  .stats { 
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
-    gap: 24px; max-width: 1000px; margin: 40px auto; padding: 0 20px; 
-  }
-  .stat-card { 
-    background: #0f1116; border-radius: 16px; padding: 24px; text-align: center; 
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: 0.3s; 
-  }
+  /* Stats Section */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+  .stat-card { background: #0f1116; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: 0.3s; }
   .stat-card:hover { transform: translateY(-4px); }
   .stat-card strong { display: block; font-size: 14px; color: #9aa0b4; margin-bottom: 8px; }
   .stat-card p { font-size: 20px; margin-bottom: 12px; }
@@ -47,55 +32,30 @@
 
   .cmc-card { background: linear-gradient(145deg, #2e1a4f, #7b61ff); color: #e6eef8; padding: 12px; font-size: 18px; }
 
-  /* --- Donation Card --- */
-  #zec-donation {
-    text-align: center; margin: 40px auto; max-width: 320px;
-    background: #0f1116; border-radius: 16px; padding: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); color: #e6eef8;
-  }
+  /* Donation Card */
+  #zec-donation { text-align: center; margin: 40px auto; max-width: 320px; background: #0f1116; border-radius: 16px; padding: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); color: #e6eef8; }
   #zec-donation h3 { color:#7b61ff; margin-bottom:16px; font-size:20px; }
   #zec-donation p { font-size:14px; word-break:break-all; margin-bottom:0; }
   #zec-donation img { width:200px; height:200px; margin-bottom:12px; border-radius:12px; }
 
-  /* --- Memory Game --- */
+  /* Memory Game */
   #memory-game { max-width: 500px; margin: 60px auto; text-align: center; }
   #memory-game h2 { color:#7b61ff; margin-bottom:20px; }
-  #game-board {
-    display: grid;
-    grid-template-columns: repeat(4, 100px);
-    grid-auto-rows: 100px;
-    gap: 12px;
-    justify-content: center;
-  }
-  #game-board .card {
-    width: 100px;
-    height: 100px;
-    perspective: 600px;
-    cursor: pointer;
-  }
-  #game-board .card-inner {
-    width: 100%;
-    height: 100%;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    border-radius: 12px;
-    position: relative; /* nu absoluut niet nodig voor flip */
-  }
-  #game-board .card.flipped .card-inner {
-    transform: rotateY(180deg);
-  }
-  .card-front, .card-back {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius: 12px;
-    backface-visibility: hidden;
-  }
+  #game-board { display: grid; grid-template-columns: repeat(4, 100px); grid-auto-rows: 100px; gap: 12px; justify-content: center; }
+  #game-board .card { width: 100px; height: 100px; perspective: 600px; cursor: pointer; }
+  #game-board .card-inner { width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; border-radius: 12px; position: relative; }
+  #game-board .card.flipped .card-inner { transform: rotateY(180deg); }
+  .card-front, .card-back { width: 100%; height: 100%; position: absolute; top: 0; left: 0; border-radius: 12px; backface-visibility: hidden; }
   .card-front { transform: rotateY(180deg); object-fit: cover; }
   .card-back { background: #7b61ff; }
 
-  /* --- Footer --- */
+  /* Launch Button & Overlays */
+  #launch-btn { position: fixed; bottom: 24px; right: 24px; padding: 14px 22px; border: none; border-radius: 50px; background: orange; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; z-index: 9999; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+  #rocket { position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%); font-size: 60px; z-index: 10000; pointer-events: none; transition: transform 2.5s ease-out; }
+  #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; }
+  #zec-price { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); font-size: 22px; font-weight: bold; color: #7b61ff; z-index: 10001; text-align: center; }
+
+  /* Footer */
   footer { text-align: center; padding: 20px 20px 60px; font-size: 12px; color: #9aa0b4; }
   footer a { color: #7b61ff; text-decoration: none; }
   footer a:hover { text-decoration: underline; }
@@ -147,9 +107,125 @@
   </div>
   <div class="stat-card cmc-card">
     <strong>CoinMarketCap Rank</strong>
-    <p><a href="https://coinmarketcap.com/currencies/zcash/" target="_blank">#49</a></p>
+    <p id="cmc-rank">Fetching…</p>
   </div>
 </section>
+
+<section class="stat-card" id="dca-calculator" style="max-width:700px;margin:40px auto;">
+  <strong>DCA Calculator (Historical Daily Buys)</strong>
+  <div style="margin-top:12px; text-align:center;">
+    <label>Days to Simulate:</label>
+    <input type="number" id="dca-days" value="365" min="1" max="500" step="1"
+      style="width:80px; padding:6px 10px; border-radius:6px; border:none; margin-right:10px;">
+    
+    <label>Daily Investment (USD):</label>
+    <input type="number" id="dca-amount" value="10" min="1" step="1"
+      style="width:80px; padding:6px 10px; border-radius:6px; border:none; margin-right:10px;">
+    
+    <button id="dca-btn"
+      style="padding:8px 16px;border:none;border-radius:6px;background:#7b61ff;color:#fff;cursor:pointer;">
+      Calculate
+    </button>
+  </div>
+
+  <p id="dca-status" style="margin-top:14px; text-align:center; color:#9aa0b4;"></p>
+
+  <table id="dca-table" style="width:100%;margin-top:20px;border-collapse:collapse;display:none;">
+    <thead>
+      <tr style="background:#1a1c26;color:#7b61ff;">
+        <th style="padding:10px;border-radius:6px 0 0 6px;">Metric</th>
+        <th style="padding:10px;border-radius:0 6px 6px 0;">Value</th>
+      </tr>
+    </thead>
+    <tbody id="dca-results" style="background:#0f1116;"></tbody>
+  </table>
+
+  <p style="text-align:center;margin-top:10px;font-size:12px;color:#9aa0b4;">
+    Data source: <a href="https://www.coingecko.com/en/coins/zcash" target="_blank" style="color:#7b61ff;">CoinGecko API</a>
+  </p>
+</section>
+
+<script>
+let lastDcaCall = 0;
+
+document.getElementById('dca-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('dca-btn');
+  const status = document.getElementById('dca-status');
+  const table = document.getElementById('dca-table');
+  const tbody = document.getElementById('dca-results');
+
+  const days = parseInt(document.getElementById('dca-days').value);
+  const daily = parseFloat(document.getElementById('dca-amount').value);
+  const cooldown = 6000; // 6 sec
+
+  const now = Date.now();
+  if (now - lastDcaCall < cooldown) {
+    const wait = ((cooldown - (now - lastDcaCall)) / 1000).toFixed(1);
+    status.innerText = `⏳ Wait ${wait}s before recalculating.`;
+    return;
+  }
+  lastDcaCall = now;
+
+  if (isNaN(days) || days <= 0) { status.innerText = '⚠️ Invalid days'; return; }
+  if (isNaN(daily) || daily <= 0) { status.innerText = '⚠️ Invalid daily amount'; return; }
+
+  btn.disabled = true;
+  btn.innerText = 'Calculating…';
+  status.innerText = '⏳ Fetching historical prices…';
+  table.style.display = 'none';
+  tbody.innerHTML = '';
+
+  try {
+    const today = Math.floor(Date.now() / 1000);
+    const from = today - days * 86400;
+
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/zcash/market_chart/range?vs_currency=usd&from=${from}&to=${today}`);
+    const data = await res.json();
+    const prices = data?.prices || [];
+    if (!prices.length) { status.innerText = '⚠️ No price data'; return; }
+
+    // one price per day
+    const dailyMap = {};
+    prices.forEach(([ts, price]) => {
+      const day = new Date(ts).toISOString().split('T')[0];
+      if (!dailyMap[day]) dailyMap[day] = price;
+    });
+    const dailyPrices = Object.values(dailyMap);
+
+    let totalInvested = 0, totalZEC = 0;
+    dailyPrices.forEach(p => { totalInvested += daily; totalZEC += daily / p; });
+
+    const currentRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd');
+    const currentData = await currentRes.json();
+    const currentPrice = currentData?.zcash?.usd || dailyPrices[dailyPrices.length-1];
+    const currentValue = totalZEC * currentPrice;
+    const profit = currentValue - totalInvested;
+    const roi = (profit / totalInvested) * 100;
+
+    tbody.innerHTML = `
+      <tr><td style="padding:10px;">Date Range</td><td style="padding:10px;">${days} days</td></tr>
+      <tr><td style="padding:10px;">Daily Investment</td><td style="padding:10px;">$${daily.toFixed(2)}</td></tr>
+      <tr><td style="padding:10px;">Total Invested</td><td style="padding:10px;">$${totalInvested.toFixed(2)}</td></tr>
+      <tr><td style="padding:10px;">Total ZEC Acquired</td><td style="padding:10px;">${totalZEC.toFixed(4)} ZEC</td></tr>
+      <tr><td style="padding:10px;">Current ZEC Price</td><td style="padding:10px;">$${currentPrice.toFixed(2)}</td></tr>
+      <tr><td style="padding:10px;">Current Portfolio Value</td><td style="padding:10px;">$${currentValue.toFixed(2)}</td></tr>
+      <tr><td style="padding:10px;">Profit / Loss</td><td style="padding:10px;color:${profit>=0?'#4ade80':'#f87171'};">$${profit.toFixed(2)} (${roi.toFixed(2)}%)</td></tr>
+    `;
+    table.style.display = 'table';
+    status.innerText = `✅ Calculated over ${dailyPrices.length} days.`;
+
+  } catch(e) {
+    console.error(e);
+    status.innerText = '❌ Error fetching data.';
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'Calculate';
+  }
+});
+</script>
+
+
+
 
 <section id="zec-donation">
   <h3>Support with Zcash</h3>
@@ -157,186 +233,13 @@
   <p>u1pxtmfpy6zw0kklrlagy06t5jj73e8etm9mgpzy85unn3zx58putaa990n5al46299dxj8uvpt34yrs2zcdrc76edsw5dqu3w3kdmellf5lzgwx5px5kaltx3xhyshmttaqjph3fkcntz5335vh94rxv4a32r75g4wt4lgnne7yl736rt</p>
 </section>
 
+<!-- Launch Button & overlays -->
+<button id="launch-btn">🚀 Launch ZEC</button>
+<div id="rocket">🚀</div>
+<canvas id="confetti"></canvas>
+<p id="zec-price"></p>
 
-<section class="calculator">
-  <h2>ZEC DCA Calculator</h2>
-  <div class="calc-inputs">
-    <input type="number" id="dailyAmount" placeholder="Daily Investment (USD)" value="10"/>
-    <input type="number" id="duration" placeholder="Duration" value="30"/>
-    <select id="durationUnit">
-      <option value="days" selected>Days</option>
-      <option value="months">Months</option>
-      <option value="years">Years</option>
-    </select>
-    <button onclick="calculateDCA()">Calculate</button>
-  </div>
-  <div class="results" id="results">
-    <div class="result-line"><strong>Total Invested:</strong> <span id="invested">–</span></div>
-    <div class="result-line"><strong>Total Zcash Stacked:</strong> <span id="stacked">–</span></div>
-    <div class="result-line"><strong>Total Value Today:</strong> <span id="valueToday">–</span></div>
-    <div class="result-line"><strong>DCA USD/ZEC:</strong> <span id="dcaValue">–</span></div>
-    <div class="note" id="note"></div>
-  </div>
-  <p class="credit">Data powered by <a href="https://www.coingecko.com/" target="_blank">CoinGecko</a></p>
-</section>
-
-<style>
-  .calculator {
-    max-width: 700px;
-    margin: 40px auto; /* centers the calculator */
-    padding: 24px;
-    background: #0f1116;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-    text-align: center; /* keep all elements centered */
-  }
-  .calc-inputs {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center; /* center inputs */
-  }
-  .calc-inputs input, .calc-inputs select {
-    flex: 1 1 120px; /* allow shrinking and growing, min width 120px */
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-  }
-  .calc-inputs button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background: #7b61ff;
-    color: #fff;
-    cursor: pointer;
-  }
-  .results {
-    margin-top: 20px;
-    text-align: left; /* keep table aligned neatly */
-  }
-  .result-line {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #222;
-  }
-  .result-line strong {
-    color: #9aa0b4;
-  }
-  .note {
-    font-size: 12px;
-    color: #9aa0b4;
-    margin-top: 8px;
-    text-align: center;
-  }
-  .credit {
-    font-size: 12px;
-    color: #9aa0b4;
-    text-align: center;
-    margin-top: 10px;
-  }
-  .credit a {
-    color: #7b61ff;
-    text-decoration: none;
-  }
-</style>
-
-<script>
-let lastFetchTime = 0;
-let cachedPrice = null;
-let isFetching = false;
-
-function getDays(duration, unit) {
-  if(unit === 'days') return duration;
-  if(unit === 'months') return duration * 30;
-  if(unit === 'years') return duration * 365;
-  return duration;
-}
-
-async function fetchDailyPrices(days){
-  const url = `https://api.coingecko.com/api/v3/coins/zcash/market_chart?vs_currency=usd&days=${days}&interval=daily`;
-  const res = await fetch(url);
-  if(!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
-  const data = await res.json();
-  if(!data.prices || data.prices.length === 0) throw new Error('No price data returned by API.');
-  let prices = data.prices.map(p => p[1]);
-  if(prices.length > days) prices = prices.slice(0, days); 
-  return prices;
-}
-
-async function fetchCurrentPrice(){
-  const now = Date.now();
-  if(cachedPrice && now - lastFetchTime < 60000) return cachedPrice;
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd`;
-  const res = await fetch(url);
-  if(!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
-  const data = await res.json();
-  cachedPrice = data.zcash.usd;
-  lastFetchTime = now;
-  return cachedPrice;
-}
-
-async function calculateDCA(){
-  if(isFetching) { alert("Please wait a moment before recalculating."); return; }
-  isFetching = true;
-  setTimeout(()=>{isFetching=false},3000);
-
-  const dailyAmount = parseFloat(document.getElementById('dailyAmount').value);
-  const duration = parseInt(document.getElementById('duration').value);
-  const unit = document.getElementById('durationUnit').value;
-
-  if(isNaN(dailyAmount) || isNaN(duration) || dailyAmount<=0 || duration<=0){
-    alert("Please enter valid values for daily investment and duration.");
-    return;
-  }
-
-  // Max duration limits
-  const maxLimits = { days: 500, months: 16, years: 1 }; // 500 days max
-  if(duration > maxLimits[unit]){
-    alert(`Maximum duration for ${unit} is ${maxLimits[unit]}. Please enter a shorter period.`);
-    return;
-  }
-
-  const days = getDays(duration, unit);
-
-  document.getElementById('invested').innerText = 'Fetching…';
-  document.getElementById('stacked').innerText = 'Fetching…';
-  document.getElementById('valueToday').innerText = 'Fetching…';
-  document.getElementById('dcaValue').innerText = 'Fetching…';
-  document.getElementById('note').innerText = '';
-
-  try {
-    const prices = await fetchDailyPrices(days);
-    const currentPrice = await fetchCurrentPrice();
-
-    let totalZec = 0;
-    prices.forEach(price=>totalZec += dailyAmount/price);
-
-    const totalInvested = dailyAmount*prices.length;
-    const totalValueToday = totalZec*currentPrice;
-    const dcaValue = totalInvested/totalZec;
-
-    document.getElementById('invested').innerText = `$${totalInvested.toFixed(2)}`;
-    document.getElementById('stacked').innerText = totalZec.toFixed(6)+" ZEC";
-    document.getElementById('valueToday').innerText = `$${totalValueToday.toFixed(2)}`;
-    document.getElementById('dcaValue').innerText = `$${dcaValue.toFixed(2)} USD/ZEC`;
-    document.getElementById('note').innerText = `Calculation based on the past ${prices.length} days of ZEC prices (excluding today).`;
-  } catch(e){
-    document.getElementById('invested').innerText = 'Failed to fetch';
-    document.getElementById('stacked').innerText = 'Failed to fetch';
-    document.getElementById('valueToday').innerText = 'Failed to fetch';
-    document.getElementById('dcaValue').innerText = 'Failed to fetch';
-    document.getElementById('note').innerText = '';
-    console.error(e);
-    alert("Failed to fetch data: " + e.message);
-  }
-}
-</script>
-
-
-
-
+<!-- Memory Game -->
 <section id="memory-game">
   <h2>ZEC Memory Game</h2>
   <div id="game-board"></div>
@@ -357,7 +260,7 @@ async function calculateDCA(){
 </footer>
 
 <script>
-// --- Fun Facts ---
+// ========== FUN FACTS ==========
 const facts = [
   "Zcash was the first cryptocurrency to implement zk-SNARKs, enabling private transactions.",
   "Users can choose between transparent and shielded addresses, offering flexibility in transaction privacy.",
@@ -403,7 +306,7 @@ function showNextFact(){
   },250);
 }
 
-// --- Live Price ---
+// ========== LIVE PRICE & HALVING ==========
 async function fetchPriceAndHypothetical(){
   const currency = document.getElementById('currency').value.toLowerCase();
   document.getElementById('price').innerText = 'Fetching…';
@@ -425,7 +328,6 @@ async function fetchPriceAndHypothetical(){
   }catch(e){ document.getElementById('price').innerText = 'Fetching…'; document.getElementById('hypoPrice').innerText = 'Fetching…'; }
 }
 
-// Halving countdown
 const halvingDate = new Date('2028-11-18T00:00:00Z');
 function updateCountdown(){
   const now = new Date();
@@ -443,23 +345,9 @@ setInterval(fetchPriceAndHypothetical,60000);
 updateCountdown();
 setInterval(updateCountdown,1000);
 
-// --- Memory Game ---
-const memImages = [
-    'images/zcash-card.png',
-  'images/ledger.png',
-  'images/keystone.png',
-  'images/zashi.png',
-  'images/zingo.png',
-  'images/trezor.png',
-  'images/exodus.png',
-  'images/edge.png'
-];
-
-let cards = [];
-let firstCard = null;
-let secondCard = null;
-let lockBoard = false;
-let matches = 0;
+// ========== Memory Game ==========
+const memImages = ['images/zcash-card.png','images/ledger.png','images/keystone.png','images/zashi.png','images/zingo.png','images/trezor.png','images/exodus.png','images/edge.png'];
+let cards=[], firstCard=null, secondCard=null, lockBoard=false, matches=0;
 
 function startGame(){
   const board = document.getElementById('game-board');
@@ -488,14 +376,82 @@ function flipCard(card){
     matches++; firstCard=null; secondCard=null; lockBoard=false;
     if(matches===memImages.length){ document.getElementById('game-message').innerText='🎉 You matched all ZEC cards! 🎉'; }
   }else{
-    setTimeout(()=>{
-      firstCard.classList.remove('flipped'); secondCard.classList.remove('flipped'); firstCard=null; secondCard=null; lockBoard=false;
-    },1000);
+    setTimeout(()=>{ firstCard.classList.remove('flipped'); secondCard.classList.remove('flipped'); firstCard=null; secondCard=null; lockBoard=false; },1000);
   }
 }
 
 startGame();
-</script>
 
+// ========== CoinMarketCap Rank ==========
+async function fetchCMCRank() {
+  const rankEl = document.getElementById('cmc-rank');
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/coins/zcash');
+    const data = await res.json();
+    const rank = data?.market_cap_rank || 'N/A';
+    rankEl.innerHTML = `<a href="https://coinmarketcap.com/currencies/zcash/" target="_blank">#${rank}</a>`;
+  } catch (err) { rankEl.innerText = 'Unavailable'; }
+}
+fetchCMCRank();
+setInterval(fetchCMCRank, 3600000);
+
+// ========== Launch ZEC ==========
+const launchBtn = document.getElementById('launch-btn');
+const rocket = document.getElementById('rocket');
+const priceElZEC = document.getElementById('zec-price');
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let confettiActive = false;
+
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+launchBtn.addEventListener('click', async () => {
+  if(confettiActive) return;
+  priceElZEC.innerText = '';
+  rocket.style.transform = 'translate(-50%, -600px)';
+  confettiActive=true;
+  setTimeout(startConfetti, 1500);
+  setTimeout(async()=>{
+    await showZecPrice();
+    confettiActive=false;
+    rocket.style.transform = 'translate(-50%, 0)';
+  },3500);
+});
+
+async function showZecPrice(){
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd');
+    const data = await res.json();
+    const price = data?.zcash?.usd || 'N/A';
+    priceElZEC.innerHTML = `Current ZEC Price: <span style="color:#4ade80;">$${price}</span>`;
+  } catch(e){ priceElZEC.innerText='Unable to fetch price.'; }
+}
+
+function startConfetti(){
+  particles=[];
+  for(let i=0;i<120;i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height-canvas.height, r: Math.random()*6+4, d: Math.random()*canvas.height, color:`hsl(${Math.random()*360},70%,60%)`, tilt: Math.random()*10-10 });
+  requestAnimationFrame(drawConfetti);
+  setTimeout(()=>particles=[],3000);
+}
+
+function drawConfetti(){
+  if(!particles.length) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>ctx.fillRect(p.x,p.y,p.r,p.r, ctx.fillStyle=p.color));
+  updateConfetti();
+  requestAnimationFrame(drawConfetti);
+}
+
+function updateConfetti(){
+  for(let p of particles){
+    p.y+=Math.cos(p.d)+2;
+    p.x+=Math.sin(p.d);
+    if(p.y>canvas.height){p.y=-10; p.x=Math.random()*canvas.width;}
+  }
+}
+</script>
 </body>
 </html>
