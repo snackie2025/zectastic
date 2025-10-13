@@ -1,195 +1,229 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Zcash Flippening Party</title>
-  <meta name="description" content="Live Zcash (ZEC) price, marketcap neighbors and music — powered by CoinGecko" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg1: #0f1724;
-      --bg2: #2b076e;
-      --accent: #d946ef;
-      --muted: rgba(255,255,255,0.14);
-      --glass: rgba(255,255,255,0.06);
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; font-family: Inter, system-ui, sans-serif; }
-    body {
-      background: linear-gradient(135deg, var(--bg1), #3a0ca3, #7209b7);
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-      transform: scale(0.8);
-      transform-origin: top center;
-    }
-    h1 { font-size: 32px; margin: 0; font-weight: 800; }
-    p.lead { margin: 0; color: rgba(255,255,255,0.75); }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zcash Flippening Party</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg1: #0f1724;
+  --bg2: #2b076e;
+  --accent: #d946ef;
+  --muted: rgba(255,255,255,0.14);
+  --glass: rgba(255,255,255,0.06);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: Inter, system-ui, sans-serif; }
+body {
+  background: linear-gradient(135deg, var(--bg1), #3a0ca3, #7209b7);
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  transform: scale(0.8);
+  transform-origin: top center;
+}
+h1 { font-size: 32px; margin: 0; font-weight: 800; }
+p.lead { margin: 0; color: rgba(255,255,255,0.75); }
+.container { max-width: 1100px; margin: 0 auto; text-align: center; }
+.card { background: var(--glass); border-radius: 14px; padding: 16px; margin-top: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.zec-logo { width: 140px; margin-bottom: 10px; }
 
-    .container { max-width: 1100px; margin: 0 auto; text-align: center; }
-    .card { background: var(--glass); border-radius: 14px; padding: 16px; margin-top: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.zec-price-highlight { font-weight: 900; font-size: 28px; margin: 20px auto; width: 92%; border: 3px solid cyan; padding: 16px; border-radius: 12px; text-shadow: 0 0 15px cyan; animation: pulsePrice 2.5s infinite; line-height: 1.5; transition: border-color 0.3s, color 0.3s, text-shadow 0.3s; }
+.zec-up { border-color: #22c55e; color: #22c55e; text-shadow: 0 0 15px #22c55e; }
+.zec-down { border-color: #ef4444; color: #ef4444; text-shadow: 0 0 15px #ef4444; }
+.zec-neutral { border-color: cyan; color: cyan; text-shadow: 0 0 15px cyan; }
 
-    .zec-logo { width: 140px; margin-bottom: 10px; }
+@keyframes pulsePrice {
+  0% { box-shadow: 0 0 8px cyan; }
+  50% { box-shadow: 0 0 30px cyan; }
+  100% { box-shadow: 0 0 8px cyan; }
+}
 
-    .price-big { font-weight: 800; font-size: 64px; line-height: 1; margin: 20px 0; }
-    .blink { animation: blinkAnim .9s ease-in-out; }
-    @keyframes blinkAnim { 0%{transform:scale(1)} 50%{transform:scale(1.07)} 100%{transform:scale(1)} }
+.neighbor-list { display: flex; flex-direction: column; gap: 6px; align-items: center; margin-top: 10px; }
+.neighbor { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; width: 92%; display: flex; justify-content: space-between; font-size: 14px; }
+.neighbor span { opacity: 0.8; display: flex; flex-direction: column; align-items: flex-end; }
 
-    .neighbor-list { display: flex; flex-direction: column; gap: 6px; align-items: center; }
-    .neighbor { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; width: 92%; display: flex; justify-content: space-between; font-size: 14px; }
-    .neighbor span { opacity: 0.8; display:flex; flex-direction:column; align-items:flex-end; }
+.zec-center { background: rgba(255,215,0,0.2); font-weight: 900; font-size: 26px; width: 92%; border: 3px solid gold; padding: 16px; border-radius: 12px; text-shadow: 0 0 15px gold; animation: pulse 2.5s infinite; margin: 20px auto; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 8px gold; }
+  50% { box-shadow: 0 0 30px gold; }
+  100% { box-shadow: 0 0 8px gold; }
+}
 
-    .zec-center { background: rgba(255,215,0,0.2); font-weight:900; font-size:26px; margin:10px auto; width:92%; border:3px solid gold; padding:16px; border-radius:12px; text-shadow:0 0 15px gold; animation:pulse 2.5s infinite; }
-    @keyframes pulse { 0%{box-shadow:0 0 8px gold;} 50%{box-shadow:0 0 30px gold;} 100%{box-shadow:0 0 8px gold;} }
+.trend { display: inline-block; padding: 8px 14px; border-radius: 999px; font-weight: 600; margin-bottom: 10px; }
+.up { background: #22c55e; color: #000; }
+.down { background: #ef4444; color: #000; }
+.neutral { background: rgba(255,255,255,0.1); color: #fff; }
 
-    .muted { color: rgba(255,255,255,0.7); font-size: 13px; }
+.muted { color: rgba(255,255,255,0.7); font-size: 13px; }
 
-    .station-buttons { display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-    .station-buttons button { flex: 1 1 auto; padding: 8px 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .station-buttons button:hover { background: rgba(255,255,255,0.25); }
+.station-buttons { display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.station-buttons button { flex: 1 1 auto; padding: 8px 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.station-buttons button:hover { background: rgba(255,255,255,0.25); }
 
-    .station-info{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px}
-    .station-name{font-weight:700}
-    .small-muted{color:rgba(255,255,255,0.5);font-size:12px;margin-top:6px}
+.station-info { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 8px; }
+.station-name { font-weight: 700; }
+.small-muted { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 6px; }
 
-    .source { margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.5); }
+.above-buttons { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.above-buttons button { padding: 4px 8px; border-radius: 6px; border: none; background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-size: 12px; }
+.above-buttons button:hover { background: rgba(255,255,255,0.25); }
 
-    @media (max-width:700px){ 
-      .price-big{font-size:40px} 
-      .zec-logo{width:100px} 
-      .zec-center{font-size:20px;padding:12px} 
-    }
-  </style>
+@media (max-width:700px){
+  .zec-logo { width: 100px; }
+  .zec-price-highlight { font-size: 20px; padding: 12px; }
+  .zec-center { font-size: 20px; padding: 12px; }
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <a href="https://z.cash" target="_blank" rel="noopener noreferrer">
-      <img src="https://assets.coingecko.com/coins/images/486/large/circle-zcash-color.png" alt="Zcash Logo" class="zec-logo">
-    </a>
-    <h1>Flippening Party 🥳</h1>
-    <p class="lead">Live $ZEC price & marketcap ranking — Pick your own party vibe!</p>
+<div class="container">
+  <a href="https://z.cash" target="_blank" rel="noopener noreferrer">
+    <img src="https://assets.coingecko.com/coins/images/486/large/circle-zcash-color.png" alt="Zcash Logo" class="zec-logo">
+  </a>
+  <h1>Flippening Party 🥳</h1>
+  <p class="lead">Live $ZEC price & marketcap ranking — Pick your own party vibe!</p>
 
-    <div id="price" class="price-big">—</div>
+  <div id="trendBadge" class="trend neutral">—</div>
+  <div id="zecPriceContainer"></div>
 
-    <div class="neighbor-list" id="aboveList"></div>
-    <div id="zecCenterContainer"></div>
-    <div class="neighbor-list" id="belowList"></div>
-
-    <div class="card">
-      <div class="muted">Choose your party vibe 🎧</div>
-      <div class="station-buttons">
-        <!-- SomaFM Stations -->
-        <button data-url="https://ice1.somafm.com/groovesalad-128-mp3" data-name="Groove Salad">Groove Salad</button>
-        <button data-url="https://ice1.somafm.com/spacestation-128-mp3" data-name="Space Station Soma">Space Station Soma</button>
-        <button data-url="https://ice1.somafm.com/indiepop-128-mp3" data-name="Indie Pop Rocks!">Indie Pop Rocks!</button>
-        <button data-url="https://ice1.somafm.com/secretagent-128-mp3" data-name="Secret Agent">Secret Agent</button>
-        <button data-url="https://ice1.somafm.com/u80s-128-mp3" data-name="Underground 80s">Underground 80s</button>
-      </div>
-
-      <div class="station-info">
-        <div class="station-name" id="stationName">—</div>
-      </div>
-
-      <audio id="partyAudio" controls autoplay></audio>
-      <div class="small-muted" id="audioStatus">Attempting to autoplay. If blocked, click Play.</div>
-    </div>
-
-    <p class="muted" id="status">Loading data…</p>
-    <div class="source">Source: CoinGecko</div>
+  <div id="aboveButtonsContainer" class="above-buttons">
+    <button id="show5Btn">Show 5 Above</button>
+    <button id="showAllBtn">Show All Above</button>
   </div>
 
-  <script>
-    const POLL_MS = 12000; 
+  <div class="neighbor-list" id="aboveList"></div>
+  <div id="zecCenterContainer"></div>
 
-    const audioEl = document.getElementById('partyAudio');
-    const stationNameEl = document.getElementById('stationName');
-    const audioStatusEl = document.getElementById('audioStatus');
-    const priceEl = document.getElementById('price');
-    const zecCenterContainer = document.getElementById('zecCenterContainer');
+  <div class="card">
+    <div class="muted">Choose your party vibe 🎧</div>
+    <div class="station-buttons">
+      <button data-url="https://ice1.somafm.com/groovesalad-128-mp3" data-name="Groove Salad - Chillout/Ambient">Groove Salad</button>
+      <button data-url="https://ice1.somafm.com/indiepop-128-mp3" data-name="Indie Pop Rocks - Indie/Pop">Indie Pop Rocks</button>
+      <button data-url="https://ice1.somafm.com/dronezone-128-mp3" data-name="Drone Zone - Drone/Experimental">Drone Zone</button>
+      <button data-url="https://ice1.somafm.com/secretagent-128-mp3" data-name="Secret Agent - Lounge/Spy">Secret Agent</button>
+      <button data-url="https://ice1.somafm.com/beatblender-128-mp3" data-name="Beat Blender - Electronica/Eclectic">Beat Blender</button>
+    </div>
 
-    const stationButtons = document.querySelectorAll('.station-buttons button');
+    <div class="station-info">
+      <div class="station-name" id="stationName">Groove Salad - Chillout/Ambient</div>
+    </div>
 
-    // Function to play a station
-    function playStation(btn) {
-      const url = btn.dataset.url;
-      const name = btn.dataset.name;
-      stationNameEl.textContent = name;
-      audioEl.src = url;
-      audioEl.load();
-      audioEl.play().then(() => {
-        audioStatusEl.textContent = 'Playing — ' + name;
-      }).catch(() => {
-        audioStatusEl.textContent = 'Autoplay blocked — click Play to start: ' + name;
-      });
+    <audio id="partyAudio" controls autoplay loop></audio>
+    <div class="small-muted" id="audioStatus">Attempting to autoplay. If blocked, click Play.</div>
+  </div>
+
+  <p class="muted" id="status">Loading data…</p>
+</div>
+
+<script>
+const POLL_MS = 12000;
+let prevPrice = null;
+let marketsData = [];
+const audioEl = document.getElementById('partyAudio');
+const stationNameEl = document.getElementById('stationName');
+const audioStatusEl = document.getElementById('audioStatus');
+const trendBadge = document.getElementById('trendBadge');
+const zecPriceContainer = document.getElementById('zecPriceContainer');
+const aboveList = document.getElementById('aboveList');
+const zecCenterContainer = document.getElementById('zecCenterContainer');
+const show5Btn = document.getElementById('show5Btn');
+const showAllBtn = document.getElementById('showAllBtn');
+
+document.querySelectorAll('.station-buttons button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    audioEl.src = btn.dataset.url;
+    audioEl.load();
+    audioEl.play()
+      .then(() => audioStatusEl.textContent = 'Playing — ' + btn.dataset.name)
+      .catch(() => audioStatusEl.textContent = 'Autoplay blocked — click Play to start: ' + btn.dataset.name);
+    stationNameEl.textContent = btn.dataset.name;
+  });
+});
+
+audioEl.addEventListener('error', () => {
+  audioStatusEl.textContent = 'Stream error — please try another station.';
+});
+
+function renderNeighborsAbove(num) {
+  const idx = marketsData.findIndex(c => c.id === 'zcash');
+  const zec = marketsData[idx];
+  const above = marketsData.slice(Math.max(0, idx - num), idx);
+  const formatPrice = p => p != null ? p.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '—';
+  const formatMarket = m => m != null ? m.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) : '—';
+  aboveList.innerHTML = '<div class="muted">↑ ' + above.length + ' Above</div>' + above.map(c => {
+    const diff = c.market_cap - zec.market_cap;
+    const sign = diff > 0 ? '+' : '';
+    return `<div class='neighbor'>
+      <b>#${c.market_cap_rank} ${c.symbol.toUpperCase()} — ${c.name}</b>
+      <span>${formatPrice(c.current_price)}<br>${formatMarket(c.market_cap)} (${sign}${formatMarket(diff)})</span>
+    </div>`;
+  }).join('');
+}
+
+async function fetchData() {
+  try {
+    document.getElementById('status').textContent = 'Fetching...';
+    const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1');
+    marketsData = await res.json();
+
+    const idx = marketsData.findIndex(c => c.id === 'zcash');
+    const zec = marketsData[idx];
+    const nextProject = idx > 0 ? marketsData[idx - 1] : null;
+    const belowProject = idx < marketsData.length - 1 ? marketsData[idx + 1] : null;
+
+    const formatPrice = p => p != null ? p.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) : '—';
+    const formatMarket = m => m != null ? m.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) : '—';
+
+    if (prevPrice !== null) {
+      trendBadge.className = 'trend ' + (zec.current_price > prevPrice ? 'up' : (zec.current_price < prevPrice ? 'down' : 'neutral'));
+      trendBadge.textContent = zec.current_price > prevPrice ? '▲ UP' : (zec.current_price < prevPrice ? '▼ DOWN' : '—');
     }
 
-    // Attach click events
-    stationButtons.forEach(btn => btn.addEventListener('click', () => playStation(btn)));
-
-    // Autoplay first station on page load
-    if (stationButtons.length > 0) {
-      playStation(stationButtons[0]);
+    let boxClass = 'zec-neutral';
+    if (prevPrice !== null) {
+      boxClass = zec.current_price > prevPrice ? 'zec-up' : (zec.current_price < prevPrice ? 'zec-down' : 'zec-neutral');
     }
+    prevPrice = zec.current_price;
 
-    audioEl.addEventListener('error', () => {
-      audioStatusEl.textContent = 'Stream error — please try another station.';
-    });
+    const remainingCapAbove = nextProject ? nextProject.market_cap - zec.market_cap : 0;
 
-    // CoinGecko fetch
-    async function fetchData() {
-      try {
-        document.getElementById('status').textContent = 'Fetching...';
-        const marketsRes = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1');
-        if (!marketsRes.ok) throw new Error('CoinGecko error: ' + marketsRes.status);
-        const data = await marketsRes.json();
+    // ✅ First box: only show live price
+    zecPriceContainer.innerHTML = `
+      <div class="zec-price-highlight ${boxClass}">
+        Live Zcash Price: ${formatPrice(zec.current_price)}
+      </div>
+    `;
 
-        const idx = data.findIndex(c => c.id === 'zcash');
-        if (idx === -1) throw new Error('Zcash not found in markets');
+    // ✅ Move flip info to marketcap box
+    zecCenterContainer.innerHTML = `
+      <div class="zec-center">
+        #${zec.market_cap_rank} ZEC - ZCASH<br>
+        ${nextProject ? `About to flip $${nextProject.name}!<br>Remaining market cap to go: ${formatMarket(remainingCapAbove)}<br><br>` : ''}
+        Market Cap: ${formatMarket(zec.market_cap)}
+      </div>
+    `;
 
-        const zec = data[idx];
-        const above = data.slice(Math.max(0, idx - 3), idx);
-        const below = data.slice(idx + 1, idx + 4);
+    renderNeighborsAbove(Math.min(5, idx));
+    document.getElementById('status').textContent = 'Updated successfully ✔️';
+  } catch (e) {
+    console.error(e);
+    document.getElementById('status').textContent = 'API error. Retrying...';
+  }
+}
 
-        const newPrice = zec.current_price;
-        const formatPrice = (price) => price != null ? price.toLocaleString(undefined, {style:'currency',currency:'USD',maximumFractionDigits:2}) : '—';
-        const formatMarket = (cap) => cap != null ? cap.toLocaleString(undefined, {style:'currency',currency:'USD',maximumFractionDigits:0}) : '—';
+fetchData();
+setInterval(fetchData, POLL_MS + Math.random() * 3000);
 
-        priceEl.textContent = formatPrice(newPrice);
-        priceEl.classList.remove('blink');
-        void priceEl.offsetWidth; 
-        priceEl.classList.add('blink');
-
-        const aboveList = document.getElementById('aboveList');
-        aboveList.innerHTML = above.map(c => `
-          <div class='neighbor'>
-            <b>#${c.market_cap_rank} ${c.symbol.toUpperCase()} — ${c.name}</b>
-            <span>${formatPrice(c.current_price)}<br>${formatMarket(c.market_cap)}</span>
-          </div>`).join('');
-
-        const belowList = document.getElementById('belowList');
-        belowList.innerHTML = below.map(c => `
-          <div class='neighbor'>
-            <b>#${c.market_cap_rank} ${c.symbol.toUpperCase()} — ${c.name}</b>
-            <span>${formatPrice(c.current_price)}<br>${formatMarket(c.market_cap)}</span>
-          </div>`).join('');
-
-        const zecDiv = document.createElement('div');
-        zecDiv.className = 'zec-center';
-        zecDiv.textContent = `#${zec.market_cap_rank} ZEC - ZCASH | Market Cap: ${formatMarket(zec.market_cap)}`;
-        zecCenterContainer.innerHTML = '';
-        zecCenterContainer.appendChild(zecDiv);
-
-        document.getElementById('status').textContent = 'Updated ' + new Date().toLocaleTimeString();
-
-      } catch (err) {
-        console.error(err);
-        document.getElementById('status').textContent = 'API error. Retrying...';
-      }
-    }
-
-    fetchData();
-    setInterval(fetchData, POLL_MS + Math.random() * 3000);
-  </script>
+show5Btn.addEventListener('click', () => {
+  const idx = marketsData.findIndex(c => c.id === 'zcash');
+  renderNeighborsAbove(Math.min(5, idx));
+});
+showAllBtn.addEventListener('click', () => {
+  const idx = marketsData.findIndex(c => c.id === 'zcash');
+  renderNeighborsAbove(idx);
+});
+</script>
 </body>
 </html>
