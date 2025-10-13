@@ -72,6 +72,8 @@
 </head>
 <body>
 
+
+
 <header>
   <div class="logo-title">
     <img src="https://www.logo.wine/a/logo/Zcash/Zcash-Logo.wine.svg" alt="Zcash Logo">
@@ -79,8 +81,15 @@
   </div>
   <p>Explore the world of Zcash, one fact at a time.</p>
   <button onclick="showNextFact()">Discover Fun Fact</button>
+  <!-- New shiny Flippening button -->
+  <button onclick="window.location.href='flippening.html'" 
+          style="padding:14px 28px; font-size:16px; border:none; border-radius:8px; 
+                 background: linear-gradient(135deg,#ffcc00,#ff6600); 
+                 color:#0b0b10; font-weight:700; cursor:pointer; margin-left:12px; 
+                 box-shadow:0 4px 12px rgba(255,204,0,0.5); transition:0.3s;">
+    Zcash Flippening Party
+  </button>
 </header>
-
 <section class="fun-fact" id="fun-fact-section">
   <p id="fun-fact-text">Click the button above for some ZECtastic facts…</p>
 </section>
@@ -111,8 +120,10 @@
   </div>
 </section>
 
+
 <section class="stat-card" id="dca-calculator" style="max-width:700px;margin:40px auto;">
   <strong>DCA Calculator (Historical Daily Buys)</strong>
+
   <div style="margin-top:12px; text-align:center;">
     <label>Days to Simulate:</label>
     <input type="number" id="dca-days" value="365" min="1" max="500" step="1"
@@ -144,87 +155,6 @@
     Data source: <a href="https://www.coingecko.com/en/coins/zcash" target="_blank" style="color:#7b61ff;">CoinGecko API</a>
   </p>
 </section>
-
-<script>
-let lastDcaCall = 0;
-
-document.getElementById('dca-btn').addEventListener('click', async () => {
-  const btn = document.getElementById('dca-btn');
-  const status = document.getElementById('dca-status');
-  const table = document.getElementById('dca-table');
-  const tbody = document.getElementById('dca-results');
-
-  const days = parseInt(document.getElementById('dca-days').value);
-  const daily = parseFloat(document.getElementById('dca-amount').value);
-  const cooldown = 6000; // 6 sec
-
-  const now = Date.now();
-  if (now - lastDcaCall < cooldown) {
-    const wait = ((cooldown - (now - lastDcaCall)) / 1000).toFixed(1);
-    status.innerText = `⏳ Wait ${wait}s before recalculating.`;
-    return;
-  }
-  lastDcaCall = now;
-
-  if (isNaN(days) || days <= 0) { status.innerText = '⚠️ Invalid days'; return; }
-  if (isNaN(daily) || daily <= 0) { status.innerText = '⚠️ Invalid daily amount'; return; }
-
-  btn.disabled = true;
-  btn.innerText = 'Calculating…';
-  status.innerText = '⏳ Fetching historical prices…';
-  table.style.display = 'none';
-  tbody.innerHTML = '';
-
-  try {
-    const today = Math.floor(Date.now() / 1000);
-    const from = today - days * 86400;
-
-    const res = await fetch(`https://api.coingecko.com/api/v3/coins/zcash/market_chart/range?vs_currency=usd&from=${from}&to=${today}`);
-    const data = await res.json();
-    const prices = data?.prices || [];
-    if (!prices.length) { status.innerText = '⚠️ No price data'; return; }
-
-    // one price per day
-    const dailyMap = {};
-    prices.forEach(([ts, price]) => {
-      const day = new Date(ts).toISOString().split('T')[0];
-      if (!dailyMap[day]) dailyMap[day] = price;
-    });
-    const dailyPrices = Object.values(dailyMap);
-
-    let totalInvested = 0, totalZEC = 0;
-    dailyPrices.forEach(p => { totalInvested += daily; totalZEC += daily / p; });
-
-    const currentRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd');
-    const currentData = await currentRes.json();
-    const currentPrice = currentData?.zcash?.usd || dailyPrices[dailyPrices.length-1];
-    const currentValue = totalZEC * currentPrice;
-    const profit = currentValue - totalInvested;
-    const roi = (profit / totalInvested) * 100;
-
-    tbody.innerHTML = `
-      <tr><td style="padding:10px;">Date Range</td><td style="padding:10px;">${days} days</td></tr>
-      <tr><td style="padding:10px;">Daily Investment</td><td style="padding:10px;">$${daily.toFixed(2)}</td></tr>
-      <tr><td style="padding:10px;">Total Invested</td><td style="padding:10px;">$${totalInvested.toFixed(2)}</td></tr>
-      <tr><td style="padding:10px;">Total ZEC Acquired</td><td style="padding:10px;">${totalZEC.toFixed(4)} ZEC</td></tr>
-      <tr><td style="padding:10px;">Current ZEC Price</td><td style="padding:10px;">$${currentPrice.toFixed(2)}</td></tr>
-      <tr><td style="padding:10px;">Current Portfolio Value</td><td style="padding:10px;">$${currentValue.toFixed(2)}</td></tr>
-      <tr><td style="padding:10px;">Profit / Loss</td><td style="padding:10px;color:${profit>=0?'#4ade80':'#f87171'};">$${profit.toFixed(2)} (${roi.toFixed(2)}%)</td></tr>
-    `;
-    table.style.display = 'table';
-    status.innerText = `✅ Calculated over ${dailyPrices.length} days.`;
-
-  } catch(e) {
-    console.error(e);
-    status.innerText = '❌ Error fetching data.';
-  } finally {
-    btn.disabled = false;
-    btn.innerText = 'Calculate';
-  }
-});
-</script>
-
-
 
 
 <section id="zec-donation">
