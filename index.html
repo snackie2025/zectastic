@@ -72,11 +72,12 @@
 </head>
 <body>
 
+
 <header>
- <div class="logo-title">
-  <img src="zectastic.png" alt="ZECtastic Logo">
-  
-</div>
+  <div class="logo-title">
+    <!-- ZECtastic logo, doubled size -->
+    <img src="zectastic.png" alt="ZECtastic Logo" style="max-width:440px;">
+      </div>
 
   <p>Explore the world of Zcash, one fact at a time.</p>
   <button onclick="showNextFact()">Discover Fun Fact</button>
@@ -381,6 +382,68 @@ function updateConfetti(){
     if(p.y>canvas.height){p.y=-10; p.x=Math.random()*canvas.width;}
   }
 }
+
+// ========== DCA CALCULATOR ==========
+document.getElementById('dca-btn').addEventListener('click', async () => {
+  const days = parseInt(document.getElementById('dca-days').value) || 365;
+  const dailyUSD = parseFloat(document.getElementById('dca-amount').value) || 10;
+  const statusEl = document.getElementById('dca-status');
+  const resultsEl = document.getElementById('dca-results');
+  const tableEl = document.getElementById('dca-table');
+
+  statusEl.innerText = 'Calculating…';
+  tableEl.style.display = 'none';
+  resultsEl.innerHTML = '';
+
+  try {
+    // Fetch historical prices from CoinGecko (daily)
+    const endDate = Math.floor(Date.now() / 1000);
+    const startDate = endDate - (days * 24 * 60 * 60);
+
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/zcash/market_chart/range?vs_currency=usd&from=${startDate}&to=${endDate}`);
+    const data = await res.json();
+    const prices = data.prices; // [[timestamp, price], ...]
+
+    if (!prices || prices.length === 0) throw new Error('No historical data available.');
+
+    let totalZEC = 0;
+    let totalSpent = 0;
+
+    prices.forEach(p => {
+      const price = p[1];
+      totalZEC += dailyUSD / price;
+      totalSpent += dailyUSD;
+    });
+
+    const latestPrice = prices[prices.length - 1][1];
+    const currentValue = totalZEC * latestPrice;
+    const profitLoss = currentValue - totalSpent;
+    const roiPercent = (profitLoss / totalSpent) * 100;
+
+    const rows = [
+      ['Days Simulated', days],
+      ['Daily Investment (USD)', `$${dailyUSD}`],
+      ['Total Invested (USD)', `$${totalSpent.toFixed(2)}`],
+      ['Total ZEC Accumulated', totalZEC.toFixed(6)],
+      ['Current Value (USD)', `$${currentValue.toFixed(2)}`],
+      ['Profit / Loss (USD)', `$${profitLoss.toFixed(2)}`],
+      ['ROI (%)', `${roiPercent.toFixed(2)}%`]
+    ];
+
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="padding:10px;">${r[0]}</td><td style="padding:10px;">${r[1]}</td>`;
+      resultsEl.appendChild(tr);
+    });
+
+    tableEl.style.display = 'table';
+    statusEl.innerText = 'DCA calculation completed!';
+  } catch (err) {
+    console.error(err);
+    statusEl.innerText = 'Error fetching historical data. Try again later.';
+  }
+});
+
 </script>
 </body>
 </html>
