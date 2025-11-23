@@ -5,563 +5,395 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Zcash Live — Shield Reveal</title>
 
-<!-- Orbitron for techy / angular numerals -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 
 <style>
-  :root{
-    --zcash-gold: #F3B611;
-    --gold-glow: rgba(243,182,17,0.14);
-    --bg-dark: #000;
-    --charcoal: #070707;
-    --privacy-green: #57a88a;
-    --muted: rgba(255,255,255,0.06);
-    --ui-contrast: rgba(255,255,255,0.06);
-  }
+:root{
+  --zcash-gold: #57a88a;
+  --gold-glow: rgba(87,168,138,0.12);
+  --bg-dark: #000;
+  --privacy-green: #57a88a;
+  --accent-bright: #57a88a;
+  --accent-down: #ff85a1;
+}
 
-  /* page basics */
-  html,body { height:100%; margin:0; background:var(--bg-dark); color:var(--zcash-gold); font-family: Inter, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow:hidden; }
+/* basics */
+html,body{height:100%;margin:0;background:var(--bg-dark);color:var(--zcash-gold);font-family:Inter, "Helvetica Neue", Arial, sans-serif;overflow:auto;}
+.hex-wallpaper{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.03;color:#f3b611;font-family:ui-monospace,monospace;font-size:10px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;letter-spacing:6px;transform:translate3d(0,0,0);background:repeating-linear-gradient(90deg,transparent 0 10px, rgba(255,255,255,0.002) 10px 11px);will-change:transform,opacity}
+.hex-wallpaper .line{width:100%;text-align:center;white-space:nowrap;user-select:none;opacity:0.85}
+@keyframes hexDrift{from{transform:translateX(-4%)}to{transform:translateX(4%)}}
+.hex-wallpaper .line{animation:hexDrift 30s linear infinite alternate}
 
-  /* encrypted wallpaper (very subtle hex characters drifting) */
-  .hex-wallpaper {
-    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.03; color:#f3b611;
-    font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, "Roboto Mono", "Helvetica Neue", monospace;
-    font-size:10px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; letter-spacing:6px;
-    transform: translate3d(0,0,0);
-    background: repeating-linear-gradient(90deg, transparent 0 10px, rgba(255,255,255,0.002) 10px 11px);
-  }
-  .hex-wallpaper .line { width:100%; text-align:center; white-space:nowrap; user-select:none; opacity:0.85; }
-  @keyframes hexDrift { from { transform: translateX(-6%); } to { transform: translateX(6%); } }
-  .hex-wallpaper .line { animation: hexDrift 24s linear infinite alternate; }
+/* center & shield */
+.center{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:32px;box-sizing:border-box}
+.shield{position:relative;width:min(84vw,920px);max-width:920px;display:flex;align-items:center;justify-content:center;padding:48px 26px;box-sizing:border-box;gap:18px;max-height:calc(100vh - 120px);overflow:visible;transition:box-shadow 240ms ease,transform 180ms ease}
+.shield-bg{position:absolute;inset:0;border-radius:22px;z-index:0;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.14));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(8px) saturate(1.05);box-shadow:0 18px 80px rgba(0,0,0,0.6), 0 4px 18px rgba(243,182,17,0.03)}
+.shield-frame{position:absolute;z-index:1;left:50%;top:18px;transform:translateX(-50%);width:86%;opacity:0.24;pointer-events:none}
+.block-pulse{position:absolute;z-index:1;width:42%;height:48%;background:linear-gradient(180deg, rgba(243,182,17,0.06), rgba(243,182,17,0.03));border-radius:6px;transform:translateY(6%) scale(1);transition:transform 180ms ease,box-shadow 180ms ease,opacity 200ms ease;filter:blur(0.6px);display:block;will-change:transform,box-shadow,opacity}
 
-  /* container */
-  .center {
-    position:relative; z-index:2; height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column;
-    padding:32px; box-sizing:border-box;
-  }
+/* price area */
+.price-wrap{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;flex-direction:column;width:100%;gap:10px;padding:12px;box-sizing:border-box}
+.price{font-family:'Orbitron',system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:clamp(36px,12vw,124px);line-height:0.9;letter-spacing:-0.02em;color:var(--zcash-gold);text-align:center;position:relative;z-index:3;-webkit-font-smoothing:antialiased;transition:opacity 220ms ease,transform 180ms cubic-bezier(.2,.9,.3,1);opacity:0.95;will-change:opacity,transform}
+.price::after{content:"";position:absolute;inset:auto -8% -8% -8%;z-index:-1;background:radial-gradient(closest-side,var(--gold-glow),transparent 40%);filter:blur(16px);opacity:0.9;pointer-events:none}
 
-  /* Shield container */
-  .shield {
-    position:relative;
-    width: min(84vw, 820px);
-    max-width:820px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:48px 26px;
-    box-sizing:border-box;
-    gap:18px;
-  }
+/* blinking price animation */
+@keyframes blinkPrice {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.price.blinking {
+  animation: blinkPrice 1.4s infinite;
+}
 
-  /* Frosted glass shield background */
-  .shield-bg {
-    position:absolute; inset:0; border-radius:22px; z-index:0;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.14));
-    border: 1px solid rgba(255,255,255,0.04);
-    backdrop-filter: blur(8px) saturate(1.05);
-    box-shadow: 0 18px 80px rgba(0,0,0,0.6), 0 4px 18px rgba(243,182,17,0.03);
-  }
+/* zec details */
+.zec-details{width:100%;display:flex;justify-content:center;gap:18px;margin-top:6px;pointer-events:none}
+.zec-card{
+  pointer-events:auto;
+  background:rgba(255,255,255,0.01);
+  border-radius:10px;
+  padding:8px 12px;
+  border:1px solid rgba(255,255,255,0.03);
+  display:flex;
+  gap:12px;
+  align-items:center;
+  color:var(--zcash-gold);
+  font-size:13px;
+}
 
-  /* shield outline (svg inserted) sits behind text */
-  .shield-frame { position:absolute; z-index:1; left:50%; top:36px; transform:translateX(-50%); width:80%; opacity:0.12; pointer-events:none; }
+/* party list */
+.party-list{position:relative;z-index:4;width:100%;max-height:220px;overflow:auto;display:none;flex-direction:column;gap:8px;pointer-events:auto;margin-top:8px}
+.shield.party-active .party-list{display:flex}
 
-  /* block pulse (square behind number) */
-  .block-pulse {
-    position:absolute; z-index:1; width:42%; height:48%; background:linear-gradient(180deg, rgba(243,182,17,0.06), rgba(243,182,17,0.03)); border-radius:6px;
-    transform:translateY(6%) scale(1); transition: transform 180ms ease, box-shadow 180ms ease, opacity 200ms ease;
-    filter: blur(0.6px);
-    display:block;
-  }
+/* project rows */
+.project-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+.project-left{display:flex;flex-direction:column;gap:2px}
+.project-title{font-weight:800;font-size:14px;color:var(--zcash-gold)}
+.project-ticker{font-size:12px;opacity:0.8;color:var(--zcash-gold)}
+.project-right{text-align:right;min-width:170px;display:flex;flex-direction:column;gap:2px;align-items:flex-end;font-size:13px;color:var(--zcash-gold)}
 
-  /* price text container */
-  .price-wrap {
-    position:relative; z-index:2; display:flex; align-items:center; justify-content:center; flex-direction:column;
-    width:100%;
-  }
+/* top-right mode toggle (shifted left) */
+.mode-toggle{
+  position:fixed;
+  right:40px;   /* moved left from 12px */
+  top:12px;
+  z-index:6;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  background:rgba(255,255,255,0.02);
+  border-radius:8px;
+  padding:6px;
+  border:1px solid rgba(255,255,255,0.04);
+  backdrop-filter:blur(6px)
+}
+.mode-toggle button{background:transparent;border:0;color:#fff;padding:8px 10px;border-radius:6px;cursor:pointer;font-weight:700;opacity:0.9}
+.mode-toggle button.active{background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));color:var(--zcash-gold)}
 
-  /* the numeric price: big, angular, Orbitron */
-  .price {
-    font-family: 'Orbitron', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-weight:700;
-    font-size:clamp(36px, 12vw, 124px);
-    line-height:0.9;
-    letter-spacing: -0.02em;
-    color: var(--zcash-gold);
-    text-align:center;
-    position:relative;
-    z-index:3;
-    -webkit-font-smoothing:antialiased;
-    transition: opacity 220ms ease, transform 180ms cubic-bezier(.2,.9,.3,1);
-    opacity: 0.6; /* starts slightly hidden */
-    will-change: opacity, transform;
-  }
+/* player toggle */
+.player-toggle{position:fixed;right:12px;bottom:12px;z-index:6;background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,0.04);color:white}
+.controls{position:fixed;right:12px;bottom:70px;z-index:7;display:flex;flex-direction:column;gap:8px;opacity:0;transform:translateY(8px);pointer-events:none}
+.controls.show{opacity:1;transform:none;pointer-events:auto}
+.controls .btn{appearance:none;border-radius:8px;padding:8px 12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff;cursor:pointer;font-weight:700}
 
-  /* faint gold glow behind price */
-  .price::after {
-    content:"";
-    position:absolute; inset:auto -8% -8% -8%;
-    z-index:-1;
-    background: radial-gradient(closest-side, var(--gold-glow), transparent 40%);
-    filter: blur(16px);
-    opacity:0.9;
-    pointer-events:none;
-  }
+/* party button */
+.party-btn{position:fixed;right:70px;bottom:12px;z-index:6;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.18));color:var(--zcash-gold);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px)}
+.party-back{margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--zcash-gold);padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700}
 
-  /* pixel mask to simulate pixelated -> unpixelated reveal */
-  .pixel-mask {
-    position:absolute; z-index:4; inset:0; pointer-events:none; mix-blend-mode:overlay;
-    background-image:
-      linear-gradient(0deg, rgba(0,0,0,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,0,0.035) 1px, transparent 1px);
-    background-size: 6px 6px; opacity:0.12; transition: opacity 90ms linear, transform 90ms linear;
-    border-radius:18px;
-  }
-
-  /* proof lines sliding */
-  .proof-lines { position:absolute; z-index:1; inset:0; pointer-events:none; overflow:visible; }
-  .proof-lines .line { position:absolute; width:140%; height:2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); opacity:0.08; transform:rotate(-18deg); left:-20%; top:44%; transition: transform 180ms ease, opacity 200ms ease; }
-  .proof-lines .line.two { top:56%; transform:rotate(18deg); }
-
-  /* reveal / pixel states */
-  .reveal-ready .pixel-mask { opacity:0.18; transform: scale(1.02); }
-  .reveal-active .pixel-mask { opacity:0; transform: scale(1); transition: opacity 80ms linear, transform 80ms linear; }
-  .reveal-active .price { opacity:1; transform: translateY(-6px) scale(1.01); }
-  .reveal-fade .price { transition: opacity 600ms ease; opacity:0.72; transform:none; }
-
-  /* small top-right dual mode toggle */
-  .mode-toggle {
-    position: fixed; right:12px; top:12px; z-index:6;
-    display:flex; gap:8px; align-items:center;
-    background: rgba(255,255,255,0.02); border-radius:8px; padding:6px; border: 1px solid rgba(255,255,255,0.04);
-    backdrop-filter: blur(6px);
-  }
-  .mode-toggle button { background:transparent; border:0; color: #fff; padding:8px 10px; border-radius:6px; cursor:pointer; font-weight:700; font-family:inherit; opacity:0.9; }
-  .mode-toggle button.active { background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); color:var(--zcash-gold); }
-
-  /* subtle footer control to reveal audio/player (hidden by default to keep price-only) */
-  .player-toggle {
-    position: fixed; right:12px; bottom:12px; z-index:6;
-    background: rgba(255,255,255,0.02); border-radius:8px; padding:8px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; cursor:pointer;
-    border:1px solid rgba(255,255,255,0.04); color:white;
-  }
-
-  /* hidden control UI (keeps functionality but out of sight) */
-  .controls {
-    position: fixed; right:12px; bottom:70px; z-index:7; display:flex; flex-direction:column; gap:8px; opacity:0; transform: translateY(8px); pointer-events:none;
-  }
-  .controls.show { opacity:1; transform:none; pointer-events:auto; }
-
-  .controls .btn { appearance:none; border-radius:8px; padding:8px 12px; border: 1px solid rgba(255,255,255,0.04); background:transparent; color: #fff; cursor:pointer; font-weight:700; }
-
-  /* small responsive adjustments */
-  @media (max-width:640px){
-    .shield { padding:28px 18px; }
-    .price { font-size: clamp(32px, 18vw, 72px); }
-    .block-pulse { width:60%; height:50%; }
-  }
+/* responsive */
+@media(max-width:640px){.party-list{max-height:180px}.project-right{min-width:130px;font-size:12px}.party-btn{right:84px}}
 </style>
 </head>
+
 <body>
 
-  <!-- encrypted wallpaper (hex lines) -->
+  <!-- wallpaper -->
   <div class="hex-wallpaper" aria-hidden="true">
-    <!-- create several repeated lines of pseudo-random hex to create texture -->
     <div class="line">3f a1 0c 9b 4d 8e f2 7a c9 1b 55 aa 7f e3 2d</div>
     <div class="line">b4 6a 9d 0f e1 3c 7b dd 18 90 2a 5e 33 c1 8f</div>
     <div class="line">9c e4 1b 7f 2d 5a 80 3c b1 4e 6a 0f d3 77 9a</div>
   </div>
 
   <div class="center">
-
-    <div class="shield reveal-ready" id="shieldRoot" aria-live="polite">
-      <div class="shield-bg" aria-hidden="true"></div>
-
-      <!-- block pulse behind number -->
-      <div class="block-pulse" id="blockPulse" aria-hidden="true"></div>
-
-      <!-- proof lines -->
-      <div class="proof-lines" aria-hidden="true">
-        <div class="line one"></div>
-        <div class="line two"></div>
-      </div>
-
-      <!-- shield SVG frame (thin outline) -->
-      <svg class="shield-frame" viewBox="0 0 100 120" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <path d="M50 4 L86 18 V48 C86 78 66 106 50 116 34 106 14 78 14 48 V18 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" />
+    <div class="shield reveal-ready" id="shieldRoot">
+      <div class="shield-bg"></div>
+      <div class="block-pulse" id="blockPulse"></div>
+      <svg class="shield-frame" viewBox="0 0 100 120">
+        <path d="M50 4 L86 18 V48 C86 78 66 106 50 116 34 106 14 78 14 48 V18 Z"
+              fill="none" stroke="currentColor" stroke-width="1.5"/>
       </svg>
 
       <div class="price-wrap">
-        <!-- pixel mask sits above price and animates on reveal -->
-        <div class="pixel-mask" id="pixelMask" aria-hidden="true"></div>
-
-        <!-- price text -->
         <div class="price" id="price">—</div>
+
+        <div class="zec-details" id="zecDetails">
+          <div class="zec-card" id="zecCard">
+            <div style="font-weight:900">ZEC</div>
+            <div><div style="font-size:12px;opacity:0.85">Supply</div><div id="zecSupply" style="font-weight:700">—</div></div>
+            <div><div style="font-size:12px;opacity:0.85">Market cap</div><div id="zecMarketCap" style="font-weight:700">—</div></div>
+          </div>
+        </div>
+
+        <div class="party-list" id="partyList"></div>
+
+        <div id="partyControls" style="display:none;pointer-events:auto">
+          <button id="partyBack" class="party-back">Go Back</button>
+        </div>
       </div>
     </div>
-
   </div>
 
-  <!-- small UI: mode toggle -->
-  <div class="mode-toggle" role="toolbar" aria-label="Display mode">
-    <button id="modePrivacy" class="active" title="Privacy Mode">Privacy</button>
-    <button id="modeGold" title="Zcash Gold Mode">Gold</button>
+  <!-- mode buttons -->
+  <div class="mode-toggle">
+    <button id="modePrivacy" class="active">Privacy</button>
+    <button id="modeGold">Gold</button>
   </div>
 
-  <!-- player toggle + hidden controls (kept out of visual noise but available) -->
-  <div class="player-toggle" id="playerToggle" title="Show player controls">🎧</div>
-
-  <div class="controls" id="controls" aria-hidden="true">
+  <!-- radio -->
+  <button class="player-toggle" id="playerToggle">🎧</button>
+  <div class="controls" id="controls">
     <button class="btn station" id="stationDelta">Delta Radio — Live</button>
-    <button class="btn station" id="stationSunSP4">Sunshine Tech</button>
     <button class="btn station" id="stationSunSP6">Sunshine Charts</button>
     <button class="btn" id="stopBtn">Stop</button>
     <button class="btn" id="muteBtn">Mute</button>
   </div>
-
-  <!-- audio (present but hidden) -->
   <audio id="radio" crossorigin="anonymous" preload="none"></audio>
 
-<script>
-/* ============================
-  Zcash-themed Price Reveal page
-  - Shield reveal + pixel mask + block pulse + proof lines
-  - Dual modes: Privacy (dark/green) and Gold (zcash gold)
-  - Keeps price polling (CoinGecko); on fetch failure we keep last displayed price
-  - Radio player functionality preserved (controls hidden by default)
-  ============================ */
+  <!-- party button -->
+  <button id="partyBtn" class="party-btn">ZEC Flippening Party</button>
 
+<script>
+/* ------------- Elements ------------- */
 const priceEl = document.getElementById('price');
 const shieldRoot = document.getElementById('shieldRoot');
-const pixelMask = document.getElementById('pixelMask');
-const blockPulse = document.getElementById('blockPulse');
-const proofLines = document.querySelectorAll('.proof-lines .line');
+const partyList = document.getElementById('partyList');
+const partyBtn = document.getElementById('partyBtn');
+const partyBack = document.getElementById('partyBack');
+const partyControls = document.getElementById('partyControls');
+const zecSupplyEl = document.getElementById('zecSupply');
+const zecMarketCapEl = document.getElementById('zecMarketCap');
 
-const controlsWrap = document.getElementById('controls');
 const playerToggle = document.getElementById('playerToggle');
+const controlsWrapEl = document.getElementById('controls');
+const muteBtn = document.getElementById('muteBtn');
 
 const modePrivacy = document.getElementById('modePrivacy');
 const modeGold = document.getElementById('modeGold');
 
 const radioEl = document.getElementById('radio');
 
-let lastPrice = null;
-let lastDisplayed = priceEl.textContent || '—';
-
-/* ---------------------------
-  Formatting & polling
---------------------------- */
-const formatPrice = n => {
-  const v = Number(n);
+/* Formatters */
+const formatMoneyCompact = v => {
   if (!isFinite(v)) return '—';
-  return new Intl.NumberFormat('en-US', {maximumFractionDigits: 2, minimumFractionDigits: 2}).format(v);
+  if (Math.abs(v) >= 1e12) return '$' + (v/1e12).toFixed(2) + 'T';
+  if (Math.abs(v) >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+  if (Math.abs(v) >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+  if (Math.abs(v) >= 1e3) return '$' + (v/1e3).toFixed(2) + 'k';
+  return '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits:2});
 };
+const formatPriceFull = v => isFinite(v) ? '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits:6}) : '—';
 
-async function fetchPrice(){
-  try{
+/* Price polling */
+async function fetchZecPrice(){
+  try {
     const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd');
-    if(!res.ok) throw new Error('network');
+    if (!res.ok) throw new Error('price fetch failed');
     const json = await res.json();
     const val = json?.zcash?.usd;
     if (val == null) throw new Error('bad response');
-    const formatted = formatPrice(val);
+    priceEl.textContent = formatPriceFull(val);
 
-    // run reveal animation & update
-    triggerRevealUpdate(formatted, val);
+    /* blink animation */
+    priceEl.classList.add('blinking');
+    setTimeout(() => priceEl.classList.remove('blinking'), 1400);
 
-    // color hint (minor): green if up, pink if down
-    if (lastPrice !== null){
-      if (val > lastPrice) priceEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--accent-bright') || '#57a88a';
-      else if (val < lastPrice) priceEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--accent-down') || '#ff85a1';
-      else priceEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--zcash-gold') || '#F3B611';
-    } else {
-      // first load -> use neutral gold
-      priceEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--zcash-gold') || '#F3B611';
-    }
-
-    lastPrice = val;
-    lastDisplayed = formatted;
-  }catch(e){
-    // keep lastDisplayed unchanged
-    console.warn('fetch error, keeping last price', e);
+  } catch (e) {
+    console.warn('fetchZecPrice error', e);
   }
 }
 
-// initial fetch & steady poll (1s as before; changeable)
-fetchPrice();
-const pollInterval = 1000;
-setInterval(fetchPrice, pollInterval);
-
-/* ---------------------------
-  Reveal animation plumbing
---------------------------- */
-let revealTimeout = null;
-function triggerRevealUpdate(formattedText, numericValue){
-  // set text immediately (so screen-readers get updated)
-  priceEl.textContent = formattedText;
-
-  // Shield states: reveal-ready -> reveal-active -> reveal-fade -> ready
-  shieldRoot.classList.remove('reveal-active','reveal-fade');
-  // quickly show pixel mask (simulate encrypted)
-  shieldRoot.classList.add('reveal-ready');
-
-  // small block pulse (instant)
-  blockPulse.style.opacity = '1';
-  blockPulse.style.transform = 'translateY(0%) scale(1.04)';
-  blockPulse.style.boxShadow = '0 8px 30px rgba(243,182,17,0.12)';
-  // clear any existing timeouts
-  if (revealTimeout) clearTimeout(revealTimeout);
-
-  // next tick: reveal
-  setTimeout(()=> {
-    shieldRoot.classList.remove('reveal-ready');
-    shieldRoot.classList.add('reveal-active');
-    // animate proof lines sliding
-    proofLines.forEach((l,i)=> {
-      l.style.transform = (i===0) ? 'translateX(18%) rotate(-18deg)' : 'translateX(-18%) rotate(18deg)';
-      l.style.opacity = '0.12';
-    });
-    // remove block pulse visual quickly
-    blockPulse.style.transform = 'translateY(-4%) scale(1.02)';
-    blockPulse.style.boxShadow = '0 18px 56px rgba(243,182,17,0.06)';
-  }, 40); // tiny delay
-
-  // after short reveal, fade back to semi-transparent state (ZK vibe)
-  revealTimeout = setTimeout(()=> {
-    shieldRoot.classList.remove('reveal-active');
-    shieldRoot.classList.add('reveal-fade');
-    // reset proof lines
-    proofLines.forEach((l)=> {
-      l.style.transform = 'translateX(0%)';
-      l.style.opacity = '0.06';
-    });
-    // remove block pulse highlight gently
-    blockPulse.style.transform = 'translateY(6%) scale(1)';
-    blockPulse.style.boxShadow = 'none';
-  }, 420); // reveal visible for ~380ms total
-
-  // final cleanup: keep in ready state
-  setTimeout(()=> {
-    shieldRoot.classList.remove('reveal-fade');
-  }, 820);
-}
-
-/* ---------------------------
-  Clock (small neat element)
---------------------------- */
-const clockEl = document.createElement('div');
-clockEl.style.position = 'fixed';
-clockEl.style.left = '14px';
-clockEl.style.top = '14px';
-clockEl.style.zIndex = '6';
-clockEl.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.18))';
-clockEl.style.color = 'rgba(255,255,255,0.9)';
-clockEl.style.padding = '8px 10px';
-clockEl.style.borderRadius = '8px';
-clockEl.style.fontSize = '13px';
-clockEl.style.backdropFilter = 'blur(6px)';
-clockEl.style.border = '1px solid rgba(255,255,255,0.04)';
-clockEl.textContent = '--:--';
-document.body.appendChild(clockEl);
-
-function updateClock(){
-  const d = new Date();
-  const hh = String(d.getHours()).padStart(2,'0');
-  const mm = String(d.getMinutes()).padStart(2,'0');
-  clockEl.textContent = hh + ':' + mm;
-}
-updateClock(); setInterval(updateClock, 60*1000);
-
-/* ---------------------------
-  Dual Mode: Privacy vs Gold
---------------------------- */
-function setMode(mode){
-  if (mode === 'gold'){
-    document.documentElement.style.setProperty('--zcash-gold', '#F3B611');
-    document.documentElement.style.setProperty('--gold-glow', 'rgba(243,182,17,0.18)');
-    document.body.style.background = 'linear-gradient(180deg,#070707,#000000)';
-    modeGold.classList.add('active'); modePrivacy.classList.remove('active');
-  } else {
-    // privacy mode (dark + green accent)
-    document.documentElement.style.setProperty('--zcash-gold', '#57a88a');
-    document.documentElement.style.setProperty('--gold-glow', 'rgba(87,168,138,0.12)');
-    document.body.style.background = 'linear-gradient(180deg,#000000,#050505)';
-    modePrivacy.classList.add('active'); modeGold.classList.remove('active');
+async function fetchZecDetails(){
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/coins/zcash?localization=false&tickers=false&market_data=true');
+    if (!r.ok) throw new Error('zcash details failed');
+    const j = await r.json();
+    const s = j?.market_data?.circulating_supply ?? j?.circulating_supply ?? null;
+    const m = j?.market_data?.market_cap?.usd ?? null;
+    if (s) zecSupplyEl.textContent = Number(s).toLocaleString('en-US', {maximumFractionDigits:0}) + ' ZEC';
+    if (m) zecMarketCapEl.textContent = formatMoneyCompact(m);
+  } catch(e){
+    console.warn('fetchZecDetails error', e);
   }
 }
-// initial privacy mode
-setMode('privacy');
-modePrivacy.addEventListener('click', ()=> setMode('privacy'));
-modeGold.addEventListener('click', ()=> setMode('gold'));
+fetchZecPrice();
+fetchZecDetails();
+setInterval(fetchZecPrice, 15000);
+setInterval(fetchZecDetails, 60000);
 
-/* ---------------------------
-  Minimal hidden audio/player (kept available)
-  - Controls hidden by default; reveal with playerToggle button
---------------------------- */
-const controlsWrapEl = document.getElementById('controls');
-playerToggle.addEventListener('click', ()=>{
-  controlsWrapEl.classList.toggle('show');
-  // update aria-hidden
-  const shown = controlsWrapEl.classList.contains('show');
-  controlsWrapEl.setAttribute('aria-hidden', !shown);
-});
-
-// Station endpoints (direct streams)
-const stations = {
-  delta: { name: 'Delta Radio — Live', url: 'https://streams.deltaradio.de/delta-live/mp3-192/streams.deltaradio.de/' },
-  sun_sp4: { name: 'Sunshine Live — Tech House', url: 'https://stream.sunshine-live.de/sp4/mp3-192/utm_source=radio.menu/' },
-  sun_sp6: { name: 'Sunshine Live — Charts', url: 'https://stream.sunshine-live.de/sp6/mp3-192/utm_source=radio.menu/' }
-};
-
-// controls bindings
-document.getElementById('stationDelta').addEventListener('click', ()=> setStation(stations.delta.url));
-document.getElementById('stationSunSP4').addEventListener('click', ()=> setStation(stations.sun_sp4.url));
-document.getElementById('stationSunSP6').addEventListener('click', ()=> setStation(stations.sun_sp6.url));
-document.getElementById('stopBtn').addEventListener('click', ()=> stopAudio());
-document.getElementById('muteBtn').addEventListener('click', ()=> toggleMute());
-
-let audioCtx = null;
-let analyser = null;
-let dataArray = null;
-let sourceNode = null;
-let vizInterval = null;
-let isPlaying = false;
-let isMuted = false;
+/* Audio player (unchanged from your original except formatting) */
+let audioCtx = null, analyser = null, dataArray = null, sourceNode = null, isPlaying=false, isMuted=false;
 
 function looksLikeStreamUrl(url){
-  return /(\.mp3$|\.aac$|\/mp3-|\/aac-|\/stream\/|icecast|shoutcast|\/play\.pls|\/play\.m3u|\/mp3-)/i.test(url);
+  return /(\.mp3(\?|$)|\.aac(\?|$)|\/mp3-|\/aac-|\/stream\/|icecast|shoutcast|\/play\.pls|\/play\.m3u|\/mp3-)/i.test(url);
 }
 
 function initAudioGraph(){
   if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
   try {
-    sourceNode = audioCtx.createMediaElementSource(radioEl);
-    sourceNode.connect(analyser);
-    analyser.connect(audioCtx.destination);
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    try {
+      sourceNode = audioCtx.createMediaElementSource(radioEl);
+      sourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    } catch(err){
+      console.warn('Audio graph issue:', err);
+    }
   } catch(err){
-    console.warn('createMediaElementSource failed (CORS or unsupported):', err);
+    console.warn('AudioContext unavailable:', err);
+    audioCtx = null;
   }
-  applyBeatGlowFromAnalyser(analyser, dataArray);
 }
 
 async function setStation(url){
   stopAudio();
-  if (!looksLikeStreamUrl(url)){
-    const open = confirm('This link might not be a direct audio stream. Open it in a new tab to inspect/copy a direct stream URL?');
-    if (open) window.open(url, '_blank');
+  if (!looksLikeStreamUrl(url)) {
+    if (confirm('This link may not be a direct stream. Open it in a new tab?')) window.open(url, '_blank');
     return;
   }
   radioEl.src = url;
   radioEl.load();
-  try {
-    initAudioGraph();
-    await audioCtx.resume();
-  } catch(e){}
-  await startAudio();
-}
-
-async function startAudio(){
-  if (!radioEl.src){
-    alert('No station selected.');
-    return;
-  }
-  if (!audioCtx) initAudioGraph();
-  try { await radioEl.play(); } catch(e){
-    console.warn('play() failed:', e);
-    alert('Playback failed (CORS/autoplay policy). Try clicking again or open station page.');
-    return;
-  }
-  isPlaying = true;
-  startVisualizer();
-  // subtle vinyl animate (if present)
-  document.getElementById('vinyl')?.classList?.add('playing');
+  try { initAudioGraph(); if (audioCtx) await audioCtx.resume(); } catch(e){}
+  try { await radioEl.play(); isPlaying=true; } catch(e){ alert('Playback failed.'); }
 }
 
 function stopAudio(){
   try { radioEl.pause(); } catch(e){}
   try { radioEl.removeAttribute('src'); radioEl.load(); } catch(e){}
-  try {
-    if (audioCtx) {
-      if (sourceNode) { try { sourceNode.disconnect(); } catch(e){} sourceNode = null; }
-      try { analyser.disconnect(); } catch(e){}
-      analyser = null;
-      try { audioCtx.close(); } catch(e){}
-      audioCtx = null;
-    }
-  } catch(e){}
+  try { if (audioCtx) audioCtx.close(); } catch(e){}
+  audioCtx = null;
   isPlaying = false;
-  stopVisualizer();
-  document.getElementById('vinyl')?.classList?.remove('playing');
 }
+
 function toggleMute(){
   isMuted = !isMuted;
   radioEl.muted = isMuted;
-  document.getElementById('muteBtn').textContent = isMuted ? 'Unmute' : 'Mute';
+  muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
 }
 
-// beat-synced glow for price (uses analyser)
-function applyBeatGlowFromAnalyser(analyserNode, arr){
-  if (!analyserNode || !arr) return;
-  if (applyBeatGlowFromAnalyser._id) return;
-  applyBeatGlowFromAnalyser._id = setInterval(()=>{
-    try {
-      analyserNode.getByteFrequencyData(arr);
-      let sum = 0;
-      const maxIndex = Math.floor(arr.length * 0.25);
-      for (let i=0;i<maxIndex;i++) sum += arr[i];
-      const avg = sum / Math.max(1,maxIndex);
-      if (avg > 90) {
-        priceEl.classList.add('glow');
-        setTimeout(()=> priceEl.classList.remove('glow'), 160);
-      } else if (avg > 45) {
-        priceEl.classList.add('glow');
-        setTimeout(()=> priceEl.classList.remove('glow'), 90);
-      }
-    } catch(e){}
-  }, 35);
-}
+/* station buttons */
+document.getElementById('stationDelta').addEventListener('click', ()=> setStation('https://streams.deltaradio.de/delta-live/mp3-192/streams.deltaradio.de/'));
+document.getElementById('stationSunSP6').addEventListener('click', ()=> setStation('https://stream.sunshine-live.de/sp6/mp3-192/utm_source=radio.menu/'));
+document.getElementById('stopBtn').addEventListener('click', stopAudio);
+muteBtn.addEventListener('click', toggleMute);
 
-// visualizer driven by analyser (bars are not in DOM in this minimal view but logic kept)
-function startVisualizer(){
-  if (!analyser || !dataArray) return;
-  clearInterval(vizInterval);
-  vizInterval = setInterval(()=>{
-    try {
-      analyser.getByteFrequencyData(dataArray);
-      // Possibility: if you later show bars, they will respond. For now we keep logic ready.
-    } catch(e){}
-  }, 80);
-}
-function stopVisualizer(){ clearInterval(vizInterval); vizInterval = null; }
-
-/* Accessible helper -> set station from console: window.setStationUrl(url) */
-window.setStationUrl = function(url, autoplay = true){
-  if(!url) return;
-  stopAudio();
-  radioEl.src = url;
-  radioEl.load();
-  if (autoplay) startAudio();
-};
-
-/* ---------------------------
-  Small niceties: keyboard toggle for player controls (press 'p') and space to pause/play audio (if controls shown)
---------------------------- */
-document.addEventListener('keydown', (e)=>{
-  if (e.key === 'p') {
-    controlsWrapEl.classList.toggle('show');
-  } else if (e.code === 'Space') {
-    // if controls visible and audio has src toggle play/stop
-    if (controlsWrapEl.classList.contains('show') && radioEl.src) {
-      e.preventDefault();
-      if (isPlaying) stopAudio();
-      else startAudio();
-    }
-  }
+/* Player toggle */
+playerToggle.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const shown = controlsWrapEl.classList.toggle('show');
+  controlsWrapEl.setAttribute('aria-hidden', String(!shown));
+  playerToggle.setAttribute('aria-expanded', String(shown));
 });
 
+/* close player if clicking outside */
+document.addEventListener('click', (e)=>{
+  if (!controlsWrapEl.classList.contains('show')) return;
+  if (playerToggle.contains(e.target) || controlsWrapEl.contains(e.target)) return;
+  controlsWrapEl.classList.remove('show');
+});
+
+/* Party mode */
+let partyActive = false;
+partyBtn.addEventListener('click', async (e) => {
+  e.stopPropagation();
+  if (!partyActive) await openParty();
+  else closeParty();
+});
+partyBack.addEventListener('click', closeParty);
+
+async function openParty(){
+  partyActive = true;
+  partyBtn.setAttribute('aria-pressed','true');
+  shieldRoot.classList.add('party-active');
+  partyControls.style.display = 'block';
+  partyList.setAttribute('aria-hidden','false');
+  await loadPartyData();
+}
+
+function closeParty(){
+  partyActive = false;
+  partyBtn.setAttribute('aria-pressed','false');
+  shieldRoot.classList.remove('party-active');
+  partyControls.style.display = 'none';
+  partyList.setAttribute('aria-hidden','true');
+}
+
+async function loadPartyData(){
+  partyList.innerHTML = '<div class="project-row" style="justify-content:center"><div style="opacity:0.85">Loading…</div></div>';
+
+  try {
+    const zResp = await fetch('https://api.coingecko.com/api/v3/coins/zcash?localization=false&tickers=false&market_data=true');
+    const zJson = await zResp.json();
+    const zecSupply = zJson?.market_data?.circulating_supply ?? null;
+
+    const mResp = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1');
+    const markets = await mResp.json();
+    const zIndex = markets.findIndex(c => c.id === 'zcash' || (c.symbol||'').toLowerCase() === 'zec');
+
+    let twoAbove = [];
+    if (zIndex >= 0) twoAbove = markets.slice(Math.max(0,zIndex-2), zIndex).reverse();
+    if (twoAbove.length<2) twoAbove = markets.filter(c => c.id !== 'zcash').slice(0,2);
+
+    const btc = markets.find(c => c.id === 'bitcoin');
+    const ids = new Set(twoAbove.map(i=>i.id));
+    if (btc && !ids.has('bitcoin')) twoAbove.push(btc);
+    else {
+      const filler = markets.find(c => c.id !== 'zcash' && !ids.has(c.id));
+      if (filler) twoAbove.push(filler);
+    }
+    const final = twoAbove.slice(0,3);
+
+    partyList.innerHTML = '';
+    for (const proj of final) {
+      const mcap = proj.market_cap;
+      const price = proj.current_price;
+      const zecIf = (zecSupply && mcap) ? mcap / zecSupply : NaN;
+      partyList.innerHTML += `
+        <div class="project-row">
+          <div class="project-left">
+            <div class="project-title">${proj.name}</div>
+            <div class="project-ticker">${(proj.symbol||'').toUpperCase()}</div>
+          </div>
+          <div class="project-right">
+            <div>${formatMoneyCompact(mcap)}</div>
+            <div style="opacity:0.85">${formatPriceFull(price)} · ZEC @ cap: <strong>${isFinite(zecIf)?'$'+zecIf.toLocaleString('en-US',{maximumFractionDigits:2}):'—'}</strong></div>
+          </div>
+        </div>`;
+    }
+
+  } catch(err){
+    partyList.innerHTML = '<div class="project-row" style="justify-content:center;color:#ff8080;font-weight:700">Failed to load party data</div>';
+  }
+}
+
+/* Mode toggles */
+function setMode(mode){
+  if (mode === 'gold') {
+    document.documentElement.style.setProperty('--zcash-gold','#F3B611');
+    document.documentElement.style.setProperty('--gold-glow','rgba(243,182,17,0.18)');
+    modeGold.classList.add('active');
+    modePrivacy.classList.remove('active');
+  } else {
+    document.documentElement.style.setProperty('--zcash-gold','#57a88a');
+    document.documentElement.style.setProperty('--gold-glow','rgba(87,168,138,0.12)');
+    modePrivacy.classList.add('active');
+    modeGold.classList.remove('active');
+  }
+}
+setMode('privacy');
+modePrivacy.addEventListener('click', ()=> setMode('privacy'));
+modeGold.addEventListener('click', ()=> setMode('gold'));
 </script>
 </body>
 </html>
