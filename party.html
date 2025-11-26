@@ -8,392 +8,507 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 
 <style>
+/* ========================================= */
+/* ROOT VARIABLES + SMOOTH THEME CHANGE      */
+/* ========================================= */
 :root{
-  --zcash-gold: #57a88a;
-  --gold-glow: rgba(87,168,138,0.12);
-  --bg-dark: #000;
-  --privacy-green: #57a88a;
-  --accent-bright: #57a88a;
-  --accent-down: #ff85a1;
+  --accent: #57a88a;
+  --accent-weak: rgba(87,168,138,0.12);
+  --gold: #F3B611;
+  --shield-frame-color: #57a88a;
+  --bg-panel: rgba(12,12,12,0.92);
+  transition: --accent 450ms ease, --shield-frame-color 450ms ease;
 }
 
-/* basics */
-html,body{height:100%;margin:0;background:var(--bg-dark);color:var(--zcash-gold);font-family:Inter, "Helvetica Neue", Arial, sans-serif;overflow:auto;}
-.hex-wallpaper{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.03;color:#f3b611;font-family:ui-monospace,monospace;font-size:10px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;letter-spacing:6px;transform:translate3d(0,0,0);background:repeating-linear-gradient(90deg,transparent 0 10px, rgba(255,255,255,0.002) 10px 11px);will-change:transform,opacity}
-.hex-wallpaper .line{width:100%;text-align:center;white-space:nowrap;user-select:none;opacity:0.85}
-@keyframes hexDrift{from{transform:translateX(-4%)}to{transform:translateX(4%)}}
-.hex-wallpaper .line{animation:hexDrift 30s linear infinite alternate}
+/* BASE */
+html,body{ height:100%; margin:0; background:#000; color:var(--accent);
+  font-family:Inter, "Helvetica Neue", Arial, sans-serif; overflow:auto; }
 
-/* center & shield */
-.center{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:32px;box-sizing:border-box}
-.shield{position:relative;width:min(84vw,920px);max-width:920px;display:flex;align-items:center;justify-content:center;padding:48px 26px;box-sizing:border-box;gap:18px;max-height:calc(100vh - 120px);overflow:visible;transition:box-shadow 240ms ease,transform 180ms ease}
-.shield-bg{position:absolute;inset:0;border-radius:22px;z-index:0;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.14));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(8px) saturate(1.05);box-shadow:0 18px 80px rgba(0,0,0,0.6), 0 4px 18px rgba(243,182,17,0.03)}
-.shield-frame{position:absolute;z-index:1;left:50%;top:18px;transform:translateX(-50%);width:86%;opacity:0.24;pointer-events:none}
-.block-pulse{position:absolute;z-index:1;width:42%;height:48%;background:linear-gradient(180deg, rgba(243,182,17,0.06), rgba(243,182,17,0.03));border-radius:6px;transform:translateY(6%) scale(1);transition:transform 180ms ease,box-shadow 180ms ease,opacity 200ms ease;filter:blur(0.6px);display:block;will-change:transform,box-shadow,opacity}
+/* BACKGROUND HEX WALL */
+.hex-wallpaper{ position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.03; color:#f3b611;
+  font-family:ui-monospace,monospace; font-size:10px; display:flex; flex-wrap:wrap;
+  align-items:center; justify-content:center; letter-spacing:6px;
+  background:repeating-linear-gradient(90deg, transparent 0 10px, rgba(255,255,255,0.002) 10px 11px); }
+.hex-wallpaper .line{ width:100%; text-align:center; opacity:0.85; animation:hexDrift 30s linear infinite alternate; }
+@keyframes hexDrift{ from{ transform:translateX(-4%) } to{ transform:translateX(4%) } }
 
-/* price area */
-.price-wrap{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;flex-direction:column;width:100%;gap:10px;padding:12px;box-sizing:border-box}
-.price{font-family:'Orbitron',system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:clamp(36px,12vw,124px);line-height:0.9;letter-spacing:-0.02em;color:var(--zcash-gold);text-align:center;position:relative;z-index:3;-webkit-font-smoothing:antialiased;transition:opacity 220ms ease,transform 180ms cubic-bezier(.2,.9,.3,1);opacity:0.95;will-change:opacity,transform}
-.price::after{content:"";position:absolute;inset:auto -8% -8% -8%;z-index:-1;background:radial-gradient(closest-side,var(--gold-glow),transparent 40%);filter:blur(16px);opacity:0.9;pointer-events:none}
+/* CENTER SHIELD */
+.center{ position:relative; z-index:2; min-height:100vh; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; padding:32px; box-sizing:border-box; }
 
-/* blinking price animation */
-@keyframes blinkPrice {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
+.shield{ position:relative; width:min(84vw,920px); max-width:920px; padding:48px 26px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:18px; transition:box-shadow 350ms ease, transform 300ms ease; }
+
+.shield-bg{ position:absolute; inset:0; border-radius:22px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.16));
+  border:1px solid rgba(255,255,255,0.05); backdrop-filter:blur(8px) saturate(1.05); }
+
+/* SHIELD FRAME */
+.shield-frame{ position:absolute; left:50%; top:16px; transform:translateX(-50%); width:86%; opacity:0.25;
+  pointer-events:none; stroke:var(--shield-frame-color); transition:stroke 600ms ease, opacity 600ms ease; }
+@keyframes shieldPartyGlow { 0%{ filter:hue-rotate(0deg) brightness(1); } 50%{ filter:hue-rotate(40deg) brightness(1.18); } 100%{ filter:hue-rotate(0deg) brightness(1); } }
+.shield.party-active .shield-frame{ animation: shieldPartyGlow 4.5s linear infinite; }
+
+/* PRICE */
+.price{ font-family:'Orbitron'; font-weight:700; font-size:clamp(36px,12vw,88px); letter-spacing:-0.02em;
+  color:var(--accent); position:relative; transition:color 200ms ease, transform 200ms ease, background 220ms ease;
+  padding:6px 12px; border-radius:10px; min-width:160px; text-align:center; }
+
+/* update highlights */
+.price.updated{ transform:translateY(-2px) scale(1.02); background:rgba(255,255,255,0.03); box-shadow:0 6px 18px rgba(0,0,0,0.45); }
+.price.remote-updated{ transform:translateY(-3px) scale(1.035); background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); box-shadow:0 10px 30px rgba(0,0,0,0.55); }
+
+/* ZEC DETAILS */
+.zec-details{ display:flex; justify-content:center; width:100%; margin-top:6px; }
+.zec-card{ background:rgba(255,255,255,0.01); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+  display:flex; gap:12px; align-items:center; color:var(--accent); transition:color 600ms ease, border 600ms ease; position:relative; overflow:hidden; }
+
+/* shimmer */
+@keyframes shimmerSweep{ 0%{ transform:translateX(-120%) } 60%{ transform:translateX(120%) } 100%{ transform:translateX(120%) } }
+.shimmer{ position:absolute; top:0; left:0; bottom:0; width:40%; background:linear-gradient(115deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%);
+  transform:translateX(-120%); pointer-events:none; }
+
+/* PARTY LIST - smooth reveal */
+.party-list{
+  display:flex; flex-direction:column; gap:8px; width:100%; max-height:0; overflow:hidden; margin-top:8px;
+  opacity:0; transform:translateY(8px) scale(0.995); transition: max-height 520ms cubic-bezier(.05,.9,.2,1), opacity 420ms ease, transform 420ms cubic-bezier(.05,.9,.2,1);
 }
-.price.blinking {
-  animation: blinkPrice 1.4s infinite;
+
+/* when active, expand and show with animation */
+.shield.party-active .party-list{
+  max-height:420px; opacity:1; transform:translateY(0) scale(1);
 }
 
-/* zec details */
-.zec-details{width:100%;display:flex;justify-content:center;gap:18px;margin-top:6px;pointer-events:none}
-.zec-card{
-  pointer-events:auto;
-  background:rgba(255,255,255,0.01);
-  border-radius:10px;
-  padding:8px 12px;
-  border:1px solid rgba(255,255,255,0.03);
-  display:flex;
-  gap:12px;
-  align-items:center;
-  color:var(--zcash-gold);
-  font-size:13px;
+/* party content card style - a little party pop */
+.project-row{
+  background:rgba(255,255,255,0.01); padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.03);
+  display:flex; justify-content:space-between; gap:12px; align-items:center; transform:translateY(6px); opacity:0;
+  transition:transform 420ms ease, opacity 420ms ease;
 }
 
-/* party list */
-.party-list{position:relative;z-index:4;width:100%;max-height:220px;overflow:auto;display:none;flex-direction:column;gap:8px;pointer-events:auto;margin-top:8px}
-.shield.party-active .party-list{display:flex}
+/* animate children in when party opens (stagger) */
+.shield.party-active .project-row{ transform:translateY(0); opacity:1; }
 
-/* project rows */
-.project-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-.project-left{display:flex;flex-direction:column;gap:2px}
-.project-title{font-weight:800;font-size:14px;color:var(--zcash-gold)}
-.project-ticker{font-size:12px;opacity:0.8;color:var(--zcash-gold)}
-.project-right{text-align:right;min-width:170px;display:flex;flex-direction:column;gap:2px;align-items:flex-end;font-size:13px;color:var(--zcash-gold)}
-
-/* top-right mode toggle (shifted left) */
-.mode-toggle{
-  position:fixed;
-  right:40px;   /* moved left from 12px */
-  top:12px;
-  z-index:6;
-  display:flex;
-  gap:8px;
-  align-items:center;
-  background:rgba(255,255,255,0.02);
-  border-radius:8px;
-  padding:6px;
-  border:1px solid rgba(255,255,255,0.04);
-  backdrop-filter:blur(6px)
+/* leader (first item) gold highlight */
+.project-row.leader{
+  border-color: rgba(243,182,17,0.35);
+  box-shadow: 0 8px 28px rgba(243,182,17,0.06);
+  background: linear-gradient(180deg, rgba(243,182,17,0.02), rgba(255,255,255,0.005));
 }
-.mode-toggle button{background:transparent;border:0;color:#fff;padding:8px 10px;border-radius:6px;cursor:pointer;font-weight:700;opacity:0.9}
-.mode-toggle button.active{background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));color:var(--zcash-gold)}
+.project-row.leader .title { color: var(--gold); font-weight:800; }
 
-/* player toggle */
-.player-toggle{position:fixed;right:12px;bottom:12px;z-index:6;background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,0.04);color:white}
-.controls{position:fixed;right:12px;bottom:70px;z-index:7;display:flex;flex-direction:column;gap:8px;opacity:0;transform:translateY(8px);pointer-events:none}
-.controls.show{opacity:1;transform:none;pointer-events:auto}
-.controls .btn{appearance:none;border-radius:8px;padding:8px 12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff;cursor:pointer;font-weight:700}
+/* small meta text */
+.project-row .meta{ font-size:12px; opacity:.82; }
 
-/* party button */
-.party-btn{position:fixed;right:70px;bottom:12px;z-index:6;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.18));color:var(--zcash-gold);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px)}
-.party-back{margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--zcash-gold);padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700}
+/* MODE BUTTONS */
+.mode-toggle{ position:fixed; right:40px; top:12px; z-index:10; background:rgba(255,255,255,0.02); padding:6px; border-radius:8px;
+  border:1px solid rgba(255,255,255,0.04); display:flex; gap:8px; }
+.mode-toggle button{ background:transparent; border:0; padding:8px 10px; font-weight:700; cursor:pointer; color:#fff; border-radius:6px; }
+.mode-toggle button.active{ background:rgba(255,255,255,0.04); color:var(--accent); }
 
-/* responsive */
-@media(max-width:640px){.party-list{max-height:180px}.project-right{min-width:130px;font-size:12px}.party-btn{right:84px}}
+/* CONTROLS STACK (align radio + party button) */
+.controls-stack{
+  position:fixed; right:16px; bottom:16px; z-index:50;
+  display:flex; flex-direction:column; gap:12px; align-items:flex-end;
+}
+
+/* headphone button (top of stack) */
+.headphone-btn{ display:flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:999px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25)); border:1px solid rgba(255,255,255,0.04); color:var(--accent);
+  cursor:pointer; transition: transform 260ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms ease; }
+.headphone-btn:hover{ transform:translateY(-4px); box-shadow:0 8px 30px rgba(0,0,0,0.6); }
+
+/* party button (below) */
+.party-btn{
+  padding:10px 14px; border-radius:10px; background:rgba(255,255,255,0.02); color:var(--accent); border:1px solid rgba(255,255,255,0.04);
+  cursor:pointer; backdrop-filter:blur(6px); transition: transform 200ms ease, box-shadow 220ms ease;
+}
+.party-btn:hover{ transform:translateY(-4px); box-shadow:0 8px 26px rgba(0,0,0,0.45); }
+
+/* radio panel - smooth slide + fade */
+.radio-panel{ position:fixed; right:16px; bottom:86px; z-index:40; width:320px; max-width:calc(100vw - 32px);
+  background:var(--bg-panel); border-radius:12px; padding:12px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.04);
+  display:flex; flex-direction:column; gap:8px; opacity:0; transform:translateY(12px) scale(0.995); pointer-events:none;
+  transition: opacity 320ms ease, transform 360ms cubic-bezier(.05,.9,.2,1); }
+
+/* visible */
+.radio-panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+
+/* simple station row - only show name and active indicator */
+.station{ display:flex; align-items:center; justify-content:space-between; padding:10px; border-radius:10px; cursor:pointer;
+  background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.03); transition: transform 180ms ease, border-color 220ms ease; }
+.station:hover{ transform:translateY(-3px); }
+.station.active{ border-color:rgba(87,168,138,0.28); box-shadow:0 6px 20px rgba(87,168,138,0.06); }
+
+/* controls row (Stop / Mute) */
+.radio-controls{ display:flex; gap:8px; justify-content:flex-end; align-items:center; }
+.icon-btn{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:var(--accent); cursor:pointer; }
+.icon-btn.active{ background:rgba(255,255,255,0.03); }
+
+/* status small text */
+.small{ font-size:12px; opacity:.78; }
+
+/* responsive tweaks */
+@media (max-width:420px){
+  .radio-panel{ width:calc(100vw - 28px); right:14px; bottom:86px; }
+  .price{ font-size:clamp(28px,14vw,64px) }
+}
 </style>
 </head>
 
 <body>
 
-  <!-- wallpaper -->
-  <div class="hex-wallpaper" aria-hidden="true">
-    <div class="line">3f a1 0c 9b 4d 8e f2 7a c9 1b 55 aa 7f e3 2d</div>
-    <div class="line">b4 6a 9d 0f e1 3c 7b dd 18 90 2a 5e 33 c1 8f</div>
-    <div class="line">9c e4 1b 7f 2d 5a 80 3c b1 4e 6a 0f d3 77 9a</div>
+<div class="hex-wallpaper">
+  <div class="line">3f a1 0c 9b 4d 8e f2 7a c9 1b 55 aa 7f e3 2d</div>
+  <div class="line">b4 6a 9d 0f e1 3c 7b dd 18 90 2a 5e 33 c1 8f</div>
+  <div class="line">9c e4 1b 7f 2d 5a 80 3c b1 4e 6a 0f d3 77 9a</div>
+</div>
+
+<div class="center">
+  <div class="shield" id="shieldRoot">
+    <div class="shield-bg"></div>
+
+    <svg class="shield-frame" viewBox="0 0 100 120">
+      <path d="M50 4 L86 18 V48 C86 78 66 106 50 116 34 106 14 78 14 48 V18 Z"
+            fill="none" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+
+    <div class="price" id="price">—</div>
+
+    <div class="zec-details">
+      <div class="zec-card">
+        <div style="font-weight:900">ZEC</div>
+
+        <div>
+          <div style="font-size:12px;opacity:.8">Supply</div>
+          <div id="zecSupply">—</div>
+        </div>
+
+        <div>
+          <div style="font-size:12px;opacity:.8">Market cap</div>
+          <div id="zecMarketCap">—</div>
+        </div>
+
+        <div class="shimmer" id="zecShimmer"></div>
+      </div>
+    </div>
+
+    <div class="party-list" id="partyList" aria-live="polite"></div>
+
+    <div id="partyControls" style="display:none">
+      <button id="partyBack" class="party-back">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="mode-toggle">
+  <button id="modePrivacy" class="active">Privacy</button>
+  <button id="modeGold">Gold</button>
+</div>
+
+<!-- Controls stack - aligns radio + flippening button -->
+<div class="controls-stack" id="controlsStack">
+  <button class="headphone-btn" id="radioToggleBtn" aria-label="Toggle radio" title="Radio">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block">
+      <path d="M3 13v-2a9 9 0 0 1 18 0v2"></path>
+      <path d="M5 13v6a2 2 0 0 0 2 2h1v-8H5z"></path>
+      <path d="M19 13v6a2 2 0 0 1-2 2h-1v-8h3z"></path>
+    </svg>
+  </button>
+
+  <button id="partyBtn" class="party-btn">ZEC Flippening Party</button>
+</div>
+
+<!-- RADIO PANEL -->
+<div class="radio-panel" id="radioPanel" role="region" aria-label="Radio panel">
+  <!-- Station 1 (Dance 1) -->
+  <!-- Sunshine Live EDM (public stream endpoint) -->
+  <div class="station" data-stream="https://stream.sunshine-live.de/edm/mp3-128" data-index="0">
+    <div>
+      <div style="font-weight:700" class="title">Dance 1</div>
+      <div class="small">Sunshine EDM</div>
+    </div>
+    <div class="small status">Stopped</div>
   </div>
 
-  <div class="center">
-    <div class="shield reveal-ready" id="shieldRoot">
-      <div class="shield-bg"></div>
-      <div class="block-pulse" id="blockPulse"></div>
-      <svg class="shield-frame" viewBox="0 0 100 120">
-        <path d="M50 4 L86 18 V48 C86 78 66 106 50 116 34 106 14 78 14 48 V18 Z"
-              fill="none" stroke="currentColor" stroke-width="1.5"/>
-      </svg>
+  <!-- Station 2 (Dance 2) -->
+  <!-- Dance.FM MP3 HQ -->
+  <div class="station" data-stream="https://streams.dancefm.net/mp3-hq" data-index="1">
+    <div>
+      <div style="font-weight:700" class="title">Dance 2</div>
+      <div class="small">Dance.FM HQ</div>
+    </div>
+    <div class="small status">Stopped</div>
+  </div>
 
-      <div class="price-wrap">
-        <div class="price" id="price">—</div>
-
-        <div class="zec-details" id="zecDetails">
-          <div class="zec-card" id="zecCard">
-            <div style="font-weight:900">ZEC</div>
-            <div><div style="font-size:12px;opacity:0.85">Supply</div><div id="zecSupply" style="font-weight:700">—</div></div>
-            <div><div style="font-size:12px;opacity:0.85">Market cap</div><div id="zecMarketCap" style="font-weight:700">—</div></div>
-          </div>
-        </div>
-
-        <div class="party-list" id="partyList"></div>
-
-        <div id="partyControls" style="display:none;pointer-events:auto">
-          <button id="partyBack" class="party-back">Go Back</button>
-        </div>
-      </div>
+  <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px">
+    <div class="radio-controls">
+      <button id="stopAll" class="icon-btn">Stop</button>
+      <button id="muteBtn" class="icon-btn">Mute</button>
     </div>
   </div>
 
-  <!-- mode buttons -->
-  <div class="mode-toggle">
-    <button id="modePrivacy" class="active">Privacy</button>
-    <button id="modeGold">Gold</button>
-  </div>
-
-  <!-- radio -->
-  <button class="player-toggle" id="playerToggle">🎧</button>
-  <div class="controls" id="controls">
-    <button class="btn station" id="stationDelta">Delta Radio — Live</button>
-    <button class="btn station" id="stationSunSP6">Sunshine Charts</button>
-    <button class="btn" id="stopBtn">Stop</button>
-    <button class="btn" id="muteBtn">Mute</button>
-  </div>
-  <audio id="radio" crossorigin="anonymous" preload="none"></audio>
-
-  <!-- party button -->
-  <button id="partyBtn" class="party-btn">ZEC Flippening Party</button>
+  <!-- audio elements -->
+  <audio id="audio0" crossorigin="anonymous"></audio>
+  <audio id="audio1" crossorigin="anonymous"></audio>
+</div>
 
 <script>
-/* ------------- Elements ------------- */
-const priceEl = document.getElementById('price');
-const shieldRoot = document.getElementById('shieldRoot');
-const partyList = document.getElementById('partyList');
-const partyBtn = document.getElementById('partyBtn');
-const partyBack = document.getElementById('partyBack');
-const partyControls = document.getElementById('partyControls');
-const zecSupplyEl = document.getElementById('zecSupply');
-const zecMarketCapEl = document.getElementById('zecMarketCap');
+/* Elements & helpers */
+const priceEl = document.getElementById("price");
+const zecSupplyEl = document.getElementById("zecSupply");
+const zecMarketCapEl = document.getElementById("zecMarketCap");
+const shimmerEl = document.getElementById("zecShimmer");
 
-const playerToggle = document.getElementById('playerToggle');
-const controlsWrapEl = document.getElementById('controls');
-const muteBtn = document.getElementById('muteBtn');
+const shieldRoot = document.getElementById("shieldRoot");
+const partyList = document.getElementById("partyList");
+const partyBtn = document.getElementById("partyBtn");
+const partyBack = document.getElementById("partyBack");
+const partyControls = document.getElementById("partyControls");
 
-const modePrivacy = document.getElementById('modePrivacy');
-const modeGold = document.getElementById('modeGold');
+const modePrivacy = document.getElementById("modePrivacy");
+const modeGold = document.getElementById("modeGold");
 
-const radioEl = document.getElementById('radio');
+/* Radio elements */
+const radioToggleBtn = document.getElementById("radioToggleBtn");
+const radioPanel = document.getElementById("radioPanel");
+const stopAllBtn = document.getElementById("stopAll");
+const muteBtn = document.getElementById("muteBtn");
+const stationEls = Array.from(document.querySelectorAll(".station"));
+const audioEls = [ document.getElementById("audio0"), document.getElementById("audio1") ];
 
-/* Formatters */
-const formatMoneyCompact = v => {
-  if (!isFinite(v)) return '—';
-  if (Math.abs(v) >= 1e12) return '$' + (v/1e12).toFixed(2) + 'T';
-  if (Math.abs(v) >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
-  if (Math.abs(v) >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
-  if (Math.abs(v) >= 1e3) return '$' + (v/1e3).toFixed(2) + 'k';
-  return '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits:2});
-};
-const formatPriceFull = v => isFinite(v) ? '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits:6}) : '—';
+let isMuted = false;
+let activeIndex = null;
 
-/* Price polling */
+/* formatting */
+function formatMoneyCompact(v){
+  if(!isFinite(v)) return "—";
+  if (Math.abs(v) >= 1e12) return "$" + (v/1e12).toFixed(2) + "T";
+  if (Math.abs(v) >= 1e9) return "$" + (v/1e9).toFixed(2) + "B";
+  if (Math.abs(v) >= 1e6) return "$" + (v/1e6).toFixed(2) + "M";
+  if (Math.abs(v) >= 1e3) return "$" + (v/1e3).toFixed(2) + "k";
+  return "$" + v.toLocaleString("en-US",{maximumFractionDigits:2});
+}
+function formatPriceFullFixed2(v){
+  if(!isFinite(v)) return "—";
+  const parts = Number(v).toFixed(2);
+  const [intPart, frac] = parts.split(".");
+  return "$" + Number(intPart).toLocaleString("en-US") + "." + frac;
+}
+
+/* PRICE state */
+let lastFetchedPrice = null;
+let displayedPrice = null;
+let perSecondTicker = null;
+let fetchTicker = null;
+
+/* Fetch ZEC price (remote) */
 async function fetchZecPrice(){
-  try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd');
-    if (!res.ok) throw new Error('price fetch failed');
-    const json = await res.json();
-    const val = json?.zcash?.usd;
-    if (val == null) throw new Error('bad response');
-    priceEl.textContent = formatPriceFull(val);
-
-    /* blink animation */
-    priceEl.classList.add('blinking');
-    setTimeout(() => priceEl.classList.remove('blinking'), 1400);
-
-  } catch (e) {
-    console.warn('fetchZecPrice error', e);
-  }
-}
-
-async function fetchZecDetails(){
-  try {
-    const r = await fetch('https://api.coingecko.com/api/v3/coins/zcash?localization=false&tickers=false&market_data=true');
-    if (!r.ok) throw new Error('zcash details failed');
+  try{
+    const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd");
     const j = await r.json();
-    const s = j?.market_data?.circulating_supply ?? j?.circulating_supply ?? null;
-    const m = j?.market_data?.market_cap?.usd ?? null;
-    if (s) zecSupplyEl.textContent = Number(s).toLocaleString('en-US', {maximumFractionDigits:0}) + ' ZEC';
-    if (m) zecMarketCapEl.textContent = formatMoneyCompact(m);
-  } catch(e){
-    console.warn('fetchZecDetails error', e);
+    const val = j?.zcash?.usd;
+    if (val == null) return;
+
+    lastFetchedPrice = Number(val);
+    displayedPrice = lastFetchedPrice;
+    priceEl.textContent = formatPriceFullFixed2(displayedPrice);
+    priceEl.classList.add("remote-updated");
+    setTimeout(()=> priceEl.classList.remove("remote-updated"), 700);
+  }catch(e){
+    console.error("fetchZecPrice error", e);
   }
 }
+
+/* Fetch details */
+let zecCirculatingSupply = null;
+async function fetchZecDetails(){
+  try{
+    const r = await fetch("https://api.coingecko.com/api/v3/coins/zcash?localization=false&tickers=false&market_data=true");
+    const j = await r.json();
+    const s = j?.market_data?.circulating_supply ?? null;
+    const m = j?.market_data?.market_cap?.usd ?? null;
+    if(s){ zecCirculatingSupply = Number(s); zecSupplyEl.textContent = Number(s).toLocaleString("en-US"); }
+    if(m) zecMarketCapEl.textContent = formatMoneyCompact(m);
+
+    shimmerEl.style.animation = "none";
+    void shimmerEl.offsetWidth;
+    shimmerEl.style.animation = "shimmerSweep 1.8s ease";
+  }catch(e){ console.error("fetchZecDetails error", e); }
+}
+
+/* initialize */
 fetchZecPrice();
 fetchZecDetails();
-setInterval(fetchZecPrice, 15000);
+fetchTicker = setInterval(fetchZecPrice, 15000);
 setInterval(fetchZecDetails, 60000);
 
-/* Audio player (unchanged from your original except formatting) */
-let audioCtx = null, analyser = null, dataArray = null, sourceNode = null, isPlaying=false, isMuted=false;
-
-function looksLikeStreamUrl(url){
-  return /(\.mp3(\?|$)|\.aac(\?|$)|\/mp3-|\/aac-|\/stream\/|icecast|shoutcast|\/play\.pls|\/play\.m3u|\/mp3-)/i.test(url);
+/* per-second small increments (cents) */
+function startPerSecondTicker(){
+  if(perSecondTicker) return;
+  perSecondTicker = setInterval(()=>{
+    if(displayedPrice == null) return;
+    // small step to move cents (ensure visible changes with 2 decimals)
+    const base = Math.max(0.005, Math.abs(displayedPrice) * 0.00002);
+    const jitter = (Math.random() * base) * 0.7 + (base * 0.02);
+    displayedPrice = Number(displayedPrice) + jitter;
+    priceEl.textContent = formatPriceFullFixed2(displayedPrice);
+    priceEl.classList.add("updated");
+    setTimeout(()=> priceEl.classList.remove("updated"), 220);
+  }, 1000);
 }
+startPerSecondTicker();
 
-function initAudioGraph(){
-  if (audioCtx) return;
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-    try {
-      sourceNode = audioCtx.createMediaElementSource(radioEl);
-      sourceNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
-    } catch(err){
-      console.warn('Audio graph issue:', err);
-    }
-  } catch(err){
-    console.warn('AudioContext unavailable:', err);
-    audioCtx = null;
-  }
-}
-
-async function setStation(url){
-  stopAudio();
-  if (!looksLikeStreamUrl(url)) {
-    if (confirm('This link may not be a direct stream. Open it in a new tab?')) window.open(url, '_blank');
-    return;
-  }
-  radioEl.src = url;
-  radioEl.load();
-  try { initAudioGraph(); if (audioCtx) await audioCtx.resume(); } catch(e){}
-  try { await radioEl.play(); isPlaying=true; } catch(e){ alert('Playback failed.'); }
-}
-
-function stopAudio(){
-  try { radioEl.pause(); } catch(e){}
-  try { radioEl.removeAttribute('src'); radioEl.load(); } catch(e){}
-  try { if (audioCtx) audioCtx.close(); } catch(e){}
-  audioCtx = null;
-  isPlaying = false;
-}
-
-function toggleMute(){
-  isMuted = !isMuted;
-  radioEl.muted = isMuted;
-  muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
-}
-
-/* station buttons */
-document.getElementById('stationDelta').addEventListener('click', ()=> setStation('https://streams.deltaradio.de/delta-live/mp3-192/streams.deltaradio.de/'));
-document.getElementById('stationSunSP6').addEventListener('click', ()=> setStation('https://stream.sunshine-live.de/sp6/mp3-192/utm_source=radio.menu/'));
-document.getElementById('stopBtn').addEventListener('click', stopAudio);
-muteBtn.addEventListener('click', toggleMute);
-
-/* Player toggle */
-playerToggle.addEventListener('click', (e)=>{
-  e.stopPropagation();
-  const shown = controlsWrapEl.classList.toggle('show');
-  controlsWrapEl.setAttribute('aria-hidden', String(!shown));
-  playerToggle.setAttribute('aria-expanded', String(shown));
-});
-
-/* close player if clicking outside */
-document.addEventListener('click', (e)=>{
-  if (!controlsWrapEl.classList.contains('show')) return;
-  if (playerToggle.contains(e.target) || controlsWrapEl.contains(e.target)) return;
-  controlsWrapEl.classList.remove('show');
-});
-
-/* Party mode */
-let partyActive = false;
-partyBtn.addEventListener('click', async (e) => {
-  e.stopPropagation();
-  if (!partyActive) await openParty();
-  else closeParty();
-});
-partyBack.addEventListener('click', closeParty);
+/* PARTY - top 5 with smooth reveal, first is gold */
+let partyOn = false;
+partyBtn.addEventListener("click", ()=> partyOn? closeParty() : openParty());
+if(document.getElementById("partyBack")) document.getElementById("partyBack").addEventListener("click", closeParty);
 
 async function openParty(){
-  partyActive = true;
-  partyBtn.setAttribute('aria-pressed','true');
-  shieldRoot.classList.add('party-active');
-  partyControls.style.display = 'block';
-  partyList.setAttribute('aria-hidden','false');
-  await loadPartyData();
+  partyOn = true;
+  shieldRoot.classList.add("party-active");
+  partyControls.style.display = "block";
+  await loadPartyList();
 }
-
 function closeParty(){
-  partyActive = false;
-  partyBtn.setAttribute('aria-pressed','false');
-  shieldRoot.classList.remove('party-active');
-  partyControls.style.display = 'none';
-  partyList.setAttribute('aria-hidden','true');
+  partyOn = false;
+  shieldRoot.classList.remove("party-active");
+  partyControls.style.display = "none";
 }
 
-async function loadPartyData(){
-  partyList.innerHTML = '<div class="project-row" style="justify-content:center"><div style="opacity:0.85">Loading…</div></div>';
+async function loadPartyList(){
+  partyList.innerHTML = `<div style="padding:12px;text-align:center;opacity:.8">Loading top 5 by market cap...</div>`;
 
-  try {
-    const zResp = await fetch('https://api.coingecko.com/api/v3/coins/zcash?localization=false&tickers=false&market_data=true');
-    const zJson = await zResp.json();
-    const zecSupply = zJson?.market_data?.circulating_supply ?? null;
+  try{
+    if(!zecCirculatingSupply) await fetchZecDetails();
 
-    const mResp = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1');
-    const markets = await mResp.json();
-    const zIndex = markets.findIndex(c => c.id === 'zcash' || (c.symbol||'').toLowerCase() === 'zec');
+    const r = await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=5&page=1");
+    const mk = await r.json();
+    if(!Array.isArray(mk) || mk.length === 0){ partyList.innerHTML = `<div style="padding:12px;text-align:center;opacity:.8">No data</div>`; return; }
 
-    let twoAbove = [];
-    if (zIndex >= 0) twoAbove = markets.slice(Math.max(0,zIndex-2), zIndex).reverse();
-    if (twoAbove.length<2) twoAbove = markets.filter(c => c.id !== 'zcash').slice(0,2);
+    // clear then insert with staggered animation
+    partyList.innerHTML = "";
+    mk.forEach((proj, idx) => {
+      const mcap = proj.market_cap ?? 0;
+      const p = proj.current_price ?? 0;
+      const sym = proj.symbol ? proj.symbol.toUpperCase() : "";
+      const zecIf = (zecCirculatingSupply && zecCirculatingSupply > 0) ? (mcap / zecCirculatingSupply) : null;
 
-    const btc = markets.find(c => c.id === 'bitcoin');
-    const ids = new Set(twoAbove.map(i=>i.id));
-    if (btc && !ids.has('bitcoin')) twoAbove.push(btc);
-    else {
-      const filler = markets.find(c => c.id !== 'zcash' && !ids.has(c.id));
-      if (filler) twoAbove.push(filler);
-    }
-    const final = twoAbove.slice(0,3);
-
-    partyList.innerHTML = '';
-    for (const proj of final) {
-      const mcap = proj.market_cap;
-      const price = proj.current_price;
-      const zecIf = (zecSupply && mcap) ? mcap / zecSupply : NaN;
-      partyList.innerHTML += `
-        <div class="project-row">
-          <div class="project-left">
-            <div class="project-title">${proj.name}</div>
-            <div class="project-ticker">${(proj.symbol||'').toUpperCase()}</div>
-          </div>
-          <div class="project-right">
-            <div>${formatMoneyCompact(mcap)}</div>
-            <div style="opacity:0.85">${formatPriceFull(price)} · ZEC @ cap: <strong>${isFinite(zecIf)?'$'+zecIf.toLocaleString('en-US',{maximumFractionDigits:2}):'—'}</strong></div>
-          </div>
+      const row = document.createElement("div");
+      row.className = "project-row" + (idx === 0 ? " leader" : "");
+      row.style.transitionDelay = (idx * 60) + "ms"; // subtle stagger
+      row.innerHTML = `
+        <div>
+          <div class="title" style="font-weight:700">${proj.name}</div>
+          <div style="opacity:0.8">${sym}</div>
+          <div class="meta">Market cap · ${formatMoneyCompact(mcap)}</div>
+        </div>
+        <div style="text-align:right">
+          <div>${formatPriceFullFixed2(p)} · <span class="meta">ZEC if: <strong>${zecIf ? formatPriceFullFixed2(zecIf) : "—"}</strong></span></div>
         </div>`;
-    }
+      partyList.appendChild(row);
+    });
 
-  } catch(err){
-    partyList.innerHTML = '<div class="project-row" style="justify-content:center;color:#ff8080;font-weight:700">Failed to load party data</div>';
+  }catch(e){
+    console.error("loadPartyList error", e);
+    partyList.innerHTML = `<div style='padding:12px;color:#f88;text-align:center'>Failed to load top 5</div>`;
   }
 }
 
-/* Mode toggles */
-function setMode(mode){
-  if (mode === 'gold') {
-    document.documentElement.style.setProperty('--zcash-gold','#F3B611');
-    document.documentElement.style.setProperty('--gold-glow','rgba(243,182,17,0.18)');
-    modeGold.classList.add('active');
-    modePrivacy.classList.remove('active');
+/* MODE SWITCH */
+function setMode(m){
+  if(m==="gold"){
+    document.documentElement.style.setProperty("--accent", "#F3B611");
+    document.documentElement.style.setProperty("--shield-frame-color","#F3B611");
+    modeGold.classList.add("active"); modePrivacy.classList.remove("active");
   } else {
-    document.documentElement.style.setProperty('--zcash-gold','#57a88a');
-    document.documentElement.style.setProperty('--gold-glow','rgba(87,168,138,0.12)');
-    modePrivacy.classList.add('active');
-    modeGold.classList.remove('active');
+    document.documentElement.style.setProperty("--accent", "#57a88a");
+    document.documentElement.style.setProperty("--shield-frame-color", "#57a88a");
+    modePrivacy.classList.add("active"); modeGold.classList.remove("active");
   }
 }
-setMode('privacy');
-modePrivacy.addEventListener('click', ()=> setMode('privacy'));
-modeGold.addEventListener('click', ()=> setMode('gold'));
+modePrivacy.addEventListener("click", ()=> setMode("privacy"));
+modeGold.addEventListener("click", ()=> setMode("gold"));
+setMode("privacy");
+
+/* ============================
+   RADIO INTERACTIONS (simplified)
+   - station rows clickable (Dance 1 / Dance 2)
+   - Stop and Mute available
+   ============================ */
+
+radioToggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  radioPanel.classList.toggle("open");
+  radioToggleBtn.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-6px)' }, { transform: 'translateY(0)' }], { duration: 260, easing: 'cubic-bezier(.2,.9,.3,1)' });
+});
+
+// close panel on outside click
+document.addEventListener("click", (e) => {
+  if(!radioPanel.classList.contains("open")) return;
+  if(!radioPanel.contains(e.target) && !radioToggleBtn.contains(e.target)){
+    radioPanel.classList.remove("open");
+  }
+});
+radioPanel.addEventListener("click", (e)=> e.stopPropagation());
+
+/* set audio src for each audio element */
+stationEls.forEach((el, idx) => {
+  const url = el.dataset.stream;
+  const audio = audioEls[idx];
+  if(url) audio.src = url;
+});
+
+/* clicking a station toggles play/stop */
+stationEls.forEach((el, idx) => {
+  const audio = audioEls[idx];
+  const status = el.querySelector(".status");
+  el.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    // if already active, stop it
+    if(activeIndex === idx){
+      audio.pause();
+      audio.currentTime = 0;
+      el.classList.remove("active");
+      status.textContent = "Stopped";
+      activeIndex = null;
+      return;
+    }
+    // stop other audio
+    audioEls.forEach((a, i) => {
+      if(i !== idx){ a.pause(); try{ a.currentTime = 0; }catch{} stationEls[i].classList.remove("active"); stationEls[i].querySelector(".status").textContent = "Stopped"; }
+    });
+    // play selected
+    try{
+      audio.muted = isMuted;
+      await audio.play();
+      activeIndex = idx;
+      el.classList.add("active");
+      status.textContent = "Playing";
+    }catch(err){
+      console.warn("Playback may be blocked by browser autoplay policy:", err);
+      status.textContent = "Playback blocked";
+    }
+  });
+});
+
+/* Stop All */
+stopAllBtn.addEventListener("click", () => {
+  audioEls.forEach((a, i) => { a.pause(); try{ a.currentTime = 0; }catch{} stationEls[i].classList.remove("active"); stationEls[i].querySelector(".status").textContent = "Stopped"; });
+  activeIndex = null;
+});
+
+/* Mute toggle */
+muteBtn.addEventListener("click", () => {
+  isMuted = !isMuted;
+  audioEls.forEach(a => a.muted = isMuted);
+  muteBtn.classList.toggle("active", isMuted);
+  muteBtn.textContent = isMuted ? "Muted" : "Mute";
+});
+
+/* prevent pointer-events weirdness when audio tags not ready */
+audioEls.forEach(a => { a.preload = "none"; });
+
 </script>
 </body>
 </html>
