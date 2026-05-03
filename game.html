@@ -270,10 +270,11 @@ body::after{
   font-size:clamp(13px,2.2vw,16px);
   line-height:1.85;
   color:#c8c8c8;
-  min-height:160px;
+  min-height:200px;
   width:100%;
   position:relative;
 }
+#intro-text div { line-height:1.85; }
 #intro-text .hi  { color:var(--gold); }
 #intro-text .red { color:#ff4444; }
 #intro-text .teal{ color:var(--neon); }
@@ -282,11 +283,12 @@ body::after{
 /* blinking cursor */
 #intro-cursor{
   display:inline-block;
-  width:2px;height:1.1em;
+  width:8px;height:1em;
   background:var(--neon);
-  vertical-align:middle;
-  margin-left:2px;
+  vertical-align:text-bottom;
+  margin-left:1px;
   animation:blink .7s steps(1) infinite;
+  flex-shrink:0;
 }
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 
@@ -451,6 +453,21 @@ body::after{
   z-index:10;
 }
 #intro-skip:hover{color:rgba(244,183,40,.6);}
+
+/* mute button */
+#intro-mute{
+  position:absolute;top:16px;right:90px;
+  font-size:9px;color:rgba(244,183,40,.25);
+  letter-spacing:.2em;cursor:pointer;
+  border:none;background:none;
+  transition:color .2s;
+  font-family:'Share Tech Mono',monospace;
+  z-index:10;
+  white-space:nowrap;
+}
+#intro-mute:hover{color:rgba(244,183,40,.6);}
+#intro-mute.muted{color:rgba(255,80,80,.45);}
+#intro-mute.muted:hover{color:rgba(255,80,80,.8);}
 </style>
 </head>
 <body>
@@ -460,6 +477,7 @@ body::after{
 <!-- INTRO CINEMATIC -->
 <div id="intro">
   <button id="intro-skip">SKIP ›</button>
+  <button id="intro-mute">🔊 SOUND</button>
   <div id="intro-inner">
     <div id="intro-year">// SYSTEM BROADCAST — 2026.04.14 — 03:17:42 UTC</div>
     <div id="intro-title-wrap">
@@ -777,16 +795,19 @@ async function submitScore(raw) {
   d = d.slice(0, 50);
   saveLbLocal(d); renderLb(d);
 
-  // 2. Upsert to Supabase (insert or update if name exists with higher score)
+  // 2. Upsert to Supabase (insert or update — name is the unique key)
+  if (raw <= 0) { await loadLb(); return; }
+  const cleanName = pd.name.slice(0,12).replace(/[^A-Z0-9_\-\.]/g,'');
+  if (cleanName.length < 2) { await loadLb(); return; }
   try {
     await fetch(`${SB_URL}/rest/v1/scores`, {
       method: 'POST',
-      headers: { ...SB_HDR, 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ name: pd.name.slice(0,12).replace(/[^A-Z0-9_\-\.]/g,''), raw, updated_at: new Date().toISOString() })
+      headers: { ...SB_HDR, 'Prefer': 'resolution=merge-duplicates,return=representation' },
+      body: JSON.stringify({ name: cleanName, raw, updated_at: new Date().toISOString() })
     });
     // Reload global board after submit
     await loadLb();
-  } catch(e) {}
+  } catch(e) { await loadLb(); }
 }
 
 function renderLb(data) {
@@ -1445,6 +1466,7 @@ const introText    = document.getElementById('intro-text');
 const introNext    = document.getElementById('intro-next');
 const introBar     = document.getElementById('intro-bar');
 const introSkipBtn = document.getElementById('intro-skip');
+const introMuteBtn = document.getElementById('intro-mute');
 const introChLabel = document.getElementById('ch-label');
 const introDotsEl  = document.getElementById('intro-dots');
 const introNameWrap= document.getElementById('intro-name-wrap');
@@ -1475,88 +1497,252 @@ function stripTags(s) {
   return s.replace(/<[^>]+>/g,'').replace(/&[a-z]+;/g,'X');
 }
 
+// ── TYPEWRITER SOUND ──────────────────────────────────────────────
+// AudioContext is created lazily on first user gesture so browsers allow it.
+let _audioCtx = null;
+let _typeSoundMuted = false;
+
+function _ensureAudio() {
+  if (_audioCtx) return _audioCtx;
+  try {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch(e) {}
+  return _audioCtx;
+}
+
+function playTypeClick() {
+  if (_typeSoundMuted) return;
+  try {
+    const ctx = _ensureAudio();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    // ~30ms noise burst shaped to sound like a key click
+    const len  = Math.floor(ctx.sampleRate * 0.028);
+    const buf  = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      const decay = Math.pow(1 - i / len, 5);
+      data[i] = (Math.random() * 2 - 1) * decay * 0.35;
+    }
+    const src    = ctx.createBufferSource();
+    src.buffer   = buf;
+    const filter = ctx.createBiquadFilter();
+    filter.type            = 'bandpass';
+    filter.frequency.value = 3200;
+    filter.Q.value         = 0.7;
+    const gain      = ctx.createGain();
+    gain.gain.value = 0.6;
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    src.start();
+  } catch(e) {}
+}
+
+// ── CHAPTER TYPING ENGINE ─────────────────────────────────────────
+//
+// Strategy: build a flat array of lines first, then type them one by one.
+// Cursor is a real inline element that moves with typed characters because
+// we write actual text nodes — not a clipping trick — so the cursor sits
+// right after the last typed character at all times.
+//
+// Each chapter entry may contain \n — we split on those into sub-lines.
+// Blank segments from leading \n are counted and converted to top margin.
+//
 function typeChapter(chIdx, onDone) {
   const ch = CHAPTERS[chIdx];
   introText.innerHTML = '';
-  const cursor = document.createElement('span');
-  cursor.id = 'intro-cursor';
-  introText.appendChild(cursor);
 
   introChLabel.textContent = ch.label;
   introChLabel.classList.add('vis');
   introBar.classList.remove('vis');
-  introNext.disabled = true;
+  introNext.disabled  = true;
   introNameWrap.classList.remove('vis');
 
-  introTyping = true;
+  introTyping   = true;
   introSkipType = false;
 
+  // ── Build flat line list ──────────────────────────────────────
+  // Each item: { plain, parts, gap, topMargin }
+  //   plain  = raw text (no HTML tags) for character-by-character typing
+  //   parts  = array of { text, cls } segments with optional colour class
+  //   gap    = ms delay before this line starts
+  //   topMargin = CSS margin-top for spacing
+  //
+  // We parse the coloured tag markup into segments so we can build
+  // the line character-by-character with correct colouring, avoiding
+  // the clipPath trick entirely.
+  //
+  const CLASS_MAP = { hi:'hi', red:'red', teal:'teal', pur:'pur' };
+
+  function parseSegments(raw) {
+    // Returns [{text, cls}] where cls may be null (plain) or a colour class
+    const out = [];
+    const re  = /<(hi|red|teal|pur)>([\s\S]*?)<\/\1>/g;
+    let last  = 0, m;
+    while ((m = re.exec(raw)) !== null) {
+      if (m.index > last) out.push({ text: raw.slice(last, m.index), cls: null });
+      out.push({ text: m[2], cls: CLASS_MAP[m[1]] });
+      last = re.lastIndex;
+    }
+    if (last < raw.length) out.push({ text: raw.slice(last), cls: null });
+    return out;
+  }
+
+  const lines = [];
+  let isVeryFirst = true; // first line of the whole chapter
+
+  ch.text.forEach((entry, ei) => {
+    const rawParts = entry.t.split('\n');
+    // Count leading empty strings = leading \n = paragraph gap above
+    let leadingBlanks = 0;
+    while (leadingBlanks < rawParts.length && rawParts[leadingBlanks] === '') leadingBlanks++;
+
+    const realParts = rawParts.filter(p => p !== '');
+    if (!realParts.length) return;
+
+    realParts.forEach((part, pi) => {
+      let topMargin = '0';
+      if (isVeryFirst) {
+        topMargin = '0';
+      } else if (pi === 0) {
+        // First sub-line of this entry — use the leading blank count for spacing
+        topMargin = leadingBlanks >= 2 ? '1.15em' : leadingBlanks === 1 ? '0.55em' : '0.3em';
+      } else {
+        // Continuation sub-line within the same entry
+        topMargin = '0.25em';
+      }
+
+      lines.push({
+        segments  : parseSegments(part),
+        plain     : part.replace(/<[^>]+>/g, ''), // raw text for char count
+        gap       : (pi === 0) ? entry.d : 110,   // delay: entry.d for first sub-line
+        topMargin,
+      });
+      isVeryFirst = false;
+    });
+  });
+
+  // ── Shared blinking cursor element ───────────────────────────
+  const cursorEl  = document.createElement('span');
+  cursorEl.id     = 'intro-cursor';
+
+  // ── finish helper (used in two places) ───────────────────────
+  function finish() {
+    introText.appendChild(cursorEl);   // cursor at very end
+    introTyping = false;
+    introBar.classList.add('vis');
+    introNext.disabled = false;
+    if (chIdx === CHAPTERS.length - 1) {
+      introNext.style.display = 'none';
+      introNameWrap.classList.add('vis');
+      setTimeout(() => introNameInp.focus(), 100);
+    }
+    if (onDone) onDone();
+  }
+
+  // ── dump all remaining lines instantly (skip mode) ───────────
+  function dumpRemaining(fromIdx) {
+    for (let i = fromIdx; i < lines.length; i++) {
+      const item  = lines[i];
+      const lineEl = document.createElement('div');
+      lineEl.style.marginTop = item.topMargin;
+      item.segments.forEach(seg => {
+        const node = seg.cls ? Object.assign(document.createElement('span'), { className: seg.cls, textContent: seg.text })
+                             : document.createTextNode(seg.text);
+        lineEl.appendChild(node);
+      });
+      introText.appendChild(lineEl);
+    }
+    finish();
+  }
+
+  // ── main per-line loop ────────────────────────────────────────
   let lineIdx = 0;
 
   function doLine() {
-    if (lineIdx >= ch.text.length) {
-      introTyping = false;
-      introBar.classList.add('vis');
-      introNext.disabled = false;
-      if (chIdx === CHAPTERS.length - 1) {
-        // Last chapter — show name input
-        introNext.style.display = 'none';
-        introNameWrap.classList.add('vis');
-        setTimeout(() => introNameInp.focus(), 100);
-      }
-      if (onDone) onDone();
-      return;
-    }
+    if (lineIdx >= lines.length) { finish(); return; }
 
-    const line = ch.text[lineIdx];
-    const delay = introSkipType ? 0 : line.d;
+    const item = lines[lineIdx];
 
     introTypingTimeout = setTimeout(() => {
-      // Type out this line character by character
-      const html    = parseLine(line.t);
-      const plain   = stripTags(html);
-      const speed   = introSkipType ? 0 : 18;
-      let   charIdx = 0;
 
-      // We inject HTML segments — build a temp span
-      const span = document.createElement('span');
-      span.innerHTML = html;
-      span.style.opacity = '0';
-      introText.insertBefore(span, cursor);
+      if (introSkipType) { dumpRemaining(lineIdx); return; }
 
-      if (introSkipType || speed === 0) {
-        span.style.opacity = '1';
-        lineIdx++;
-        doLine();
-        return;
+      // Create div for this line and add to DOM immediately
+      const lineEl = document.createElement('div');
+      lineEl.style.marginTop = item.topMargin;
+      introText.appendChild(lineEl);
+
+      // Decompose segments into a flat array of {char, cls} for typing
+      const chars = [];
+      item.segments.forEach(seg => {
+        for (const ch of seg.text) chars.push({ ch, cls: seg.cls });
+      });
+
+      const total = chars.length || 1;
+      let   ci    = 0;
+
+      // Span nodes per colour class — we grow them as chars arrive
+      // so styled text builds up naturally without re-rendering
+      const spanMap = {}; // cls -> current span element
+      // Tracks the "active" append target as we move through segments
+      let   segIdx  = 0; // which segment we're currently in
+      let   segCi   = 0; // how many chars consumed from current segment
+
+      // Simpler: just rebuild the line content each tick from chars[0..ci]
+      // This is cheap for lines of <200 chars and guarantees cursor position.
+      function renderUpTo(n) {
+        lineEl.innerHTML = '';
+        // Group consecutive chars by cls
+        let i = 0;
+        while (i < n) {
+          const cls = chars[i].cls;
+          let text  = '';
+          while (i < n && chars[i].cls === cls) { text += chars[i].ch; i++; }
+          if (cls) {
+            const sp = document.createElement('span');
+            sp.className   = cls;
+            sp.textContent = text;
+            lineEl.appendChild(sp);
+          } else {
+            lineEl.appendChild(document.createTextNode(text));
+          }
+        }
+        lineEl.appendChild(cursorEl); // cursor always at the end of revealed text
       }
 
-      // Fade in character by character using a clip trick
-      // Actually: just reveal the whole span instantly but char by char via text reveal
-      span.style.opacity = '1';
-      span.style.clipPath = `inset(0 100% 0 0)`;
+      renderUpTo(0); // show cursor on empty line immediately
 
-      const totalChars = plain.length || 1;
-      function revealNext() {
+      const CHAR_SPEED = 22;
+
+      function tick() {
         if (introSkipType) {
-          span.style.clipPath = '';
+          // Show full line, then dump the rest
+          renderUpTo(total);
+          lineEl.removeChild(cursorEl); // cursor moves to next line
           lineIdx++;
-          doLine();
+          dumpRemaining(lineIdx);
           return;
         }
-        charIdx++;
-        const pct = Math.max(0, 100 - (charIdx / totalChars) * 100);
-        span.style.clipPath = `inset(0 ${pct}% 0 0)`;
-        if (charIdx >= totalChars) {
-          span.style.clipPath = '';
+
+        ci++;
+        renderUpTo(ci);
+        if (ci % 2 === 1) playTypeClick();
+
+        if (ci >= total) {
+          // Done with this line — remove cursor (it'll be placed by next line)
+          lineEl.removeChild(cursorEl);
           lineIdx++;
           doLine();
         } else {
-          introTypingTimeout = setTimeout(revealNext, speed);
+          introTypingTimeout = setTimeout(tick, CHAR_SPEED);
         }
       }
-      revealNext();
-    }, delay);
+
+      introTypingTimeout = setTimeout(tick, CHAR_SPEED);
+
+    }, introSkipType ? 0 : item.gap);
   }
 
   doLine();
@@ -1572,6 +1758,9 @@ function goToChapter(idx) {
 }
 
 function advanceIntro() {
+  // Prime AudioContext on this user gesture so it's ready to play
+  _ensureAudio();
+  if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
   if (introTyping) {
     // Skip typing animation, show full text immediately
     introSkipType = true;
@@ -1628,6 +1817,20 @@ function maybeShowIntro() {
 
   introNext.addEventListener('click', advanceIntro);
   introSkipBtn.addEventListener('click', skipIntro);
+
+  // Prime AudioContext on the very first interaction with the intro screen
+  introEl.addEventListener('click', () => {
+    _ensureAudio();
+    if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
+  }, { once: true });
+
+  introMuteBtn.addEventListener('click', () => {
+    _typeSoundMuted = !_typeSoundMuted;
+    introMuteBtn.textContent = _typeSoundMuted ? '🔇 MUTED' : '🔊 SOUND';
+    introMuteBtn.classList.toggle('muted', _typeSoundMuted);
+    // Ensure AudioContext is primed on this gesture even if unmuting
+    _ensureAudio();
+  });
 
   introNameCfm.addEventListener('click', () => finishIntro(introNameInp.value));
   introNameInp.addEventListener('keydown', e => { if (e.key === 'Enter') finishIntro(introNameInp.value); });
