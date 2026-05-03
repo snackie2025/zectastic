@@ -293,6 +293,112 @@
     .price-main { font-size: 42px; }
     .stat-value { font-size: 15px; }
   }
+  /* ── GAME SECTION ── */
+  .game-section {
+    margin: 24px 0 0;
+    border: 1px solid var(--border-bright);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .game-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    gap: 12px; flex-wrap: wrap;
+  }
+
+  .game-title-wrap { display: flex; flex-direction: column; gap: 3px; }
+
+  .game-badge {
+    font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--gold); opacity: 0.7;
+  }
+
+  .game-title {
+    font-family: var(--display); font-weight: 800;
+    font-size: clamp(15px, 3.5vw, 20px);
+    color: var(--gold); letter-spacing: 1px;
+  }
+
+  .game-sub {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+  }
+
+  .play-btn {
+    display: inline-block;
+    background: var(--gold); color: #000;
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; padding: 10px 22px; border-radius: 6px;
+    text-decoration: none; white-space: nowrap;
+    transition: opacity 0.2s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .play-btn:hover { opacity: 0.88; transform: scale(1.03); }
+
+  .game-preview {
+    position: relative; cursor: pointer;
+    height: 120px; overflow: hidden;
+    background: #02040a;
+    background-image:
+      linear-gradient(rgba(244,185,66,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,185,66,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transition: background 0.2s;
+  }
+  .game-preview:hover { background-color: #040810; }
+
+  .game-preview-inner {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 8px;
+  }
+
+  .gp-shield {
+    font-family: var(--display); font-weight: 800;
+    font-size: 38px; color: var(--gold);
+    text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(244,185,66,0.4);
+    animation: gp-pulse 2s ease-in-out infinite;
+    line-height: 1; position: relative; z-index: 2;
+  }
+
+  @keyframes gp-pulse {
+    0%,100% { text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(244,185,66,0.3); }
+    50%      { text-shadow: 0 0 35px var(--gold), 0 0 70px rgba(244,185,66,0.6); }
+  }
+
+  .gp-threats { position: absolute; inset: 0; pointer-events: none; }
+
+  .gp-threat {
+    position: absolute; font-size: 18px;
+    animation: orbit 6s linear infinite;
+    opacity: 0.7;
+  }
+  .t1 { animation-delay: 0s;    top: 20%; left: 12%; }
+  .t2 { animation-delay: -1.2s; top: 65%; left: 18%; }
+  .t3 { animation-delay: -2.4s; top: 15%; right: 14%; }
+  .t4 { animation-delay: -3.6s; top: 70%; right: 12%; }
+  .t5 { animation-delay: -4.8s; top: 42%; left: 7%; }
+
+  @keyframes orbit {
+    0%   { transform: translateX(0)   translateY(0); }
+    25%  { transform: translateX(6px) translateY(-5px); }
+    50%  { transform: translateX(12px) translateY(0); }
+    75%  { transform: translateX(6px) translateY(5px); }
+    100% { transform: translateX(0)   translateY(0); }
+  }
+
+  .gp-label {
+    font-size: 10px; color: var(--muted); letter-spacing: 2px;
+    text-transform: uppercase; position: relative; z-index: 2;
+  }
+
+  @media (max-width: 640px) {
+    .game-header { padding: 12px 14px; }
+    .game-preview { height: 90px; }
+    .gp-shield { font-size: 28px; }
+    .gp-label { font-size: 9px; letter-spacing: 1px; }
+  }
 </style>
 </head>
 <body>
@@ -405,6 +511,31 @@
       <div class="ticker-item">24h High <span id="t6b">—</span></div>
       <div class="ticker-item">24h Low <span id="t7b">—</span></div>
       <div class="ticker-item">Shielded <span id="t8b">—</span></div>
+    </div>
+  </div>
+
+  <!-- ENCRYPT THE MONEY GAME -->
+  <div class="game-section">
+    <div class="game-header">
+      <div class="game-title-wrap">
+        <span class="game-badge">MINI GAME</span>
+        <div class="game-title">⚡ ENCRYPT THE MONEY</div>
+        <div class="game-sub">Shield your ZCash from threats — earn Ƶ, climb the leaderboard</div>
+      </div>
+      <a href="game.html" class="play-btn">PLAY NOW →</a>
+    </div>
+    <div class="game-preview" onclick="window.location.href='game.html'">
+      <div class="game-preview-inner">
+        <div class="gp-shield">Ƶ</div>
+        <div class="gp-threats">
+          <span class="gp-threat t1">👁</span>
+          <span class="gp-threat t2">🔓</span>
+          <span class="gp-threat t3">💀</span>
+          <span class="gp-threat t4">🕵</span>
+          <span class="gp-threat t5">⚠</span>
+        </div>
+        <div class="gp-label">TARGET: Ƶ 1.00000000 &nbsp;·&nbsp; TAP TO PLAY</div>
+      </div>
     </div>
   </div>
 
