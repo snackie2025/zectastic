@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZECTASTIC.COM</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --zec:    #f4b728;
+    --zec2:   #f9d76c;
+    --bg:     #050709;
+    --bg2:    #0b0f18;
+    --bg3:    #0f1520;
+    --cyan:   #00e5ff;
+    --red:    #ff3c6e;
+    --green:  #00ff9d;
+    --text:   #e8eaf0;
+    --muted:  #556080;
+    --border: rgba(244,183,40,0.18);
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html { height:100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    /* allow scroll on mobile, lock on large screens */
+    overflow-x: hidden;
+  }
+
+  /* grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(244,183,40,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,183,40,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 10px 14px 10px;
+    gap: 8px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .logo-img {
+    height: 52px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 14px rgba(244,183,40,0.5));
+  }
+
+  /* fallback text logo if no image */
+  .logo-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--zec);
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 20px rgba(244,183,40,0.4);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(0,255,157,0.07);
+    border: 1px solid rgba(0,255,157,0.22);
+    border-radius: 20px;
+    padding: 4px 13px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    color: var(--green);
+    white-space: nowrap;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 7px var(--green);
+    animation: blink 1.1s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+
+  .last-upd {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  /* ── ZEC HERO — PRICE TOP CENTER ── */
+  .zec-hero {
+    background: linear-gradient(135deg, #0e1422 0%, #141d30 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(244,183,40,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .zec-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--zec), transparent);
+    border-radius: 14px 14px 0 0;
+  }
+
+  .zec-hero-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .zec-coin-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .zec-price-big {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.6rem, 7vw, 4rem);
+    font-weight: 900;
+    color: var(--zec);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-shadow: 0 0 30px rgba(244,183,40,0.35);
+    transition: opacity 0.15s;
+  }
+  .zec-price-big.tick { opacity: 0.5; }
+
+  .zec-change-pill {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .pos { color: var(--green); background: rgba(0,255,157,0.08); border: 1px solid rgba(0,255,157,0.2); }
+  .neg { color: var(--red);   background: rgba(255,60,110,0.08); border: 1px solid rgba(255,60,110,0.2); }
+
+  .zec-stats {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    width: 100%;
+    margin-top: 6px;
+    padding-top: 12px;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+
+  .zec-stat {
+    text-align: center;
+    padding: 0 14px;
+  }
+  .zec-stat + .zec-stat {
+    border-left: 1px solid rgba(255,255,255,0.06);
+  }
+  .zec-stat .lbl {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .zec-stat .val {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .zec-stat .val.mcap-val  { color: var(--cyan); }
+  .zec-stat .val.vol-val   { color: var(--zec2); }
+  .zec-stat .val.rank-val  { color: #c084fc; }
+
+  /* ── SECTION LABEL ── */
+  .sec-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .sec-label::before, .sec-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(244,183,40,0.2), transparent);
+  }
+
+  /* ── FLIP TABLE ── */
+  .flip-table {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 0;
+  }
+
+  .flip-row {
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 36px 1fr 1fr 1fr 1fr 1fr;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.2s, background 0.2s;
+    flex: 1;
+  }
+  .flip-row:hover {
+    border-color: rgba(244,183,40,0.22);
+    background: #111827;
+  }
+
+  .flip-rank {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .flip-name-cell { display: flex; flex-direction: column; }
+  .flip-name-cell .cname {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.15;
+  }
+  .flip-name-cell .csym {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .flip-cell {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .flip-cell .flbl {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .flip-cell .fval {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .col-price { color: var(--text); }
+  .col-mcap  { color: var(--cyan); }
+  .col-need  { color: var(--zec); text-shadow: 0 0 10px rgba(244,183,40,0.35); }
+
+  .gap-pill {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(244,183,40,0.08);
+    border: 1px solid rgba(244,183,40,0.18);
+    color: var(--zec2);
+    white-space: nowrap;
+  }
+
+  /* ── RADIO ── */
+  .radio-bar {
+    background: var(--bg2);
+    border: 1px solid rgba(0,229,255,0.12);
+    border-radius: 10px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .radio-icon { font-size: 1.2rem; filter: drop-shadow(0 0 6px rgba(0,229,255,0.5)); flex-shrink:0; }
+
+  .radio-info { flex: 1; min-width: 0; }
+  .radio-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .radio-status-txt {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+  .radio-status-txt.on  { color: var(--green); }
+  .radio-status-txt.err { color: var(--red); }
+
+  .viz {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .vbar {
+    width: 3px;
+    background: var(--cyan);
+    border-radius: 1px;
+    opacity: 0.15;
+    height: 3px;
+    transition: height 0.08s;
+  }
+  .vbar.a { opacity: 0.9; box-shadow: 0 0 4px var(--cyan); }
+
+  .rbtn {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .rbtn-play {
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.28);
+    color: var(--cyan);
+  }
+  .rbtn-play:hover, .rbtn-play.on {
+    background: rgba(0,229,255,0.22);
+    box-shadow: 0 0 14px rgba(0,229,255,0.3);
+    color: #fff;
+  }
+  .rbtn-mute {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+    width: 34px; height: 34px;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .rbtn-mute:hover        { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .rbtn-mute.muted        { color: var(--red); border-color: rgba(255,60,110,0.3); }
+
+  .vol-sl {
+    -webkit-appearance: none;
+    width: 70px; height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    outline: none;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .vol-sl::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    cursor: pointer;
+  }
+
+  /* ── SKELETON ── */
+  .skeleton {
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0.04) 25%,
+      rgba(255,255,255,0.09) 50%,
+      rgba(255,255,255,0.04) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ══════════════════════════════════════
+     MOBILE RESPONSIVE  ≤ 680px
+  ══════════════════════════════════════ */
+  @media (max-width: 680px) {
+    .page { padding: 8px 10px; gap: 7px; }
+
+    /* header: logo left, status right */
+    .header { flex-wrap: nowrap; }
+    .logo-text { font-size: 0.85rem; }
+    .logo-img  { height: 40px; }
+    .live-badge { font-size: 0.58rem; padding: 3px 9px; }
+    .last-upd   { display: none; } /* reclaim space, shown in zec-hero */
+
+    /* zec hero */
+    .zec-hero { padding: 14px 12px 12px; gap: 4px; }
+    .zec-price-big { font-size: clamp(2.2rem, 11vw, 3rem); }
+    .zec-stats { gap: 0; padding-top: 10px; margin-top: 4px; }
+    .zec-stat  { padding: 0 8px; }
+    .zec-stat .val { font-size: 0.78rem; }
+    .zec-stat .lbl { font-size: 0.52rem; }
+
+    /* flip table: collapse into card layout */
+    .flip-row {
+      grid-template-columns: 32px 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 6px 10px;
+      padding: 10px 12px;
+      flex: none; /* no stretch on mobile */
+    }
+    /* rank: row 1 col 1 */
+    .flip-rank      { grid-column: 1; grid-row: 1; }
+    /* name: row 1 col 2 */
+    .flip-name-cell { grid-column: 2; grid-row: 1; }
+    /* 24h pill: row 1 col 3 */
+    .flip-cell:nth-child(3) { grid-column: 3; grid-row: 1; }
+    /* remaining cells: row 2, span all */
+    .flip-cell:nth-child(4),
+    .flip-cell:nth-child(5),
+    .flip-cell:nth-child(6) {
+      grid-column: span 1;
+      grid-row: 2;
+      font-size: 0.7rem;
+    }
+    /* re-layout row 2 as horizontal trio */
+    .flip-row { align-items: start; }
+    .flip-cell .fval { font-size: 0.72rem; }
+    .flip-cell .flbl { font-size: 0.48rem; }
+
+    /* radio */
+    .radio-bar { padding: 8px 12px; gap: 8px; }
+    .viz { display: none; } /* save space on small screens */
+    .vol-sl { width: 52px; }
+  }
+
+  /* lock page height on desktop */
+  @media (min-height: 600px) and (min-width: 681px) {
+    body { height: 100vh; overflow: hidden; }
+    .page { height: 100vh; }
+    .flip-table { flex: 1; }
+    .flip-row { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <!-- Replace src with actual logo path, fallback text shows if image fails -->
+    <span class="logo-text" id="logo-fallback">ZECTASTIC.COM</span>
+    <img class="logo-img" id="logo-img" src="logo.png" alt="ZECTASTIC"
+         onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'"
+         onload="document.getElementById('logo-fallback').style.display='none'"
+         style="display:none">
+    <div class="header-right">
+      <div class="live-badge"><span class="live-dot"></span>LIVE · 30s</div>
+      <div class="last-upd" id="upd">--:--:--</div>
+    </div>
+  </div>
+
+  <!-- ZEC HERO — price top center -->
+  <div class="zec-hero">
+    <div class="zec-hero-top">
+      <div class="zec-coin-label">ZEC / USD</div>
+      <div class="zec-price-big" id="zp">
+        <span class="skeleton" style="width:200px;height:3rem;vertical-align:middle"></span>
+      </div>
+      <div id="zc"></div>
+    </div>
+    <div class="zec-stats">
+      <div class="zec-stat">
+        <div class="lbl">Market Cap</div>
+        <div class="val mcap-val" id="zm">—</div>
+      </div>
+      <div class="zec-stat">
+        <div class="lbl">24h Volume</div>
+        <div class="val vol-val" id="zv">—</div>
+      </div>
+      <div class="zec-stat">
+        <div class="lbl">CMC Rank</div>
+        <div class="val rank-val" id="zr">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION LABEL -->
+  <div class="sec-label">Next To Flip · 5 Coins Above Zcash</div>
+
+  <!-- FLIP TABLE -->
+  <div class="flip-table" id="ft">
+    <div class="flip-row" style="opacity:0.35"><span class="skeleton" style="width:100%;height:14px;display:block"></span></div>
+    <div class="flip-row" style="opacity:0.35"><span class="skeleton" style="width:100%;height:14px;display:block"></span></div>
+    <div class="flip-row" style="opacity:0.35"><span class="skeleton" style="width:100%;height:14px;display:block"></span></div>
+    <div class="flip-row" style="opacity:0.35"><span class="skeleton" style="width:100%;height:14px;display:block"></span></div>
+    <div class="flip-row" style="opacity:0.35"><span class="skeleton" style="width:100%;height:14px;display:block"></span></div>
+  </div>
+
+  <!-- RADIO -->
+  <div class="radio-bar">
+    <div class="radio-icon">📻</div>
+    <div class="radio-info">
+      <div class="radio-name" id="rname">Radio Record — Dance &amp; Electronic</div>
+      <div class="radio-status-txt" id="rst">STANDBY</div>
+    </div>
+    <div class="viz" id="viz"></div>
+    <button class="rbtn rbtn-play" id="bplay" onclick="toggleR()">▶ ON</button>
+    <button class="rbtn rbtn-mute" id="bmute" onclick="toggleM()" title="Mute">🔊</button>
+    <input class="vol-sl" type="range" id="vsl" min="0" max="100" value="75" oninput="setVol(this.value)">
+  </div>
+
+</div>
+<audio id="aud" preload="none"></audio>
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const API = 'https://api.coingecko.com/api/v3';
+let zec = null, flips = [], ticker = null;
+
+// Number formatters
+function f$(n) {
+  if (n == null) return '—';
+  if (n >= 1e12) return '$' + (n / 1e12).toFixed(2) + 'T';
+  if (n >= 1e9)  return '$' + (n / 1e9).toFixed(2)  + 'B';
+  if (n >= 1e6)  return '$' + (n / 1e6).toFixed(2)  + 'M';
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fp(n) {
+  if (n == null) return '—';
+  if (n >= 1000) return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (n >= 1)    return '$' + n.toFixed(2);
+  return '$' + n.toFixed(4);
+}
+function fpct(n) {
+  if (n == null) return '—';
+  return (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+}
+function now() {
+  return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+// ─── FETCH ──────────────────────────────────────────────────────────────────
+async function fetchAll() {
+  try {
+    const res = await fetch(
+      `${API}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&price_change_percentage=24h`
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const coins = await res.json();
+    const idx = coins.findIndex(c => c.id === 'zcash');
+    if (idx < 0) throw new Error('ZEC not found');
+    zec   = coins[idx];
+    flips = coins.slice(Math.max(0, idx - 5), idx).reverse();
+    renderZec();
+    renderFlip();
+    document.getElementById('upd').textContent = 'UPDATED ' + now();
+  } catch (e) {
+    document.getElementById('upd').textContent = 'ERR: ' + e.message;
+  }
+}
+
+// ─── TICK ANIMATION ─────────────────────────────────────────────────────────
+function startTick() {
+  if (ticker) return;
+  ticker = setInterval(() => {
+    const el = document.getElementById('zp');
+    if (!el || !zec) return;
+    el.classList.add('tick');
+    setTimeout(() => el.classList.remove('tick'), 120);
+  }, 1000);
+}
+
+// ─── RENDER ZEC ─────────────────────────────────────────────────────────────
+function renderZec() {
+  if (!zec) return;
+  const el = document.getElementById('zp');
+  el.textContent = fp(zec.current_price);
+  startTick();
+
+  const p   = zec.price_change_percentage_24h_in_currency ?? zec.price_change_percentage_24h;
+  const pos = p >= 0;
+  document.getElementById('zc').innerHTML =
+    `<span class="zec-change-pill ${pos ? 'pos' : 'neg'}">${fpct(p)} 24H</span>`;
+  document.getElementById('zm').textContent = f$(zec.market_cap);
+  document.getElementById('zv').textContent = f$(zec.total_volume);
+  document.getElementById('zr').textContent = '#' + zec.market_cap_rank;
+}
+
+// ─── RENDER FLIP TABLE ──────────────────────────────────────────────────────
+function renderFlip() {
+  if (!flips.length || !zec) return;
+  const supply = zec.circulating_supply || 16660000;
+  const zmc    = zec.market_cap;
+  const ft     = document.getElementById('ft');
+  ft.innerHTML = '';
+
+  flips.forEach(c => {
+    const zAtCap = c.market_cap / supply;
+    const capGap = c.market_cap - zmc;
+    const pct24  = c.price_change_percentage_24h_in_currency ?? c.price_change_percentage_24h ?? 0;
+    const pos    = pct24 >= 0;
+    const pctCol = pos ? '#00ff9d' : '#ff3c6e';
+
+    const row = document.createElement('div');
+    row.className = 'flip-row';
+    row.innerHTML = `
+      <div class="flip-rank">#${c.market_cap_rank}</div>
+      <div class="flip-name-cell">
+        <span class="cname">${c.name}</span>
+        <span class="csym">${c.symbol.toUpperCase()}</span>
+      </div>
+      <div class="flip-cell">
+        <span class="flbl">Price</span>
+        <span class="fval col-price">${fp(c.current_price)}</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:${pctCol}">${fpct(pct24)}</span>
+      </div>
+      <div class="flip-cell">
+        <span class="flbl">Market Cap</span>
+        <span class="fval col-mcap">${f$(c.market_cap)}</span>
+      </div>
+      <div class="flip-cell">
+        <span class="flbl">ZEC @ their cap</span>
+        <span class="fval col-need">${fp(zAtCap)}</span>
+      </div>
+      <div class="flip-cell">
+        <span class="flbl">Gap to flip</span>
+        <span class="gap-pill">+${f$(capGap)}</span>
+      </div>`;
+    ft.appendChild(row);
+  });
+}
+
+// ─── RADIO ──────────────────────────────────────────────────────────────────
+const streams = [
+  { n: 'Radio Record Dance 320k', u: 'https://online.radiorecord.ru:8102/rr_320' },
+  { n: 'Dance Wave Online',       u: 'https://dancewave.online/dance.mp3' },
+  { n: 'Radio Record House',      u: 'https://online.radiorecord.ru:8102/house_320' },
+];
+let si = 0, playing = false, muted = false;
+const aud = document.getElementById('aud');
+aud.volume = 0.75;
+
+function setStream(i) {
+  si = i;
+  aud.src = streams[i].u;
+  document.getElementById('rname').textContent = streams[i].n;
+}
+setStream(0);
+
+aud.addEventListener('error', () => {
+  if (si < streams.length - 1) {
+    setStream(si + 1);
+    if (playing) aud.play().catch(() => {});
+    rst('TRYING NEXT...', '');
+  } else {
+    rst('STREAM ERROR', 'err');
+    stopViz();
+  }
+});
+aud.addEventListener('playing', () => { rst('● LIVE — ' + streams[si].n, 'on'); startViz(); });
+aud.addEventListener('waiting', () => rst('BUFFERING...', ''));
+
+function rst(t, c) {
+  const el = document.getElementById('rst');
+  el.textContent = t;
+  el.className = 'radio-status-txt ' + c;
+}
+
+function toggleR() {
+  const b = document.getElementById('bplay');
+  if (playing) {
+    aud.pause(); aud.src = ''; playing = false;
+    b.textContent = '▶ ON'; b.classList.remove('on');
+    rst('STANDBY', ''); stopViz();
+  } else {
+    setStream(si);
+    aud.play()
+      .then(() => { playing = true; b.textContent = '⏹ OFF'; b.classList.add('on'); })
+      .catch(() => rst('CLICK AGAIN', 'err'));
+  }
+}
+
+function toggleM() {
+  muted = !muted; aud.muted = muted;
+  const b = document.getElementById('bmute');
+  b.textContent = muted ? '🔇' : '🔊';
+  b.classList.toggle('muted', muted);
+}
+
+function setVol(v) { aud.volume = v / 100; }
+
+// ─── VISUALIZER ─────────────────────────────────────────────────────────────
+const VBC   = 14;
+const vizEl = document.getElementById('viz');
+vizEl.innerHTML = '';
+for (let i = 0; i < VBC; i++) {
+  const b = document.createElement('div');
+  b.className = 'vbar';
+  vizEl.appendChild(b);
+}
+
+let vizOn = false;
+function startViz() { vizOn = true; animV(); }
+function stopViz()  {
+  vizOn = false;
+  document.querySelectorAll('.vbar').forEach(b => {
+    b.style.height = '3px';
+    b.classList.remove('a');
+  });
+}
+function animV() {
+  if (!vizOn) return;
+  document.querySelectorAll('.vbar').forEach(b => {
+    const h = Math.random() * 18 + 3;
+    b.style.height = h + 'px';
+    b.classList.toggle('a', h > 10);
+  });
+  setTimeout(() => requestAnimationFrame(animV), 85);
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+fetchAll();
+setInterval(fetchAll, 30000);
+</script>
+</body>
+</html>
