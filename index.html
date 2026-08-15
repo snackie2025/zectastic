@@ -4,794 +4,632 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zectastic — ZEC Live Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --gold: #F4B942;
-    --bg: #080A0E;
-    --surface: #0D1117;
-    --surface2: #131920;
-    --border: rgba(244,185,66,0.15);
-    --border-bright: rgba(244,185,66,0.4);
-    --text: #F0EDE8;
-    --muted: #6B7280;
-    --green: #22C55E;
-    --red: #EF4444;
-    --mono: 'Space Mono', monospace;
-    --display: 'Syne', sans-serif;
+  :root{
+    --bg:#0B0D0F;
+    --surface:#14171A;
+    --surface-2:#1B1F23;
+    --line:#262B30;
+    --text:#E8E6DF;
+    --text-dim:#8A9096;
+    --gold:#F4B728;
+    --teal:#2FBF9F;
+    --red:#FF4B4B;
+    --mono:'IBM Plex Mono', monospace;
+    --sans:'Inter', sans-serif;
   }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    min-height: 100vh;
-    overflow-x: hidden;
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{background:var(--bg);}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
   }
+  a{color:inherit; text-decoration:none;}
+  ::selection{background:var(--gold); color:#0B0D0F;}
 
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-    pointer-events: none; z-index: 1000;
-  }
-
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(244,185,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(244,185,66,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none; z-index: 0;
-  }
-
-  .wrapper {
-    position: relative; z-index: 1;
-    max-width: 1100px; margin: 0 auto;
-    padding: 0 20px 60px;
-    animation: fadeUp 0.6s ease both;
+  /* faint scanline texture over whole page */
+  body::before{
+    content:'';
+    position:fixed; inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.012) 0px,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events:none;
+    z-index:999;
   }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .wrap{max-width:1100px; margin:0 auto; padding:0 24px;}
 
-  /* HEADER */
-  header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
+  /* NAV */
+  header{
+    position:sticky; top:0; z-index:100;
+    background:rgba(11,13,15,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
   }
-
-  .logo-link { display: block; line-height: 0; }
-  .logo-img  { height: 54px; width: auto; display: block; }
-
-  .logo-fallback {
-    display: none; align-items: center; gap: 10px;
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    height:64px;
   }
-  .logo-fallback-icon {
-    width: 40px; height: 40px; border-radius: 50%; background: var(--gold);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--display); font-weight: 800; font-size: 18px; color: #000;
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--mono); font-weight:700; font-size:15px;
+    letter-spacing:0.02em;
   }
-
-  .header-right { display: flex; align-items: center; gap: 16px; }
-
-  .live-dot {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
+  .logo .mark{
+    width:26px; height:26px;
+    border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:var(--gold);
+    position:relative;
   }
-  .live-dot::before {
-    content: ''; width: 7px; height: 7px;
-    background: var(--green); border-radius: 50%;
-    animation: pulse 1.5s infinite;
+  .logo .mark::after{
+    content:'';
+    position:absolute; inset:-4px;
+    border:1px solid rgba(244,183,40,0.25);
   }
-  @keyframes pulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50%      { opacity:0.4; transform:scale(0.8); }
+  .navlinks{display:flex; gap:32px; font-family:var(--mono); font-size:12.5px; letter-spacing:0.08em;}
+  .navlinks a{color:var(--text-dim); transition:color 0.2s;}
+  .navlinks a:hover{color:var(--gold);}
+  .live-pill{
+    display:flex; align-items:center; gap:7px;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.1em;
+    color:var(--teal); border:1px solid rgba(47,191,159,0.3);
+    padding:6px 10px; border-radius:2px;
   }
-
-  .music-toggle {
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--mono); font-size: 12px;
-    padding: 7px 14px; border-radius: 6px; cursor: pointer; letter-spacing: 1px;
-    transition: border-color 0.2s, background 0.2s;
-  }
-  .music-toggle:hover  { border-color: var(--border-bright); background: var(--surface); }
-  .music-toggle.playing { border-color: var(--gold); color: var(--gold); }
+  .live-dot{width:6px; height:6px; border-radius:50%; background:var(--teal); animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.3;}}
 
   /* HERO */
-  .hero {
-    display: grid; grid-template-columns: 1fr auto; gap: 40px;
-    align-items: end; padding: 44px 0 32px;
-    border-bottom: 1px solid var(--border);
+  .hero{
+    padding:64px 0 48px;
+    border-bottom:1px solid var(--line);
+    position:relative;
   }
-  .price-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-  .price-main {
-    font-family: var(--display); font-weight: 800;
-    font-size: clamp(44px, 10vw, 96px); line-height: 1; letter-spacing: -2px;
-    color: var(--text); transition: color 0.3s;
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.15em;
+    color:var(--text-dim); text-transform:uppercase;
+    margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
   }
-  .price-main.up   { color: var(--green); }
-  .price-main.down { color: var(--red); }
-  .price-change { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
-  .change-badge { padding: 3px 10px; border-radius: 4px; font-size: 13px; font-weight: 700; }
-  .change-badge.up      { background: rgba(34,197,94,0.15);  color: var(--green); }
-  .change-badge.down    { background: rgba(239,68,68,0.15);   color: var(--red); }
-  .change-badge.neutral { background: rgba(107,114,128,0.2); color: var(--muted); }
-  .hero-right { text-align: right; }
-  .zec-btc { font-size: 13px; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; }
-  .zec-btc span { color: var(--gold); font-size: 15px; }
-  .rank-badge {
-    display: inline-block; background: rgba(244,185,66,0.1);
-    border: 1px solid var(--border-bright); color: var(--gold);
-    font-size: 12px; padding: 4px 12px; border-radius: 4px; letter-spacing: 1px;
+  .eyebrow .bracket{color:var(--gold);}
+  .price-row{
+    display:flex; align-items:baseline; gap:20px; flex-wrap:wrap;
   }
-
-  /* STATS ROW */
-  .stats-row {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr));
-    gap: 1px; background: var(--border); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden; margin: 32px 0 0;
+  .price{
+    font-family:var(--mono); font-weight:700;
+    font-size:clamp(48px, 9vw, 92px);
+    line-height:1;
+    color:var(--text);
+    font-variant-numeric:tabular-nums;
   }
-  .stat { background: var(--surface); padding: 18px 20px; transition: background 0.2s; }
-  .stat:hover { background: var(--surface2); }
-  .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
-  .stat-value { font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--text); }
-  .stat-value.gold { color: var(--gold); }
-  .stat-sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 4px; }
-
-  /* SHIELDED PANEL */
-  .shield-panel {
-    margin: 16px 0 0; background: var(--surface);
-    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  .price .cents{font-size:0.5em; color:var(--text-dim);}
+  .change{
+    font-family:var(--mono); font-size:20px; font-weight:600;
+    padding:4px 10px; border-radius:2px;
   }
-  .shield-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 20px; border-bottom: 1px solid var(--border);
+  .change.up{color:var(--teal); background:rgba(47,191,159,0.1);}
+  .change.down{color:var(--red); background:rgba(255,75,75,0.1);}
+  .sub-stats{
+    display:flex; gap:28px; flex-wrap:wrap;
+    margin-top:22px;
+    font-family:var(--mono); font-size:13px; color:var(--text-dim);
   }
-  .shield-title { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); }
-  .shield-source { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
-  .shield-source a { color: var(--gold); text-decoration: none; opacity: 0.8; transition: opacity 0.2s; }
-  .shield-source a:hover { opacity: 1; }
-
-  .shield-body {
-    display: grid; grid-template-columns: 1fr 1fr 2fr;
-    gap: 1px; background: var(--border);
-  }
-  .shield-cell { background: var(--surface2); padding: 18px 20px; }
-  .shield-cell-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
-  .shield-cell-value { font-family: var(--display); font-size: 22px; font-weight: 700; color: var(--gold); }
-  .shield-cell-value.white { color: var(--text); }
-
-  .shield-bar-cell { background: var(--surface2); padding: 18px 20px; display: flex; flex-direction: column; justify-content: center; }
-  .shield-bar-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-  .shield-bar-track { height: 8px; background: var(--surface); border-radius: 4px; overflow: hidden; }
-  .shield-bar-fill  { height: 100%; width: 0%; background: var(--gold); border-radius: 4px; transition: width 1s ease; }
-  .shield-bar-sub   { font-size: 11px; color: var(--muted); margin-top: 7px; }
-
-  .pool-pills { display: flex; gap: 7px; margin-top: 10px; flex-wrap: wrap; }
-  .pool-pill {
-    font-size: 10px; letter-spacing: 0.5px;
-    padding: 3px 9px; border-radius: 3px;
-    background: rgba(244,185,66,0.06); border: 1px solid var(--border);
-    color: var(--muted); white-space: nowrap;
-  }
-  .pool-pill span { color: var(--gold); margin-left: 4px; }
-
-  /* TICKER */
-  .ticker-wrap {
-    overflow: hidden; background: var(--surface2);
-    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    padding: 10px 0; margin: 24px 0;
-  }
-  .ticker-track { display: flex; animation: scroll 28s linear infinite; width: max-content; }
-  .ticker-item { padding: 0 32px; font-size: 12px; letter-spacing: 1px; color: var(--muted); white-space: nowrap; border-right: 1px solid var(--border); }
-  .ticker-item span { color: var(--gold); margin-left: 6px; }
-  @keyframes scroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+  .sub-stats b{color:var(--text); font-weight:600;}
+  .updated{
+    margin-top:28px; font-size:11.5px; color:var(--text-dim);
+    font-family:var(--mono); letter-spacing:0.03em;
   }
 
-  /* TWO COL */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-
-  /* PANEL */
-  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .panel-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 20px; border-bottom: 1px solid var(--border);
+  /* DASHBOARD GRID */
+  .section{padding:56px 0;}
+  .section-title{
+    font-family:var(--mono); font-size:13px; letter-spacing:0.12em;
+    color:var(--text-dim); text-transform:uppercase;
+    margin-bottom:24px;
+    display:flex; align-items:center; gap:10px;
   }
-  .panel-title { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); }
-  .panel-body { padding: 16px 20px; }
-
-  /* COMPETITORS */
-  .competitor { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
-  .competitor:last-child { border-bottom: none; }
-  .comp-name { font-size: 13px; font-weight: 700; color: var(--text); }
-  .comp-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .comp-hypo { text-align: right; }
-  .comp-hypo-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-bottom: 2px; }
-  .comp-hypo-val   { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--gold); }
-  .comp-mc { text-align: right; font-size: 12px; color: var(--muted); }
-
-  /* BTC */
-  .btc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 6px; overflow: hidden; }
-  .btc-cell { background: var(--surface2); padding: 14px 16px; }
-  .btc-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-  .btc-val   { font-family: var(--display); font-size: 18px; font-weight: 700; color: var(--text); }
-
-  .spark-wrap { position: relative; height: 80px; margin-top: 14px; }
-  canvas#spark { width: 100%; height: 80px; }
-
-  /* FOOTER */
-  .footer-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-top: 20px; border-top: 1px solid var(--border);
-    font-size: 11px; color: var(--muted); letter-spacing: 1px;
+  .section-title::after{
+    content:''; flex:1; height:1px; background:var(--line);
+  }
+  .grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+  }
+  .cell{
+    background:var(--surface); padding:20px 18px;
+    transition:background 0.2s;
+  }
+  .cell:hover{background:var(--surface-2);}
+  .cell-label{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.1em;
+    color:var(--text-dim); text-transform:uppercase; margin-bottom:10px;
+  }
+  .cell-value{
+    font-family:var(--mono); font-size:21px; font-weight:600;
+    font-variant-numeric:tabular-nums;
   }
 
-  @media (max-width: 640px) {
-
-    /* Wrapper tighter on mobile */
-    .wrapper { padding: 0 14px 48px; }
-
-    /* Header — keep logo + buttons on one line */
-    header { padding: 10px 0; gap: 8px; }
-    .logo-img { height: 36px; }
-    .header-right { gap: 10px; }
-    .live-dot { display: none; } /* hide "Live" text, keep dot implicit in music btn */
-    .music-toggle { font-size: 11px; padding: 6px 10px; }
-
-    /* Hero — stack vertically, bigger price on narrow screens */
-    .hero {
-      grid-template-columns: 1fr;
-      gap: 16px;
-      padding: 28px 0 24px;
-    }
-    .price-main {
-      font-size: clamp(48px, 14vw, 72px);
-      letter-spacing: -2px;
-    }
-    .hero-right { text-align: left; display: flex; gap: 14px; align-items: center; }
-
-    /* Stats — 2 columns on mobile, not 5 */
-    .stats-row { grid-template-columns: 1fr 1fr; }
-    .stat { padding: 14px 14px; }
-    .stat-value { font-size: 17px; }
-    .stat-sub { font-size: 11px; }
-
-    /* Shielded panel — stack all 3 cells vertically */
-    .shield-body { grid-template-columns: 1fr 1fr; }
-    .shield-bar-cell { grid-column: 1 / -1; } /* full width */
-    .shield-cell { padding: 14px 16px; }
-    .shield-cell-value { font-size: 18px; }
-    .shield-bar-cell { padding: 14px 16px; }
-
-    /* Two-col panels — stack */
-    .two-col { grid-template-columns: 1fr; }
-
-    /* Competitor rows — tighter, hide market cap on tiny screens */
-    .competitor { grid-template-columns: 1fr auto; gap: 8px; }
-    .comp-mc { display: none; }
-    .comp-hypo-val { font-size: 14px; }
-
-    /* BTC values smaller */
-    .btc-val { font-size: 15px; }
-
-    /* Footer — stack vertically */
-    .footer-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
-
-    /* Pool pills wrap nicely already, just ensure font readable */
-    .pool-pill { font-size: 10px; }
+  /* SHIELD BAND */
+  .shield-band{
+    background:var(--surface);
+    border:1px solid var(--line);
+    padding:28px 28px;
+    display:flex; flex-wrap:wrap; gap:28px; align-items:center; justify-content:space-between;
+  }
+  .shield-left{flex:1; min-width:240px;}
+  .shield-title{
+    font-family:var(--mono); font-weight:600; font-size:14px;
+    color:var(--teal); margin-bottom:6px; letter-spacing:0.05em;
+  }
+  .shield-desc{font-size:13px; color:var(--text-dim); line-height:1.5; max-width:420px;}
+  .shield-bar-wrap{flex:1; min-width:220px;}
+  .shield-bar-label{
+    display:flex; justify-content:space-between;
+    font-family:var(--mono); font-size:12px; color:var(--text-dim); margin-bottom:8px;
+  }
+  .shield-bar-label b{color:var(--teal);}
+  .shield-bar{
+    height:10px; background:var(--surface-2); border:1px solid var(--line);
+    overflow:hidden; position:relative;
+  }
+  .shield-bar-fill{
+    height:100%; background:linear-gradient(90deg, var(--teal), #5EE0BC);
+    width:0%; transition:width 1.2s ease;
   }
 
-  /* Extra small — very narrow phones */
-  @media (max-width: 380px) {
-    .stats-row { grid-template-columns: 1fr 1fr; }
-    .price-main { font-size: 42px; }
-    .stat-value { font-size: 15px; }
+  /* GAME TEASER */
+  .transmission{
+    background:
+      radial-gradient(ellipse at top left, rgba(244,183,40,0.06), transparent 60%),
+      var(--surface);
+    border:1px solid var(--line);
+    padding:0; overflow:hidden;
+    display:grid; grid-template-columns:1.3fr 1fr;
   }
-  /* ── GAME SECTION ── */
-  .game-section {
-    margin: 24px 0 0;
-    border: 1px solid var(--border-bright);
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--surface);
+  .transmission-copy{padding:36px 36px;}
+  .transmission-tag{
+    font-family:var(--mono); font-size:11px; color:var(--red); letter-spacing:0.12em;
+    margin-bottom:14px; display:flex; align-items:center; gap:8px;
   }
-
-  .game-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 20px; border-bottom: 1px solid var(--border);
-    gap: 12px; flex-wrap: wrap;
+  .transmission-tag .dot{width:6px; height:6px; background:var(--red); border-radius:50%;}
+  .transmission h2{
+    font-family:var(--mono); font-size:26px; font-weight:700; letter-spacing:0.01em;
+    margin-bottom:12px; line-height:1.15;
   }
-
-  .game-title-wrap { display: flex; flex-direction: column; gap: 3px; }
-
-  .game-badge {
-    font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
-    color: var(--gold); opacity: 0.7;
+  .transmission p{
+    font-size:14px; color:var(--text-dim); line-height:1.6; max-width:420px; margin-bottom:24px;
   }
-
-  .game-title {
-    font-family: var(--display); font-weight: 800;
-    font-size: clamp(15px, 3.5vw, 20px);
-    color: var(--gold); letter-spacing: 1px;
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--mono); font-size:13px; font-weight:600; letter-spacing:0.05em;
+    background:var(--gold); color:#0B0D0F;
+    padding:13px 22px; border:none; cursor:pointer;
+    transition:transform 0.15s, box-shadow 0.15s;
   }
-
-  .game-sub {
-    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+  .btn:hover{transform:translateY(-1px); box-shadow:0 6px 20px rgba(244,183,40,0.25);}
+  .transmission-visual{
+    background:repeating-linear-gradient(45deg, #0e1012 0px, #0e1012 10px, #121417 10px, #121417 20px);
+    display:flex; align-items:center; justify-content:center;
+    position:relative; border-left:1px solid var(--line);
   }
-
-  .play-btn {
-    display: inline-block;
-    background: var(--gold); color: #000;
-    font-family: var(--mono); font-size: 12px; font-weight: 700;
-    letter-spacing: 2px; padding: 10px 22px; border-radius: 6px;
-    text-decoration: none; white-space: nowrap;
-    transition: opacity 0.2s, transform 0.15s;
-    flex-shrink: 0;
-  }
-  .play-btn:hover { opacity: 0.88; transform: scale(1.03); }
-
-  .game-preview {
-    position: relative; cursor: pointer;
-    height: 120px; overflow: hidden;
-    background: #02040a;
-    background-image:
-      linear-gradient(rgba(244,185,66,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(244,185,66,0.025) 1px, transparent 1px);
-    background-size: 40px 40px;
-    transition: background 0.2s;
-  }
-  .game-preview:hover { background-color: #040810; }
-
-  .game-preview-inner {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 8px;
+  .glyph-rain{
+    font-family:var(--mono); font-size:13px; color:rgba(244,183,40,0.5);
+    line-height:1.8; letter-spacing:0.3em; text-align:center;
+    padding:20px;
   }
 
-  .gp-shield {
-    font-family: var(--display); font-weight: 800;
-    font-size: 38px; color: var(--gold);
-    text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(244,185,66,0.4);
-    animation: gp-pulse 2s ease-in-out infinite;
-    line-height: 1; position: relative; z-index: 2;
+  /* RADIO BAR */
+  .radio-bar{
+    background:var(--surface); border:1px solid var(--line);
+    padding:16px 20px; display:flex; align-items:center; gap:16px;
+    font-family:var(--mono); font-size:12.5px;
+  }
+  .radio-bar .play{
+    width:34px; height:34px; border:1px solid var(--gold); color:var(--gold);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    cursor:pointer; transition:background 0.2s;
+  }
+  .radio-bar .play:hover{background:rgba(244,183,40,0.1);}
+  .radio-meta{color:var(--text-dim);}
+  .radio-meta b{color:var(--text); font-weight:600;}
+  .bars{display:flex; gap:2px; align-items:flex-end; height:16px; margin-left:auto;}
+  .bars span{width:2px; background:var(--teal); animation:eq 1s infinite ease-in-out;}
+  .bars span:nth-child(1){height:40%; animation-delay:0s;}
+  .bars span:nth-child(2){height:80%; animation-delay:0.2s;}
+  .bars span:nth-child(3){height:55%; animation-delay:0.4s;}
+  .bars span:nth-child(4){height:90%; animation-delay:0.1s;}
+  .bars span:nth-child(5){height:35%; animation-delay:0.3s;}
+  @keyframes eq{0%,100%{transform:scaleY(0.4);} 50%{transform:scaleY(1);}}
+
+  footer{
+    padding:32px 0 48px;
+    font-family:var(--mono); font-size:11px; color:var(--text-dim);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    border-top:1px solid var(--line); margin-top:24px;
+  }
+  footer a{color:var(--text-dim); border-bottom:1px solid var(--line);}
+  footer a:hover{color:var(--gold); border-color:var(--gold);}
+
+  @media (max-width:760px){
+    .grid{grid-template-columns:repeat(2, 1fr);}
+    .transmission{grid-template-columns:1fr;}
+    .transmission-visual{min-height:160px; border-left:none; border-top:1px solid var(--line);}
+    .navlinks{display:none;}
   }
 
-  @keyframes gp-pulse {
-    0%,100% { text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(244,185,66,0.3); }
-    50%      { text-shadow: 0 0 35px var(--gold), 0 0 70px rgba(244,185,66,0.6); }
+  @media (prefers-reduced-motion: reduce){
+    .live-dot, .bars span{animation:none;}
   }
 
-  .gp-threats { position: absolute; inset: 0; pointer-events: none; }
-
-  .gp-threat {
-    position: absolute; font-size: 18px;
-    animation: orbit 6s linear infinite;
-    opacity: 0.7;
+  /* COOKIE CONSENT */
+  #consent-banner{
+    position:fixed; left:0; right:0; bottom:0; z-index:1000;
+    background:var(--surface);
+    border-top:1px solid var(--gold);
+    box-shadow:0 -8px 30px rgba(0,0,0,0.5);
+    padding:20px 24px;
+    display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;
+    transform:translateY(0);
+    animation:rise 0.4s ease;
   }
-  .t1 { animation-delay: 0s;    top: 20%; left: 12%; }
-  .t2 { animation-delay: -1.2s; top: 65%; left: 18%; }
-  .t3 { animation-delay: -2.4s; top: 15%; right: 14%; }
-  .t4 { animation-delay: -3.6s; top: 70%; right: 12%; }
-  .t5 { animation-delay: -4.8s; top: 42%; left: 7%; }
-
-  @keyframes orbit {
-    0%   { transform: translateX(0)   translateY(0); }
-    25%  { transform: translateX(6px) translateY(-5px); }
-    50%  { transform: translateX(12px) translateY(0); }
-    75%  { transform: translateX(6px) translateY(5px); }
-    100% { transform: translateX(0)   translateY(0); }
+  @keyframes rise{from{transform:translateY(100%);} to{transform:translateY(0);}}
+  #consent-banner.hidden{display:none;}
+  .consent-copy{flex:1; min-width:260px;}
+  .consent-tag{
+    font-family:var(--mono); font-size:11px; color:var(--gold); letter-spacing:0.12em;
+    margin-bottom:8px;
   }
-
-  .gp-label {
-    font-size: 10px; color: var(--muted); letter-spacing: 2px;
-    text-transform: uppercase; position: relative; z-index: 2;
+  .consent-copy p{font-size:13px; color:var(--text-dim); line-height:1.6; max-width:560px;}
+  .consent-copy a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4);}
+  .consent-toggle-row{
+    display:flex; align-items:center; gap:10px; margin-top:12px;
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
   }
+  .switch{
+    width:36px; height:20px; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:12px; position:relative; cursor:pointer; flex-shrink:0;
+  }
+  .switch.on{background:rgba(47,191,159,0.25); border-color:var(--teal);}
+  .switch::after{
+    content:''; position:absolute; top:2px; left:2px;
+    width:14px; height:14px; border-radius:50%; background:var(--text-dim);
+    transition:transform 0.2s, background 0.2s;
+  }
+  .switch.on::after{transform:translateX(16px); background:var(--teal);}
+  .consent-actions{display:flex; gap:10px; flex-shrink:0; align-self:center;}
+  .btn-ghost{
+    font-family:var(--mono); font-size:12.5px; font-weight:600; letter-spacing:0.04em;
+    background:transparent; color:var(--text-dim); border:1px solid var(--line);
+    padding:12px 18px; cursor:pointer; transition:border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover{border-color:var(--text-dim); color:var(--text);}
+  .btn-gold{
+    font-family:var(--mono); font-size:12.5px; font-weight:700; letter-spacing:0.04em;
+    background:var(--gold); color:#0B0D0F; border:none;
+    padding:12px 18px; cursor:pointer; transition:transform 0.15s;
+  }
+  .btn-gold:hover{transform:translateY(-1px);}
 
-  @media (max-width: 640px) {
-    .game-header { padding: 12px 14px; }
-    .game-preview { height: 90px; }
-    .gp-shield { font-size: 28px; }
-    .gp-label { font-size: 9px; letter-spacing: 1px; }
+  #consent-tab{
+    position:fixed; bottom:20px; left:20px; z-index:900;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.06em;
+    color:var(--text-dim); background:var(--surface); border:1px solid var(--line);
+    padding:8px 12px; cursor:pointer; display:none; align-items:center; gap:6px;
+  }
+  #consent-tab.visible{display:flex;}
+  #consent-tab:hover{border-color:var(--gold); color:var(--gold);}
+  #consent-tab .dot{width:5px; height:5px; border-radius:50%; background:var(--teal);}
+
+  @media (max-width:640px){
+    #consent-banner{padding:18px;}
+    .consent-actions{width:100%;}
+    .consent-actions button{flex:1;}
   }
 </style>
 </head>
 <body>
 
-<div class="wrapper">
-
-  <!-- HEADER -->
-  <header>
-    <a class="logo-link" href="https://zectastic.com" target="_blank" rel="noopener">
-      <img class="logo-img" src="zectastic.png" alt="Zectastic.com"
-           onerror="this.parentElement.style.display='none';document.getElementById('lf').style.display='flex';">
-    </a>
-    <div id="lf" class="logo-fallback">
-      <div class="logo-fallback-icon">Z</div>
-      <div>
-        <div style="font-family:var(--display);font-weight:800;font-size:20px;">Zectastic</div>
-        <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Live Tracker</div>
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo"><span class="mark">Z</span> ZECTASTIC</div>
+      <div class="navlinks">
+        <a href="#tracker">TRACKER</a>
+        <a href="#game">GAME</a>
+        <a href="#radio">RADIO</a>
       </div>
-    </div>
-    <div class="header-right">
-      <div class="live-dot">Live</div>
-      <button class="music-toggle" id="musicBtn" onclick="toggleMusic()">&#9654; Radio</button>
-    </div>
-  </header>
+      <div class="live-pill"><span class="live-dot"></span>LIVE</div>
+    </nav>
+  </div>
+</header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div>
-      <div class="price-label">ZEC / USD — Current Price</div>
-      <div class="price-main" id="zecPrice">$—</div>
-      <div class="price-change">
-        <span class="change-badge neutral" id="changeBadge">Loading…</span>
-        <span style="font-size:12px;color:var(--muted);">24h change</span>
-      </div>
+<div class="wrap">
+
+  <section class="hero" id="tracker">
+    <div class="eyebrow"><span class="bracket">[</span>ZEC / USD — UNSHIELDED FEED<span class="bracket">]</span></div>
+    <div class="price-row">
+      <div class="price" id="price">$<span id="price-val">——.——</span></div>
+      <div class="change" id="change">— —%</div>
     </div>
-    <div class="hero-right">
-      <div class="zec-btc">ZEC/BTC &nbsp;<span id="zecBtc">—</span></div>
-      <div class="rank-badge" id="zecRank">Rank #—</div>
+    <div class="sub-stats">
+      <div>ZEC/BTC <b id="zecbtc">—</b></div>
+      <div>RANK <b id="rank">#—</b></div>
+      <div>24H HIGH <b id="high">—</b></div>
+      <div>24H LOW <b id="low">—</b></div>
+    </div>
+    <div class="updated" id="updated">SYNCING…</div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">MARKET DATA</div>
+    <div class="grid">
+      <div class="cell"><div class="cell-label">Market Cap</div><div class="cell-value" id="mcap">—</div></div>
+      <div class="cell"><div class="cell-label">24H Volume</div><div class="cell-value" id="vol">—</div></div>
+      <div class="cell"><div class="cell-label">Circulating Supply</div><div class="cell-value" id="supply">—</div></div>
+      <div class="cell"><div class="cell-label">BTC / USD</div><div class="cell-value" id="btcprice">—</div></div>
     </div>
   </section>
 
-  <!-- STATS ROW -->
-  <div class="stats-row">
-    <div class="stat">
-      <div class="stat-label">Market Cap</div>
-      <div class="stat-value gold" id="marketCap">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">24h Volume</div>
-      <div class="stat-value" id="volume24">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Circulating Supply</div>
-      <div class="stat-value" style="display:flex;align-items:baseline;gap:4px;">
-        <span id="supplyNum">—</span><span class="stat-sub" id="supplyMax"></span>
+  <section class="section">
+    <div class="section-title">PRIVACY POOL</div>
+    <div class="shield-band">
+      <div class="shield-left">
+        <div class="shield-title">◈ SHIELDED ZEC</div>
+        <div class="shield-desc">ZEC held in shielded pools, hidden from the transparent chain. Source: zkp.baby.</div>
+      </div>
+      <div class="shield-bar-wrap">
+        <div class="shield-bar-label"><span>SHIELD RATIO</span><b id="shield-pct">—%</b></div>
+        <div class="shield-bar"><div class="shield-bar-fill" id="shield-fill"></div></div>
       </div>
     </div>
-    <div class="stat">
-      <div class="stat-label">24h High</div>
-      <div class="stat-value" style="color:var(--green)" id="high24">—</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">24h Low</div>
-      <div class="stat-value" style="color:var(--red)" id="low24">—</div>
-    </div>
-  </div>
+  </section>
 
-  <!-- SHIELDED SUPPLY -->
-  <div class="shield-panel">
-    <div class="shield-header">
-      <div class="shield-title">Shielded ZEC — Privacy Pool</div>
-      <div class="shield-source">data: <a href="https://zkp.baby" target="_blank" rel="noopener">zkp.baby</a></div>
-    </div>
-    <div class="shield-body">
-      <div class="shield-cell">
-        <div class="shield-cell-label">Total shielded</div>
-        <div class="shield-cell-value" id="shieldTotal">—</div>
+  <section class="section" id="game">
+    <div class="section-title">MINI GAME</div>
+    <div class="transmission">
+      <div class="transmission-copy">
+        <div class="transmission-tag"><span class="dot"></span>SYSTEM BROADCAST</div>
+        <h2>ENCRYPT THE MONEY</h2>
+        <p>Surveillance nodes close in on your shield every second. One button. Zap threats before they breach — chain hits for combo multipliers. Climb the global board.</p>
+        <a class="btn" href="/game.html">PLAY NOW →</a>
       </div>
-      <div class="shield-cell">
-        <div class="shield-cell-label">% of circulating</div>
-        <div class="shield-cell-value white" id="shieldPct">—</div>
-      </div>
-      <div class="shield-bar-cell">
-        <div class="shield-bar-label">Shield ratio</div>
-        <div class="shield-bar-track">
-          <div class="shield-bar-fill" id="shieldBar"></div>
-        </div>
-        <div class="shield-bar-sub" id="shieldBarSub">Loading…</div>
-        <div class="pool-pills" id="poolPills"></div>
+      <div class="transmission-visual">
+        <div class="glyph-rain">01<br>◈ ◈<br>10<br>◈ ◈ ◈<br>11</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- TICKER -->
-  <div class="ticker-wrap">
-    <div class="ticker-track">
-      <div class="ticker-item">ZEC/USD <span id="t1">—</span></div>
-      <div class="ticker-item">ZEC/BTC <span id="t2">—</span></div>
-      <div class="ticker-item">Market Cap <span id="t3">—</span></div>
-      <div class="ticker-item">24h Volume <span id="t4">—</span></div>
-      <div class="ticker-item">Circulating <span id="t5">—</span></div>
-      <div class="ticker-item">24h High <span id="t6">—</span></div>
-      <div class="ticker-item">24h Low <span id="t7">—</span></div>
-      <div class="ticker-item">Shielded <span id="t8">—</span></div>
-      <div class="ticker-item">ZEC/USD <span id="t1b">—</span></div>
-      <div class="ticker-item">ZEC/BTC <span id="t2b">—</span></div>
-      <div class="ticker-item">Market Cap <span id="t3b">—</span></div>
-      <div class="ticker-item">24h Volume <span id="t4b">—</span></div>
-      <div class="ticker-item">Circulating <span id="t5b">—</span></div>
-      <div class="ticker-item">24h High <span id="t6b">—</span></div>
-      <div class="ticker-item">24h Low <span id="t7b">—</span></div>
-      <div class="ticker-item">Shielded <span id="t8b">—</span></div>
+  <section class="section" id="radio">
+    <div class="section-title">RADIO</div>
+    <div class="radio-bar">
+      <div class="play" id="radio-play">▶</div>
+      <div class="radio-meta"><b>ZECTASTIC RADIO</b> — live stream</div>
+      <div class="bars"><span></span><span></span><span></span><span></span><span></span></div>
     </div>
-  </div>
+    <audio id="radio-audio" src="https://stream.zeno.fm/0r0xa792kwzuv" preload="none"></audio>
+  </section>
 
-  <!-- ENCRYPT THE MONEY GAME -->
-  <div class="game-section">
-    <div class="game-header">
-      <div class="game-title-wrap">
-        <span class="game-badge">MINI GAME</span>
-        <div class="game-title">⚡ ENCRYPT THE MONEY</div>
-        <div class="game-sub">Shield your ZCash from threats — earn Ƶ, climb the leaderboard</div>
-      </div>
-      <a href="game.html" class="play-btn">PLAY NOW →</a>
-    </div>
-    <div class="game-preview" onclick="window.location.href='game.html'">
-      <div class="game-preview-inner">
-        <div class="gp-shield">Ƶ</div>
-        <div class="gp-threats">
-          <span class="gp-threat t1">👁</span>
-          <span class="gp-threat t2">🔓</span>
-          <span class="gp-threat t3">💀</span>
-          <span class="gp-threat t4">🕵</span>
-          <span class="gp-threat t5">⚠</span>
-        </div>
-        <div class="gp-label">TARGET: Ƶ 1.00000000 &nbsp;·&nbsp; TAP TO PLAY</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TWO COLUMNS -->
-  <div class="two-col">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">If ZEC matched their market cap</div>
-        <div style="font-size:10px;color:var(--muted);letter-spacing:1px">TOP 3 ABOVE</div>
-      </div>
-      <div class="panel-body" id="compPanel"><div style="color:var(--muted);font-size:12px">Loading…</div></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">Bitcoin</div>
-        <div style="font-size:10px;color:var(--gold);letter-spacing:1px">BTC/USD</div>
-      </div>
-      <div class="panel-body">
-        <div class="btc-grid">
-          <div class="btc-cell"><div class="btc-label">Price</div><div class="btc-val" id="btcPrice">—</div></div>
-          <div class="btc-cell"><div class="btc-label">Market Cap</div><div class="btc-val" id="btcMc">—</div></div>
-          <div class="btc-cell"><div class="btc-label">24h High</div><div class="btc-val" style="color:var(--green)" id="btcHigh">—</div></div>
-          <div class="btc-cell"><div class="btc-label">24h Low</div><div class="btc-val" style="color:var(--red)" id="btcLow">—</div></div>
-        </div>
-        <div style="margin-top:14px;">
-          <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">ZEC price trend (session)</div>
-          <div class="spark-wrap"><canvas id="spark"></canvas></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="footer-bar">
-    <span>Price: CoinGecko · Shielded: zkp.baby · Updates every 15s</span>
-    <span id="lastUpdate">Last update: —</span>
-  </div>
+  <footer>
+    <div>PRICE: COINGECKO · SHIELDED: ZKP.BABY · UPDATES EVERY 15S</div>
+    <div><a href="/privacy.html">PRIVACY</a> · <a href="#" id="manage-consent-link">COOKIE SETTINGS</a> · © 2026 ZECTASTIC</div>
+  </footer>
 
 </div>
 
-<audio id="radio" src="https://stream.zeno.fm/0r0xa792kwzuv" crossorigin="anonymous"></audio>
+<!-- COOKIE CONSENT BANNER -->
+<div id="consent-banner" class="hidden">
+  <div class="consent-copy">
+    <div class="consent-tag">◈ DATA CONSENT</div>
+    <p>
+      Zectastic runs on essential storage only — nothing more than remembering this
+      choice and, if you enable it, your radio volume. We don't connect wallets,
+      collect addresses, or sell data. See the <a href="/privacy.html">privacy policy</a>
+      for the full breakdown.
+    </p>
+    <div class="consent-toggle-row">
+      <div class="switch on" id="essential-switch" style="opacity:0.5; cursor:not-allowed;"></div>
+      <span>Essential — required, always on</span>
+    </div>
+    <div class="consent-toggle-row">
+      <div class="switch" id="analytics-switch"></div>
+      <span id="analytics-label">Privacy-respecting analytics — off (no tracker installed yet)</span>
+    </div>
+  </div>
+  <div class="consent-actions">
+    <button class="btn-ghost" id="consent-essential-only">ESSENTIAL ONLY</button>
+    <button class="btn-gold" id="consent-accept-all">ACCEPT ALL</button>
+  </div>
+</div>
+
+<div id="consent-tab"><span class="dot"></span>COOKIE SETTINGS</div>
 
 <script>
-  let realPrice = 0, displayPrice = 0, circSupply = 16500000;
-  let priceHistory = [];
-  const MAX_HISTORY = 30;
+  // ---- decrypt/scramble reveal effect ----
+  const CHARS = '0123456789';
+  function scrambleInto(el, finalText, duration=600){
+    const start = performance.now();
+    const len = finalText.length;
+    function frame(now){
+      const t = Math.min(1, (now - start) / duration);
+      let out = '';
+      for(let i=0;i<len;i++){
+        const ch = finalText[i];
+        if(ch === '.' || ch === ',' || ch === '$' || ch === '%' || ch === '+' || ch === '-' || ch === ' '){
+          out += ch; continue;
+        }
+        if(t > (i/len)){
+          out += ch;
+        } else {
+          out += CHARS[Math.floor(Math.random()*CHARS.length)];
+        }
+      }
+      el.textContent = out;
+      if(t < 1) requestAnimationFrame(frame);
+      else el.textContent = finalText;
+    }
+    requestAnimationFrame(frame);
+  }
 
-  const fmtCap = n => {
-    if (!n) return '—';
-    if (n >= 1e12) return '$' + (n/1e12).toFixed(2) + 'T';
-    if (n >= 1e9)  return '$' + (n/1e9).toFixed(2)  + 'B';
-    if (n >= 1e6)  return '$' + (n/1e6).toFixed(2)  + 'M';
-    return '$' + n.toLocaleString();
-  };
-  const fmtZec = n => {
-    if (!n) return '—';
-    if (n >= 1e6) return (n/1e6).toFixed(2) + 'M ZEC';
-    return n.toLocaleString() + ' ZEC';
-  };
+  function fmtUSD(n, decimals=2){
+    if(n === null || n === undefined) return '—';
+    return n.toLocaleString('en-US', {minimumFractionDigits:decimals, maximumFractionDigits:decimals});
+  }
+  function fmtCompact(n){
+    if(n === null || n === undefined) return '—';
+    return '$' + Intl.NumberFormat('en-US', {notation:'compact', maximumFractionDigits:2}).format(n);
+  }
 
-  // ── MARKET DATA (CoinGecko) ──────────────────────────
-  async function fetchMarket() {
-    try {
-      const res  = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false');
+  async function loadData(){
+    try{
+      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zcash,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true');
       const data = await res.json();
-      const zec  = data.find(c => c.symbol === 'zec');
-      const btc  = data.find(c => c.symbol === 'btc');
-      if (!zec || !btc) return;
 
-      realPrice  = zec.current_price;
-      circSupply = zec.circulating_supply || circSupply;
-      priceHistory.push(realPrice);
-      if (priceHistory.length > MAX_HISTORY) priceHistory.shift();
-      drawSparkline();
+      const zec = data.zcash;
+      const btc = data.bitcoin;
 
-      const chg = zec.price_change_percentage_24h;
-      const badge = document.getElementById('changeBadge');
-      if (chg !== null) {
-        badge.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
-        badge.className   = 'change-badge ' + (chg >= 0 ? 'up' : 'down');
+      if(zec){
+        scrambleInto(document.getElementById('price-val'), fmtUSD(zec.usd));
+        const chEl = document.getElementById('change');
+        const ch = zec.usd_24h_change || 0;
+        chEl.textContent = (ch >= 0 ? '▲ ' : '▼ ') + Math.abs(ch).toFixed(2) + '%';
+        chEl.className = 'change ' + (ch >= 0 ? 'up' : 'down');
+
+        document.getElementById('mcap').textContent = fmtCompact(zec.usd_market_cap);
+        document.getElementById('vol').textContent = fmtCompact(zec.usd_24h_vol);
+
+        if(btc && btc.usd){
+          document.getElementById('zecbtc').textContent = (zec.usd / btc.usd).toFixed(6);
+        }
+      }
+      if(btc){
+        scrambleInto(document.getElementById('btcprice'), fmtUSD(btc.usd, 0));
       }
 
-      document.getElementById('marketCap').textContent  = fmtCap(zec.market_cap);
-      document.getElementById('volume24').textContent   = fmtCap(zec.total_volume);
-      document.getElementById('supplyNum').textContent  = fmtZec(zec.circulating_supply);
-      document.getElementById('supplyMax').textContent  = zec.max_supply ? '/ ' + (zec.max_supply/1e6).toFixed(0) + 'M max' : '/ 21M max';
-      document.getElementById('high24').textContent     = '$' + zec.high_24h.toFixed(2);
-      document.getElementById('low24').textContent      = '$' + zec.low_24h.toFixed(2);
-      document.getElementById('zecRank').textContent    = 'Rank #' + zec.market_cap_rank;
-      const zecBtcVal = zec.current_price / btc.current_price;
-      document.getElementById('zecBtc').textContent     = zecBtcVal.toFixed(8);
-      document.getElementById('btcPrice').textContent   = '$' + btc.current_price.toLocaleString();
-      document.getElementById('btcMc').textContent      = fmtCap(btc.market_cap);
-      document.getElementById('btcHigh').textContent    = '$' + btc.high_24h.toLocaleString();
-      document.getElementById('btcLow').textContent     = '$' + btc.low_24h.toLocaleString();
-
-      [['t1','t1b','$'+realPrice.toFixed(2)],['t2','t2b',zecBtcVal.toFixed(8)],
-       ['t3','t3b',fmtCap(zec.market_cap)],['t4','t4b',fmtCap(zec.total_volume)],
-       ['t5','t5b',fmtZec(zec.circulating_supply)],
-       ['t6','t6b','$'+zec.high_24h.toFixed(2)],['t7','t7b','$'+zec.low_24h.toFixed(2)]
-      ].forEach(([a,b,v]) => {
-        const ea=document.getElementById(a); if(ea) ea.textContent=v;
-        const eb=document.getElementById(b); if(eb) eb.textContent=v;
-      });
-
-      const higher = data.filter(c => c.market_cap > zec.market_cap && c.symbol !== 'zec')
-        .sort((a,b) => a.market_cap - b.market_cap).slice(0,3);
-      document.getElementById('compPanel').innerHTML = higher.map(c => {
-        const hypo = (c.market_cap / zec.circulating_supply).toFixed(2);
-        const mult = (c.market_cap / zec.market_cap).toFixed(1);
-        return `<div class="competitor">
-          <div><div class="comp-name">${c.name}</div><div class="comp-sub">${mult}× ZEC market cap</div></div>
-          <div class="comp-mc">${fmtCap(c.market_cap)}</div>
-          <div class="comp-hypo"><div class="comp-hypo-label">ZEC would be</div><div class="comp-hypo-val">$${hypo}</div></div>
-        </div>`;
-      }).join('');
-
-      document.getElementById('lastUpdate').textContent = 'Last update: ' + new Date().toLocaleTimeString();
-    } catch(e) { console.error('Market fetch:', e); }
-  }
-
-  // ── SHIELDED DATA ───────────────────────────────────
-  // Strategy: try zkp.baby (several likely endpoints) → Blockchair → hard fallback
-  async function fetchShielded() {
-    let total=0, orchard=0, sapling=0, sprout=0, pct=0;
-
-    // 1. Try zkp.baby endpoints (discovered via page source inspection)
-    const zkpEndpoints = [
-      'https://zkp.baby/api/latest',
-      'https://zkp.baby/api/stats',
-      'https://zkp.baby/api/pools',
-      'https://zkp.baby/api/current',
-    ];
-    for (const url of zkpEndpoints) {
-      try {
-        const r = await fetch(url, { signal: AbortSignal.timeout(4000) });
-        if (!r.ok) continue;
-        const d = await r.json();
-        // Handle various possible shapes
-        total   = Number(d.total_shielded || d.totalShielded || d.shielded_total || d.shielded || 0);
-        orchard = Number(d.orchard || d.orchard_pool || d.orchardPool || 0);
-        sapling = Number(d.sapling || d.sapling_pool || d.saplingPool || 0);
-        sprout  = Number(d.sprout  || d.sprout_pool  || d.sproutPool  || 0);
-        pct     = Number(d.shielded_pct || d.shieldedPct || d.shielded_percentage || d.percentage || 0);
-        if (total > 100000 || pct > 0) break;
-      } catch(_) {}
+      document.getElementById('updated').textContent =
+        'LAST SYNC ' + new Date().toLocaleTimeString('en-US', {hour12:false}) + ' UTC';
+    }catch(e){
+      document.getElementById('updated').textContent = 'FEED UNAVAILABLE — RETRYING…';
     }
+  }
 
-    // 2. Try Blockchair (free tier, sometimes blocks CORS)
-    if (total < 100000) {
-      try {
-        const r = await fetch('https://api.blockchair.com/zcash/stats', { signal: AbortSignal.timeout(6000) });
-        if (r.ok) {
-          const j = await r.json();
-          const pools = j?.data?.value_pools || [];
-          const getPool = name => {
-            const p = pools.find(x => x.name === name); if (!p) return 0;
-            if (p.chainValue)         return parseFloat(p.chainValue);
-            if (p.shielded_value_zat) return p.shielded_value_zat / 1e8;
-            return 0;
-          };
-          orchard = getPool('orchard');
-          sapling = getPool('sapling');
-          sprout  = getPool('sprout');
-          total   = orchard + sapling + sprout;
-        }
-      } catch(_) {}
+  // extra market cap/coin-detail call for rank, supply, high/low
+  async function loadDetail(){
+    try{
+      const res = await fetch('https://api.coingecko.com/api/v3/coins/zcash?localization=false&tickers=false&community_data=false&developer_data=false');
+      const d = await res.json();
+      document.getElementById('rank').textContent = '#' + (d.market_cap_rank || '—');
+      document.getElementById('high').textContent = '$' + fmtUSD(d.market_data.high_24h.usd);
+      document.getElementById('low').textContent = '$' + fmtUSD(d.market_data.low_24h.usd);
+      document.getElementById('supply').textContent = Intl.NumberFormat('en-US', {notation:'compact'}).format(d.market_data.circulating_supply) + ' ZEC';
+    }catch(e){ /* silent — dashboard still functions without this */ }
+  }
+
+  // shielded pool — zkp.baby has no known public CORS API; show a
+  // clearly-labeled placeholder state rather than fake data.
+  function loadShield(){
+    document.getElementById('shield-pct').textContent = 'DATA PENDING';
+    document.getElementById('shield-fill').style.width = '0%';
+  }
+
+  loadData();
+  loadDetail();
+  loadShield();
+  setInterval(loadData, 15000);
+
+  // radio play/pause
+  const audio = document.getElementById('radio-audio');
+  const playBtn = document.getElementById('radio-play');
+  let playing = false;
+  playBtn.addEventListener('click', () => {
+    if(!playing){ audio.play(); playBtn.textContent = '❚❚'; }
+    else { audio.pause(); playBtn.textContent = '▶'; }
+    playing = !playing;
+  });
+
+  // ---- cookie consent ----
+  // Consent state lives in localStorage under one key, storing only a
+  // timestamp + the analytics choice. No identifiers, no third-party writes.
+  const CONSENT_KEY = 'zectastic_consent_v1';
+
+  function getConsent(){
+    try{
+      const raw = localStorage.getItem(CONSENT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+  function setConsent(analytics){
+    try{
+      localStorage.setItem(CONSENT_KEY, JSON.stringify({
+        analytics: analytics,
+        essential: true,
+        ts: new Date().toISOString()
+      }));
+    }catch(e){ /* localStorage unavailable — banner will just re-show next visit */ }
+  }
+
+  function applyConsent(consent){
+    // Wire real analytics loading here in future, gated on consent.analytics.
+    // Currently no analytics script exists on this site, so this is a no-op
+    // beyond reflecting the user's stored choice in the UI.
+    if(consent && consent.analytics){
+      analyticsSwitch.classList.add('on');
+      analyticsLabel.textContent = 'Privacy-respecting analytics — on';
+    } else {
+      analyticsSwitch.classList.remove('on');
+      analyticsLabel.textContent = 'Privacy-respecting analytics — off';
     }
-
-    // 3. Hard fallback — last known figures from zkp.baby (May 2026)
-    if (total < 100000) {
-      total   = 5178839;
-      orchard = 4554021;
-      sapling = 599408;
-      sprout  = 25409;
-    }
-
-    pct = pct || (total / circSupply) * 100;
-
-    const orchPct = total > 0 ? ((orchard / total) * 100).toFixed(1) : '—';
-    const sapPct  = total > 0 ? ((sapling / total) * 100).toFixed(1) : '—';
-    const sprPct  = total > 0 ? ((sprout  / total) * 100).toFixed(1) : '—';
-
-    document.getElementById('shieldTotal').textContent  = fmtZec(total);
-    document.getElementById('shieldPct').textContent    = pct.toFixed(1) + '%';
-    document.getElementById('shieldBar').style.width    = Math.min(pct, 100) + '%';
-    document.getElementById('shieldBarSub').textContent = pct.toFixed(1) + '% of circulating supply is shielded';
-    document.getElementById('poolPills').innerHTML =
-      `<div class="pool-pill">Orchard <span>${orchPct}%</span></div>` +
-      `<div class="pool-pill">Sapling <span>${sapPct}%</span></div>` +
-      `<div class="pool-pill">Sprout <span>${sprPct}%</span></div>`;
-
-    const t8  = document.getElementById('t8');  if(t8)  t8.textContent  = fmtZec(total);
-    const t8b = document.getElementById('t8b'); if(t8b) t8b.textContent = fmtZec(total);
   }
 
-  // ── SMOOTH PRICE ─────────────────────────────────────
-  function smoothUpdate() {
-    if (realPrice === 0) return;
-    if (displayPrice === 0) displayPrice = realPrice;
-    const diff = realPrice - displayPrice;
-    displayPrice += diff * 0.08 + (Math.random() - 0.5) * 0.015;
-    document.getElementById('zecPrice').textContent = '$' + displayPrice.toFixed(2);
-    const el = document.querySelector('.price-main');
-    el.classList.remove('up','down');
-    if (diff >  0.005) el.classList.add('up');
-    if (diff < -0.005) el.classList.add('down');
-  }
+  const banner = document.getElementById('consent-banner');
+  const tab = document.getElementById('consent-tab');
+  const analyticsSwitch = document.getElementById('analytics-switch');
+  const analyticsLabel = document.getElementById('analytics-label');
+  let pendingAnalytics = false;
 
-  // ── SPARKLINE ────────────────────────────────────────
-  function drawSparkline() {
-    const canvas = document.getElementById('spark');
-    if (!canvas || priceHistory.length < 2) return;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width  = canvas.clientWidth  * dpr;
-    canvas.height = canvas.clientHeight * dpr;
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    const W = canvas.clientWidth, H = canvas.clientHeight;
-    const mn = Math.min(...priceHistory), mx = Math.max(...priceHistory), rng = mx - mn || 1;
-    ctx.clearRect(0, 0, W, H);
-    const pts = priceHistory.map((p,i) => ({
-      x: (i / (priceHistory.length - 1)) * W,
-      y: H - ((p - mn) / rng) * (H - 10) - 5
-    }));
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, 'rgba(244,185,66,0.2)');
-    grad.addColorStop(1, 'rgba(244,185,66,0)');
-    ctx.beginPath(); ctx.moveTo(pts[0].x, H);
-    pts.forEach(p => ctx.lineTo(p.x, p.y));
-    ctx.lineTo(pts[pts.length-1].x, H); ctx.closePath();
-    ctx.fillStyle = grad; ctx.fill();
-    ctx.beginPath();
-    pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-    ctx.strokeStyle = '#F4B942'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
-    const last = pts[pts.length-1];
-    ctx.beginPath(); ctx.arc(last.x, last.y, 4, 0, Math.PI*2);
-    ctx.fillStyle = '#F4B942'; ctx.fill();
-  }
+  function showBanner(){ banner.classList.remove('hidden'); tab.classList.remove('visible'); }
+  function hideBanner(){ banner.classList.add('hidden'); tab.classList.add('visible'); }
 
-  // ── MUSIC ────────────────────────────────────────────
-  function toggleMusic() {
-    const radio = document.getElementById('radio');
-    const btn   = document.getElementById('musicBtn');
-    if (radio.paused) { radio.play(); btn.textContent='⏸ Radio'; btn.classList.add('playing'); }
-    else              { radio.pause(); btn.textContent='▶ Radio'; btn.classList.remove('playing'); }
-  }
+  analyticsSwitch.addEventListener('click', () => {
+    pendingAnalytics = !pendingAnalytics;
+    analyticsSwitch.classList.toggle('on', pendingAnalytics);
+    analyticsLabel.textContent = 'Privacy-respecting analytics — ' + (pendingAnalytics ? 'on (saved once you confirm)' : 'off');
+  });
 
-  // ── BOOT ─────────────────────────────────────────────
-  fetchMarket();
-  fetchShielded();
-  setInterval(fetchMarket,   15000);
-  setInterval(fetchShielded, 60000);
-  setInterval(smoothUpdate,   1000);
-  window.addEventListener('resize', drawSparkline);
+  document.getElementById('consent-essential-only').addEventListener('click', () => {
+    setConsent(false);
+    applyConsent({analytics:false});
+    hideBanner();
+  });
+  document.getElementById('consent-accept-all').addEventListener('click', () => {
+    setConsent(true);
+    applyConsent({analytics:true});
+    hideBanner();
+  });
+  tab.addEventListener('click', showBanner);
+  document.getElementById('manage-consent-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    showBanner();
+  });
+
+  const existing = getConsent();
+  if(existing){
+    applyConsent(existing);
+    hideBanner();
+  } else {
+    showBanner();
+  }
 </script>
+
 </body>
 </html>

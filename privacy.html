@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy — Zectastic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0D0F; --surface:#14171A; --surface-2:#1B1F23; --line:#262B30;
+    --text:#E8E6DF; --text-dim:#8A9096; --gold:#F4B728; --teal:#2FBF9F; --red:#FF4B4B;
+    --mono:'IBM Plex Mono', monospace; --sans:'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased;}
+  a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4); text-decoration:none;}
+  a:hover{color:var(--gold); border-color:var(--gold);}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  header{border-bottom:1px solid var(--line); padding:20px 0;}
+  .logo{font-family:var(--mono); font-weight:700; font-size:15px; display:flex; align-items:center; gap:10px;}
+  .logo .mark{width:26px; height:26px; border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--gold);}
+  main{padding:56px 0 80px;}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:0.15em; color:var(--gold); text-transform:uppercase; margin-bottom:14px;}
+  h1{font-family:var(--mono); font-size:clamp(28px,5vw,40px); margin-bottom:12px; line-height:1.1;}
+  .updated{font-family:var(--mono); font-size:12px; color:var(--text-dim); margin-bottom:40px;}
+  h2{font-family:var(--mono); font-size:16px; color:var(--teal); margin:36px 0 12px; letter-spacing:0.02em;}
+  p{font-size:15px; line-height:1.7; color:var(--text-dim); margin-bottom:14px;}
+  p b, li b{color:var(--text); font-weight:600;}
+  ul{margin:0 0 14px 20px; color:var(--text-dim);}
+  li{margin-bottom:8px; line-height:1.6; font-size:15px;}
+  table{width:100%; border-collapse:collapse; margin:16px 0 24px; font-size:13.5px;}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);}
+  th{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; color:var(--text-dim); text-transform:uppercase;}
+  td{color:var(--text-dim);}
+  td b{color:var(--text);}
+  .callout{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--gold); padding:18px 20px; margin:24px 0;}
+  .callout p{margin-bottom:0; color:var(--text);}
+  footer{border-top:1px solid var(--line); padding:24px 0; font-family:var(--mono); font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="/" style="border:none;"><div class="logo"><span class="mark">Z</span> ZECTASTIC</div></a>
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+    <div class="eyebrow">[ DATA CONSENT · PRIVACY ]</div>
+    <h1>Privacy Policy</h1>
+    <div class="updated">Last updated: August 15, 2026</div>
+
+    <div class="callout">
+      <p><b>The short version:</b> Zectastic doesn't ask you to connect a wallet, doesn't collect your ZEC address, and doesn't sell data to anyone. We store the minimum needed to run a live price tracker and a browser game.</p>
+    </div>
+
+    <h2>01 — What we collect</h2>
+    <table>
+      <tr><th>Data</th><th>Purpose</th><th>Stored where</th></tr>
+      <tr><td><b>Cookie consent choice</b></td><td>Remember your preference so we don't ask every visit</td><td>Your browser (localStorage), not our servers</td></tr>
+      <tr><td><b>Game leaderboard score + display name</b></td><td>Show the global leaderboard</td><td>Our server, tied to a random session ID — not your identity</td></tr>
+      <tr><td><b>Basic server logs</b></td><td>Security, abuse prevention, uptime debugging</td><td>Our server, IP addresses auto-purged after 30 days</td></tr>
+    </table>
+
+    <h2>02 — What we don't collect</h2>
+    <ul>
+      <li>We never request wallet connections, seed phrases, or private keys — Zectastic is a read-only price tracker and has no reason to ever ask for these.</li>
+      <li>We don't track you across other websites.</li>
+      <li>We don't build advertising profiles, and we don't sell or share data with data brokers.</li>
+      <li>No account or email sign-up is required to use the tracker or play the game.</li>
+    </ul>
+
+    <h2>03 — Cookies &amp; local storage</h2>
+    <p>Zectastic uses <b>essential storage only</b> by default: a single entry in your browser recording your consent choice and, optionally, your radio volume. Neither is sent to our servers or any third party.</p>
+    <p>If we ever add optional, privacy-respecting analytics (no cross-site tracking, no ad targeting), it will stay off unless you switch it on in <a href="/#" onclick="return false;">Cookie Settings</a>. You can change your choice at any time from the footer of any page.</p>
+
+    <h2>04 — Third-party data sources</h2>
+    <p>Live prices are pulled directly from <a href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko's</a> public API, and shielded-pool figures from <a href="https://zkp.baby" target="_blank" rel="noopener">zkp.baby</a>. The radio stream is served by Zeno.fm. These requests happen directly from your browser to fetch public market data — no personal data is sent to them beyond what any standard web request includes (like your IP address, which they may log per their own policies).</p>
+
+    <h2>05 — The leaderboard</h2>
+    <p>Scores are validated server-side before posting — we don't trust client-submitted numbers at face value. Display names are filtered for abuse; don't use one that identifies you personally, since leaderboard entries are public by design.</p>
+
+    <h2>06 — Your choices</h2>
+    <ul>
+      <li>Clear your cookie consent choice anytime via <b>Cookie Settings</b> in the footer.</li>
+      <li>Clear localStorage manually in your browser settings to remove all locally stored data instantly.</li>
+      <li>Contact us to request removal of a leaderboard entry.</li>
+    </ul>
+
+    <h2>07 — Changes to this policy</h2>
+    <p>If this policy changes in a way that matters, we'll update the date at the top and note it on the homepage. We won't quietly expand what we collect.</p>
+  </main>
+
+  <footer>
+    <div>ZECTASTIC.COM</div>
+    <div><a href="/">← BACK TO TRACKER</a></div>
+  </footer>
+</div>
+
+</body>
+</html>
