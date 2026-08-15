@@ -840,12 +840,27 @@
     }
 
     if(result){
-      chartLoaded = true;
-      wrap.classList.remove('loading');
-      renderChart(result.labels, result.values, result.labelOverride);
+      try{
+        if(typeof Chart === 'undefined'){
+          // The Chart.js <script> tag in <head> didn't execute — most
+          // likely the CDN (cdnjs.cloudflare.com) is blocked by a
+          // script-src Content-Security-Policy on this host. This is a
+          // DIFFERENT restriction than the connect-src/CORS issue we
+          // were chasing for the data fetch itself — the data arrived
+          // fine, but the charting library never loaded, so there was
+          // nothing to draw with.
+          throw new Error('Chart.js failed to load (typeof Chart === "undefined") — likely blocked by a script-src CSP rule for cdnjs.cloudflare.com, separate from the data-fetch issue.');
+        }
+        chartLoaded = true;
+        wrap.classList.remove('loading');
+        renderChart(result.labels, result.values, result.labelOverride);
+      }catch(renderErr){
+        console.error('[Chart] Data fetched successfully, but rendering failed:', renderErr);
+        showSnapshotFallback(`Data loaded successfully, but the chart library failed to render it (see browser console for the exact error — likely a script-src CSP blocking cdnjs.cloudflare.com).`);
+      }
     } else {
       console.error('[Chart] All 4 live sources failed:', errors);
-      showSnapshotFallback(`All 4 live sources failed (see browser console for exact errors). ${errors.length ? '' : ''}`);
+      showSnapshotFallback(`All 4 live sources failed (see browser console for exact errors).`);
     }
   }
 
