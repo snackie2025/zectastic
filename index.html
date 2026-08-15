@@ -244,65 +244,6 @@
     .live-dot, .bars span{animation:none;}
   }
 
-  /* COOKIE CONSENT */
-  #consent-banner{
-    position:fixed; left:0; right:0; bottom:0; z-index:1000;
-    background:var(--surface);
-    border-top:1px solid var(--gold);
-    box-shadow:0 -8px 30px rgba(0,0,0,0.5);
-    padding:20px 24px;
-    display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;
-    transform:translateY(0);
-    animation:rise 0.4s ease;
-  }
-  @keyframes rise{from{transform:translateY(100%);} to{transform:translateY(0);}}
-  #consent-banner.hidden{display:none;}
-  .consent-copy{flex:1; min-width:260px;}
-  .consent-tag{
-    font-family:var(--mono); font-size:11px; color:var(--gold); letter-spacing:0.12em;
-    margin-bottom:8px;
-  }
-  .consent-copy p{font-size:13px; color:var(--text-dim); line-height:1.6; max-width:560px;}
-  .consent-copy a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4);}
-  .consent-toggle-row{
-    display:flex; align-items:center; gap:10px; margin-top:12px;
-    font-family:var(--mono); font-size:12px; color:var(--text-dim);
-  }
-  .switch{
-    width:36px; height:20px; background:var(--surface-2); border:1px solid var(--line);
-    border-radius:12px; position:relative; cursor:pointer; flex-shrink:0;
-  }
-  .switch.on{background:rgba(47,191,159,0.25); border-color:var(--teal);}
-  .switch::after{
-    content:''; position:absolute; top:2px; left:2px;
-    width:14px; height:14px; border-radius:50%; background:var(--text-dim);
-    transition:transform 0.2s, background 0.2s;
-  }
-  .switch.on::after{transform:translateX(16px); background:var(--teal);}
-  .consent-actions{display:flex; gap:10px; flex-shrink:0; align-self:center;}
-  .btn-ghost{
-    font-family:var(--mono); font-size:12.5px; font-weight:600; letter-spacing:0.04em;
-    background:transparent; color:var(--text-dim); border:1px solid var(--line);
-    padding:12px 18px; cursor:pointer; transition:border-color 0.2s, color 0.2s;
-  }
-  .btn-ghost:hover{border-color:var(--text-dim); color:var(--text);}
-  .btn-gold{
-    font-family:var(--mono); font-size:12.5px; font-weight:700; letter-spacing:0.04em;
-    background:var(--gold); color:#0B0D0F; border:none;
-    padding:12px 18px; cursor:pointer; transition:transform 0.15s;
-  }
-  .btn-gold:hover{transform:translateY(-1px);}
-
-  #consent-tab{
-    position:fixed; bottom:20px; left:20px; z-index:900;
-    font-family:var(--mono); font-size:11px; letter-spacing:0.06em;
-    color:var(--text-dim); background:var(--surface); border:1px solid var(--line);
-    padding:8px 12px; cursor:pointer; display:none; align-items:center; gap:6px;
-  }
-  #consent-tab.visible{display:flex;}
-  #consent-tab:hover{border-color:var(--gold); color:var(--gold);}
-  #consent-tab .dot{width:5px; height:5px; border-radius:50%; background:var(--teal);}
-
   /* IRONWOOD MIGRATION */
   .ironwood-band{
     background:var(--surface); border:1px solid var(--line);
@@ -315,7 +256,7 @@
   .ironwood-title{
     font-family:var(--mono); font-weight:600; font-size:14px;
     color:var(--teal); margin-bottom:6px; letter-spacing:0.05em;
-    display:flex; align-items:center; gap:8px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
   }
   .ironwood-title .tag{
     font-size:10px; background:rgba(47,191,159,0.12); color:var(--teal);
@@ -384,6 +325,66 @@
     .ironwood-pct-label{text-align:left;}
   }
 
+  /* COOKIE CONSENT */
+  #consent-banner{
+    position:fixed; left:0; right:0; bottom:0; z-index:1000;
+    background:var(--surface);
+    border-top:1px solid var(--gold);
+    box-shadow:0 -8px 30px rgba(0,0,0,0.5);
+    padding:20px 24px;
+    display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;
+    transform:translateY(0);
+    animation:rise 0.4s ease;
+  }
+  @keyframes rise{from{transform:translateY(100%);} to{transform:translateY(0);}}
+  #consent-banner.hidden{display:none;}
+  .consent-copy{flex:1; min-width:260px;}
+  .consent-tag{
+    font-family:var(--mono); font-size:11px; color:var(--gold); letter-spacing:0.12em;
+    margin-bottom:8px;
+  }
+  .consent-copy p{font-size:13px; color:var(--text-dim); line-height:1.6; max-width:560px;}
+  .consent-copy a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4);}
+  .consent-toggle-row{
+    display:flex; align-items:center; gap:10px; margin-top:12px;
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+  }
+  .switch{
+    width:36px; height:20px; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:12px; position:relative; cursor:pointer; flex-shrink:0;
+  }
+  .switch.on{background:rgba(47,191,159,0.25); border-color:var(--teal);}
+  .switch::after{
+    content:''; position:absolute; top:2px; left:2px;
+    width:14px; height:14px; border-radius:50%; background:var(--text-dim);
+    transition:transform 0.2s, background 0.2s;
+  }
+  .switch.on::after{transform:translateX(16px); background:var(--teal);}
+  .consent-actions{display:flex; gap:10px; flex-shrink:0; align-self:center;}
+  .btn-ghost{
+    font-family:var(--mono); font-size:12.5px; font-weight:600; letter-spacing:0.04em;
+    background:transparent; color:var(--text-dim); border:1px solid var(--line);
+    padding:12px 18px; cursor:pointer; transition:border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover{border-color:var(--text-dim); color:var(--text);}
+  .btn-gold{
+    font-family:var(--mono); font-size:12.5px; font-weight:700; letter-spacing:0.04em;
+    background:var(--gold); color:#0B0D0F; border:none;
+    padding:12px 18px; cursor:pointer; transition:transform 0.15s;
+  }
+  .btn-gold:hover{transform:translateY(-1px);}
+
+  #consent-tab{
+    position:fixed; bottom:20px; left:20px; z-index:900;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.06em;
+    color:var(--text-dim); background:var(--surface); border:1px solid var(--line);
+    padding:8px 12px; cursor:pointer; display:none; align-items:center; gap:6px;
+  }
+  #consent-tab.visible{display:flex;}
+  #consent-tab:hover{border-color:var(--gold); color:var(--gold);}
+  #consent-tab .dot{width:5px; height:5px; border-radius:50%; background:var(--teal);}
+
+
   @media (max-width:640px){
     #consent-banner{padding:18px;}
     .consent-actions{width:100%;}
@@ -443,7 +444,7 @@
           <div class="ironwood-desc">
             Orchard is sealed and exit-only. ZEC can only leave through the turnstile,
             which guarantees nothing exits that didn't legitimately enter — verifying
-            Zcash's shielded supply for the first time.
+            Zcash's shielded supply on-chain.
           </div>
         </div>
         <div>
@@ -481,7 +482,7 @@
       <div class="turnstile-legend" id="turnstile-legend"></div>
 
       <div class="ironwood-source">
-        LIVE ON-CHAIN DATA VIA <a href="https://cipherscan.app/ironwood" target="_blank" rel="noopener">CIPHERSCAN</a> · UPDATES EVERY 60S
+        LIVE ON-CHAIN DATA VIA <a href="https://cipherscan.app/ironwood" target="_blank" rel="noopener">CIPHERSCAN'S OPEN API</a> · UPDATES EVERY 60S
       </div>
     </div>
   </section>
@@ -512,7 +513,7 @@
   </section>
 
   <footer>
-    <div>PRICE: COINGECKO · SHIELDED: ZKP.BABY · UPDATES EVERY 15S</div>
+    <div>PRICE: COINGECKO · IRONWOOD: CIPHERSCAN · UPDATES EVERY 15–60S</div>
     <div><a href="/privacy.html">PRIVACY</a> · <a href="#" id="manage-consent-link">COOKIE SETTINGS</a> · © 2026 ZECTASTIC</div>
   </footer>
 
@@ -626,8 +627,9 @@
     }catch(e){ /* silent — dashboard still functions without this */ }
   }
 
-  // Ironwood migration — live on-chain data from CipherScan's open API
-  // (https://cipherscan.app/docs), no key required.
+  // Ironwood migration — live on-chain data from CipherScan's open,
+  // no-auth Zcash API (https://cipherscan.app/docs). Endpoints used:
+  // /api/supply, /api/pools/overview, /api/pools/turnstile
   const CIPHERSCAN = 'https://api.mainnet.cipherscan.app';
   const ZATOSHI = 100000000;
 
@@ -659,13 +661,14 @@
       document.getElementById('orchard-balance').textContent = fmtZEC(orchardZEC);
       document.getElementById('iw-txcount').textContent = Intl.NumberFormat('en-US').format(turnstile.summary.txCount);
 
-      // Orchard only decreases via the turnstile, so its 24h outflow ≈ ZEC migrated
+      // Orchard only decreases via the turnstile now that it's exit-only,
+      // so its 24h outflow is a direct read of ZEC migrated in the period.
       const orchard24h = overview.deltas && overview.deltas.orchard && overview.deltas.orchard['24h'];
       if(orchard24h !== null && orchard24h !== undefined){
         document.getElementById('iw-24h').textContent = fmtZEC(Math.abs(orchard24h) / ZATOSHI);
       }
 
-      // turnstile destination breakdown
+      // turnstile destination breakdown — where deshielded ZEC ends up
       const s = turnstile.summary;
       const segments = [
         {label:'Transferred', pct:s.transferredPercent, color:'var(--teal)'},
