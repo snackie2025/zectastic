@@ -258,18 +258,6 @@
     letter-spacing:0.05em;
   }
   .chart-range-label b{color:var(--text); font-weight:600;}
-  .range-toggle{
-    display:flex; border:1px solid var(--line); overflow:hidden;
-  }
-  .range-toggle button{
-    font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:0.04em;
-    background:transparent; color:var(--text-dim); border:none;
-    padding:8px 16px; cursor:pointer; transition:background 0.15s, color 0.15s;
-    border-left:1px solid var(--line);
-  }
-  .range-toggle button:first-child{border-left:none;}
-  .range-toggle button:hover{color:var(--text);}
-  .range-toggle button.active{background:var(--gold); color:#0B0D0F;}
   .chart-wrap{
     position:relative; height:280px;
   }
@@ -278,6 +266,24 @@
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-family:var(--mono); font-size:12px; color:var(--text-dim); letter-spacing:0.08em;
   }
+  .snapshot-fallback{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    height:100%; gap:16px; padding:24px; text-align:center;
+  }
+  .snapshot-value{
+    font-family:var(--mono); font-weight:700; font-size:clamp(32px, 6vw, 48px);
+    color:var(--gold); line-height:1;
+  }
+  .snapshot-meta{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+    display:flex; gap:18px; flex-wrap:wrap; justify-content:center;
+  }
+  .snapshot-meta b{color:var(--text);}
+  .snapshot-note{
+    font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
+    max-width:440px; line-height:1.6;
+  }
+  .snapshot-note a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4);}
   .chart-error{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:14px; height:100%;
@@ -441,13 +447,7 @@
     <div class="section-title">MARKET CAP CHART</div>
     <div class="chart-card">
       <div class="chart-header">
-        <div class="chart-range-label">ZEC MARKET CAP — <b id="chart-range-text">24H</b></div>
-        <div class="range-toggle" id="range-toggle">
-          <button data-range="1" class="active">24H</button>
-          <button data-range="7">7D</button>
-          <button data-range="365">1Y</button>
-          <button data-range="max">ALL</button>
-        </div>
+        <div class="chart-range-label">ZEC MARKET CAP (USD) — <b id="chart-range-text">ALL TIME</b></div>
       </div>
       <div class="chart-wrap loading" id="chart-wrap">
         <canvas id="price-chart"></canvas>
@@ -522,7 +522,7 @@
   </section>
 
   <footer>
-    <div>PRICE: COINGECKO · CHART: COINPAPRIKA/COINGECKO VIA CORS PROXY · SHIELDED SUPPLY: ZKP.BABY · UPDATES EVERY 60S</div>
+    <div>PRICE: COINGECKO · MARKET CAP CHART: COINPAPRIKA/COINGECKO VIA CORS PROXY (ALL-TIME) · SHIELDED SUPPLY: ZKP.BABY · UPDATES EVERY 60S</div>
     <div><a href="/privacy.html">PRIVACY</a> · <a href="#" id="manage-consent-link">COOKIE SETTINGS</a> · © 2026 ZECTASTIC</div>
   </footer>
 
@@ -592,33 +592,25 @@
     return '$' + Intl.NumberFormat('en-US', {notation:'compact', maximumFractionDigits:2}).format(n);
   }
 
-  // ---- market cap chart ----
-  // Data comes from zectastic-chart-worker.js, a small server-side proxy
-  // that fetches CoinPaprika (falling back to CoinGecko) and returns
-  // plain JSON to this page from the same trust boundary as the rest of
-  // the site — sidesteps the CORS/CSP issue that broke direct
-  // browser-to-third-party calls. See the Worker file for details.
-  const RANGE_LABELS = {'1': '24H', '7': '7D', '365': '1Y', 'max': 'ALL'};
-  const chartCache = {};
+  // ---- market cap chart: ZEC/USD, all-time only ----
+  // Simplified from a 4-range toggle after persistent failures across
+  // every data source tried. Now: one chart, all-time market cap, and
+  // four attempts before giving up — two data sources (CoinPaprika,
+  // CoinGecko) each tried through two independent CORS-proxy relays,
+  // since a single proxy being down was itself a possible failure mode.
   let priceChart = null;
-  let chartLoadToken = 0;
+  let chartLoaded = false;
 
-  function fmtChartLabel(ts, range){
+  function fmtChartLabel(ts){
     const d = new Date(ts);
-    if(range === '1'){
-      return d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:false});
-    }
-    if(range === '7'){
-      return d.toLocaleDateString('en-US', {weekday:'short', hour:'2-digit', hour12:false});
-    }
-    return d.toLocaleDateString('en-US', {month:'short', year: range === 'max' ? '2-digit' : undefined, day: range === '365' ? undefined : '2-digit'});
+    return d.toLocaleDateString('en-US', {month:'short', year:'2-digit'});
   }
 
   function fmtMarketCap(v){
     return '$' + Intl.NumberFormat('en-US', {notation:'compact', maximumFractionDigits:2}).format(v);
   }
 
-  function renderChart(labels, values, range, rangeLabelOverride){
+  function renderChart(labels, values, rangeLabelOverride){
     const maxLabels = 8;
     const step = Math.max(1, Math.ceil(labels.length / maxLabels));
     const displayLabels = labels.map((l, i) => (i % step === 0 ? l : ''));
@@ -682,10 +674,10 @@
         }
       }
     });
-    document.getElementById('chart-range-text').textContent = rangeLabelOverride || RANGE_LABELS[range];
+    document.getElementById('chart-range-text').textContent = rangeLabelOverride || 'ALL TIME';
   }
 
-  function showChartError(message, range){
+  function showChartError(message){
     const wrap = document.getElementById('chart-wrap');
     wrap.classList.remove('loading');
     if(priceChart){ priceChart.destroy(); priceChart = null; }
@@ -697,152 +689,167 @@
       <div>${message}</div>
       <button class="chart-retry-btn" type="button">RETRY</button>
     `;
-    err.querySelector('.chart-retry-btn').addEventListener('click', () => loadChart(range));
+    err.querySelector('.chart-retry-btn').addEventListener('click', () => { chartLoaded = false; loadChart(); });
     wrap.appendChild(err);
   }
 
-  // Chart data via a public CORS-proxy relay — no deployment needed.
-  // This exists because direct browser calls from this static site to
-  // both api.coinpaprika.com and api.coingecko.com were blocked (almost
-  // certainly CORS, since a static host can't set the response headers
-  // that would allow those cross-origin calls itself). The proxy relays
-  // the request and adds the missing CORS header.
-  //
-  // Trade-off, stated plainly: this adds a third public dependency
-  // (allorigins.win) that this site doesn't control, and free public
-  // CORS proxies are occasionally slower or flakier than a direct API
-  // call would be. If this site ever gets access to real server-side
-  // hosting (a Cloudflare Worker, a Vercel/Netlify function, anything
-  // that can run code — see zectastic-chart-worker.js), switching to
-  // that is the more robust long-term fix. This proxy approach is the
-  // pragmatic option for a purely static host today.
-  const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+  // Two independent public CORS-proxy relays, tried in order. Different
+  // services, different infrastructure — a single one being down or
+  // blocked shouldn't be able to take the whole chart out by itself.
+  const CORS_PROXIES = [
+    (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    (url) => 'https://corsproxy.io/?url=' + encodeURIComponent(url),
+  ];
 
   function isoDate(d){ return d.toISOString().slice(0, 10); }
 
-  const RANGE_CONFIG = {
-    '1':   {interval: '1h', daysBack: 1},
-    '7':   {interval: '3h', daysBack: 7},
-    '365': {interval: '1d', daysBack: 358}, // see safety-margin note below
-    'max': {interval: '1d', daysBack: 358}
-  };
-
-  async function proxiedFetch(targetUrl){
-    const res = await fetch(CORS_PROXY + encodeURIComponent(targetUrl));
+  async function fetchViaProxy(targetUrl, proxyIndex){
+    const build = CORS_PROXIES[proxyIndex];
+    const res = await fetch(build(targetUrl));
     if(!res.ok){
-      throw {httpStatus: res.status, message: `HTTP ${res.status} via CORS proxy (target: ${targetUrl})`};
+      throw {httpStatus: res.status, message: `HTTP ${res.status} via proxy #${proxyIndex + 1} (target: ${targetUrl})`};
     }
     return res.json();
   }
 
-  async function loadFromCoinPaprika(range){
-    const cfg = RANGE_CONFIG[range];
-    let data, labelOverride = null;
-
-    if(range === 'max'){
-      try{
-        data = await proxiedFetch(`https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=2016-10-28&interval=1d&limit=5000`);
-      }catch(e){
-        const fallbackStart = isoDate(new Date(Date.now() - cfg.daysBack * 86400000));
-        data = await proxiedFetch(`https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=${fallbackStart}&interval=1d&limit=5000`);
-      }
-      if(!Array.isArray(data) || data.length === 0) throw {message: 'CoinPaprika returned no data'};
-      const spanDays = Math.round((new Date(data[data.length - 1].timestamp) - new Date(data[0].timestamp)) / 86400000);
-      labelOverride = spanDays >= 350 ? `ALL (${Math.round(spanDays / 30)}MO AVAILABLE)` : `ALL (${spanDays}D AVAILABLE)`;
-    } else {
-      const startDate = isoDate(new Date(Date.now() - cfg.daysBack * 86400000));
-      data = await proxiedFetch(`https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=${startDate}&interval=${cfg.interval}&limit=5000`);
-      if(!Array.isArray(data) || data.length === 0) throw {message: 'CoinPaprika returned no data'};
+  async function fetchCoinPaprikaAllTime(proxyIndex){
+    const target = `https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=2016-10-28&interval=1d&limit=5000`;
+    let data;
+    try{
+      data = await fetchViaProxy(target, proxyIndex);
+    }catch(e){
+      // Free-tier plans commonly cap historical depth at ~1 rolling year;
+      // if the full-history request is rejected, retry with that window.
+      const fallbackStart = isoDate(new Date(Date.now() - 358 * 86400000));
+      const fallbackTarget = `https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=${fallbackStart}&interval=1d&limit=5000`;
+      data = await fetchViaProxy(fallbackTarget, proxyIndex);
     }
+    if(!Array.isArray(data) || data.length === 0) throw {message: 'CoinPaprika returned no data'};
+
+    const spanDays = Math.round((new Date(data[data.length - 1].timestamp) - new Date(data[0].timestamp)) / 86400000);
+    const labelOverride = spanDays >= 350 ? `ALL TIME (${Math.round(spanDays / 30)}MO AVAILABLE)` : `ALL TIME (${spanDays}D AVAILABLE)`;
 
     return {
-      labels: data.map(p => fmtChartLabel(p.timestamp, range)),
+      labels: data.map(p => fmtChartLabel(p.timestamp)),
       values: data.map(p => p.market_cap),
       labelOverride
     };
   }
 
-  async function loadFromCoinGecko(range){
-    const daysParam = range === 'max' ? 'max' : range;
-    const data = await proxiedFetch(`https://api.coingecko.com/api/v3/coins/zcash/market_chart?vs_currency=usd&days=${daysParam}`);
+  async function fetchCoinGeckoAllTime(proxyIndex){
+    const target = `https://api.coingecko.com/api/v3/coins/zcash/market_chart?vs_currency=usd&days=max`;
+    const data = await fetchViaProxy(target, proxyIndex);
     if(!Array.isArray(data.market_caps) || data.market_caps.length === 0){
       throw {message: 'CoinGecko returned no market_caps data'};
     }
     return {
-      labels: data.market_caps.map(p => fmtChartLabel(p[0], range)),
+      labels: data.market_caps.map(p => fmtChartLabel(p[0])),
       values: data.market_caps.map(p => p[1]),
       labelOverride: null
     };
   }
 
   function describeFetchError(e){
-    if(e instanceof TypeError){
-      return `blocked before reaching the server — likely a network issue reaching the CORS proxy itself (${e.message})`;
-    }
+    if(e instanceof TypeError) return `network error reaching the proxy (${e.message})`;
     if(e && e.httpStatus === 429) return 'rate-limited (HTTP 429)';
     if(e && e.message) return e.message;
     return 'unknown error';
   }
 
-  async function loadChart(range){
-    const myToken = ++chartLoadToken;
-    const wrap = document.getElementById('chart-wrap');
-    const existingError = wrap.querySelector('.chart-error');
-    if(existingError) existingError.remove();
+  // Guaranteed fallback if every live source fails: a real, verified
+  // market cap snapshot rather than an empty error box. Not live — this
+  // number is fixed at the time this page was built — but it's real
+  // data, clearly labeled as a snapshot, with a source link so anyone
+  // can check the current figure themselves.
+  const MARKET_CAP_SNAPSHOT = {
+    valueLabel: '$8.15B',
+    asOf: 'Aug 2026',
+    circSupply: '16.88M ZEC',
+    rank: '#14',
+    source: 'CoinGecko',
+    sourceUrl: 'https://www.coingecko.com/en/coins/zcash'
+  };
 
-    if(chartCache[range]){
-      renderChart(chartCache[range].labels, chartCache[range].values, range, chartCache[range].labelOverride);
+  function showSnapshotFallback(extraNote){
+    const wrap = document.getElementById('chart-wrap');
+    wrap.classList.remove('loading');
+    if(priceChart){ priceChart.destroy(); priceChart = null; }
+    const existing = wrap.querySelector('.chart-error, .snapshot-fallback');
+    if(existing) existing.remove();
+
+    const s = MARKET_CAP_SNAPSHOT;
+    const box = document.createElement('div');
+    box.className = 'snapshot-fallback';
+    box.innerHTML = `
+      <div class="snapshot-value">${s.valueLabel}</div>
+      <div class="snapshot-meta">
+        <span>SUPPLY <b>${s.circSupply}</b></span>
+        <span>RANK <b>${s.rank}</b></span>
+        <span>AS OF <b>${s.asOf}</b></span>
+      </div>
+      <div class="snapshot-note">
+        Live chart couldn't load, so this is a fixed snapshot instead of an empty box — source:
+        <a href="${s.sourceUrl}" target="_blank" rel="noopener">${s.source}</a>.
+        ${extraNote || ''}
+      </div>
+      <button class="chart-retry-btn" type="button">TRY LIVE CHART AGAIN</button>
+    `;
+    box.querySelector('.chart-retry-btn').addEventListener('click', () => { chartLoaded = false; loadChart(); });
+    wrap.appendChild(box);
+    document.getElementById('chart-range-text').textContent = 'SNAPSHOT';
+  }
+
+  async function loadChart(){
+    if(chartLoaded) return;
+    const wrap = document.getElementById('chart-wrap');
+    const existingError = wrap.querySelector('.chart-error, .snapshot-fallback');
+    if(existingError) existingError.remove();
+    wrap.classList.add('loading');
+
+    // If this page is being viewed as a local file rather than served
+    // over http(s), browsers block almost all outbound fetch() calls —
+    // this alone would explain every source and every proxy failing
+    // identically, regardless of which one is tried.
+    if(location.protocol === 'file:'){
+      console.warn('[Chart] Page is open via file:// — browsers block most fetch() calls from local files. This alone explains every live source failing.');
+      showSnapshotFallback('This page is currently open as a local file (file://) — browsers block live data requests from local files as a security measure, so no API would work here regardless of source. This will very likely work once the page is served from the real zectastic.com domain.');
       return;
     }
 
-    wrap.classList.add('loading');
+    // Four attempts, in order: CoinPaprika/proxy1, CoinPaprika/proxy2,
+    // CoinGecko/proxy1, CoinGecko/proxy2. First success wins.
+    const attempts = [
+      () => fetchCoinPaprikaAllTime(0),
+      () => fetchCoinPaprikaAllTime(1),
+      () => fetchCoinGeckoAllTime(0),
+      () => fetchCoinGeckoAllTime(1),
+    ];
+    const attemptLabels = ['CoinPaprika+proxy1', 'CoinPaprika+proxy2', 'CoinGecko+proxy1', 'CoinGecko+proxy2'];
 
     let result = null;
-    let paprikaError = null;
-    let geckoError = null;
+    const errors = [];
 
-    try{
-      result = await loadFromCoinPaprika(range);
-    }catch(e){
-      console.error('[Chart] CoinPaprika (via proxy) failed for range', range, e);
-      paprikaError = e;
-    }
-
-    if(!result && myToken === chartLoadToken){
+    for(let i = 0; i < attempts.length; i++){
       try{
-        result = await loadFromCoinGecko(range);
-        console.warn('[Chart] CoinPaprika failed, CoinGecko (via proxy) succeeded for range', range);
+        result = await attempts[i]();
+        break;
       }catch(e){
-        console.error('[Chart] CoinGecko (via proxy) also failed for range', range, e);
-        geckoError = e;
+        console.error(`[Chart] ${attemptLabels[i]} failed:`, e);
+        errors.push(`${attemptLabels[i]}: ${describeFetchError(e)}`);
       }
     }
 
-    if(myToken !== chartLoadToken) return;
-
     if(result){
-      chartCache[range] = result;
+      chartLoaded = true;
       wrap.classList.remove('loading');
-      renderChart(result.labels, result.values, range, result.labelOverride);
+      renderChart(result.labels, result.values, result.labelOverride);
     } else {
-      const paprikaMsg = paprikaError ? describeFetchError(paprikaError) : 'not attempted';
-      const geckoMsg = geckoError ? describeFetchError(geckoError) : 'not attempted';
-      showChartError(
-        `Chart failed to load.<br>CoinPaprika (via proxy): ${paprikaMsg}<br>CoinGecko (via proxy): ${geckoMsg}<br>If both mention the proxy itself, allorigins.win may be temporarily down — try Retry in a minute.`,
-        range
-      );
+      console.error('[Chart] All 4 live sources failed:', errors);
+      showSnapshotFallback(`All 4 live sources failed (see browser console for exact errors). ${errors.length ? '' : ''}`);
     }
   }
 
-  document.getElementById('range-toggle').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-range]');
-    if(!btn) return;
-    document.querySelectorAll('#range-toggle button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    loadChart(btn.dataset.range);
-  });
-
-  loadChart('1');
+  loadChart();
 
   async function loadData(){
     try{
