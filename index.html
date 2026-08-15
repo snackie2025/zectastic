@@ -244,6 +244,56 @@
     .live-dot, .bars span{animation:none;}
   }
 
+  /* PRICE CHART */
+  .chart-card{
+    background:var(--surface); border:1px solid var(--line);
+    padding:24px;
+  }
+  .chart-header{
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:16px; margin-bottom:20px;
+  }
+  .chart-range-label{
+    font-family:var(--mono); font-size:13px; color:var(--text-dim);
+    letter-spacing:0.05em;
+  }
+  .chart-range-label b{color:var(--text); font-weight:600;}
+  .range-toggle{
+    display:flex; border:1px solid var(--line); overflow:hidden;
+  }
+  .range-toggle button{
+    font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:0.04em;
+    background:transparent; color:var(--text-dim); border:none;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s, color 0.15s;
+    border-left:1px solid var(--line);
+  }
+  .range-toggle button:first-child{border-left:none;}
+  .range-toggle button:hover{color:var(--text);}
+  .range-toggle button.active{background:var(--gold); color:#0B0D0F;}
+  .chart-wrap{
+    position:relative; height:280px;
+  }
+  .chart-wrap.loading::after{
+    content:'LOADING CHART…';
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:12px; color:var(--text-dim); letter-spacing:0.08em;
+  }
+  .chart-error{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; height:100%;
+    font-family:var(--mono); font-size:12px; color:var(--red); text-align:center; padding:20px;
+  }
+  .chart-error > div:first-child{max-width:520px; line-height:1.7;}
+  .chart-retry-btn{
+    font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:0.06em;
+    background:transparent; color:var(--text-dim); border:1px solid var(--line);
+    padding:8px 16px; cursor:pointer; transition:border-color 0.2s, color 0.2s;
+  }
+  .chart-retry-btn:hover{border-color:var(--gold); color:var(--gold);}
+  @media (max-width:640px){
+    .chart-wrap{height:220px;}
+  }
+
   /* IRONWOOD MIGRATION */
   .ironwood-band{
     background:var(--surface); border:1px solid var(--line);
@@ -263,61 +313,22 @@
     padding:2px 7px; border:1px solid rgba(47,191,159,0.3); letter-spacing:0.08em;
   }
   .ironwood-desc{font-size:13px; color:var(--text-dim); line-height:1.5; max-width:460px;}
-  .ironwood-pct{
-    font-family:var(--mono); font-weight:700; font-size:42px; color:var(--text);
-    line-height:1; text-align:right;
+  .zkp-embed-wrap{
+    position:relative; width:100%; height:680px;
+    border:1px solid var(--line); background:var(--surface-2);
+    overflow:hidden;
   }
-  .ironwood-pct-label{
-    font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
-    letter-spacing:0.1em; text-align:right; margin-top:6px;
+  .zkp-iframe{
+    width:100%; height:100%; border:none; display:block; background:#0B0D0F;
   }
-  .migration-bar{
-    height:14px; background:var(--surface-2); border:1px solid var(--line);
-    overflow:hidden; margin-bottom:20px; display:flex;
-  }
-  .migration-bar-fill{
-    height:100%; background:linear-gradient(90deg, var(--teal), #5EE0BC);
-    width:0%; transition:width 1.2s ease;
-  }
-  .migration-bar-rest{
-    height:100%; background:repeating-linear-gradient(
-      45deg, rgba(255,75,75,0.15) 0px, rgba(255,75,75,0.15) 6px,
-      transparent 6px, transparent 12px
-    );
-    flex:1;
-  }
-  .iw-grid{
-    display:grid; grid-template-columns:repeat(4, 1fr); gap:1px;
-    background:var(--line); border:1px solid var(--line); margin-bottom:24px;
-  }
-  .iw-cell{background:var(--surface); padding:16px;}
-  .iw-cell-label{
-    font-family:var(--mono); font-size:10px; letter-spacing:0.08em;
-    color:var(--text-dim); text-transform:uppercase; margin-bottom:8px;
-  }
-  .iw-cell-value{
-    font-family:var(--mono); font-size:18px; font-weight:600;
-    font-variant-numeric:tabular-nums;
-  }
-  .iw-cell-value.orchard{color:var(--red);}
-  .iw-cell-value.ironwood{color:var(--teal);}
-  .turnstile-title{
-    font-family:var(--mono); font-size:11px; letter-spacing:0.08em;
-    color:var(--text-dim); text-transform:uppercase; margin-bottom:12px;
-  }
-  .turnstile-bars{display:flex; height:28px; overflow:hidden; border:1px solid var(--line); margin-bottom:10px;}
-  .turnstile-seg{height:100%; transition:width 0.8s ease;}
-  .turnstile-legend{
-    display:flex; flex-wrap:wrap; gap:14px;
-    font-family:var(--mono); font-size:11px; color:var(--text-dim);
-  }
-  .turnstile-legend span{display:flex; align-items:center; gap:6px;}
-  .legend-dot{width:8px; height:8px; flex-shrink:0;}
   .ironwood-source{
     font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
     margin-top:20px; padding-top:16px; border-top:1px solid var(--line);
   }
   .ironwood-source a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4);}
+  @media (max-width:640px){
+    .zkp-embed-wrap{height:520px;}
+  }
 
   @media (max-width:760px){
     .iw-grid{grid-template-columns:repeat(2, 1fr);}
@@ -391,6 +402,7 @@
     .consent-actions button{flex:1;}
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -426,6 +438,24 @@
   </section>
 
   <section class="section">
+    <div class="section-title">MARKET CAP CHART</div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-range-label">ZEC MARKET CAP — <b id="chart-range-text">24H</b></div>
+        <div class="range-toggle" id="range-toggle">
+          <button data-range="1" class="active">24H</button>
+          <button data-range="7">7D</button>
+          <button data-range="365">1Y</button>
+          <button data-range="max">ALL</button>
+        </div>
+      </div>
+      <div class="chart-wrap loading" id="chart-wrap">
+        <canvas id="price-chart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="section-title">MARKET DATA</div>
     <div class="grid">
       <div class="cell"><div class="cell-label">Market Cap</div><div class="cell-value" id="mcap">—</div></div>
@@ -436,53 +466,32 @@
   </section>
 
   <section class="section">
-    <div class="section-title">IRONWOOD MIGRATION</div>
+    <div class="section-title">IRONWOOD / SHIELDED SUPPLY</div>
     <div class="ironwood-band">
       <div class="ironwood-top">
         <div>
-          <div class="ironwood-title">◈ ORCHARD → IRONWOOD <span class="tag">NU6.3 LIVE</span></div>
+          <div class="ironwood-title">◈ ZCASH SHIELDED POOL DASHBOARD <span class="tag">LIVE</span></div>
           <div class="ironwood-desc">
-            Orchard is sealed and exit-only. ZEC can only leave through the turnstile,
-            which guarantees nothing exits that didn't legitimately enter — verifying
-            Zcash's shielded supply on-chain.
+            Live pool balances, migration trend, and shielded supply — pulled directly
+            from zkp.baby's dashboard below.
           </div>
         </div>
-        <div>
-          <div class="ironwood-pct" id="iw-pct">—%</div>
-          <div class="ironwood-pct-label">MIGRATED TO IRONWOOD</div>
-        </div>
       </div>
 
-      <div class="migration-bar">
-        <div class="migration-bar-fill" id="iw-bar-fill"></div>
-        <div class="migration-bar-rest"></div>
+      <div class="zkp-embed-wrap" id="zkp-embed-wrap">
+        <iframe
+          id="zkp-iframe"
+          class="zkp-iframe"
+          src="https://zkp.baby"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          title="zkp.baby — Zcash shielded pool dashboard">
+        </iframe>
       </div>
-
-      <div class="iw-grid">
-        <div class="iw-cell">
-          <div class="iw-cell-label">Ironwood Balance</div>
-          <div class="iw-cell-value ironwood" id="iw-balance">—</div>
-        </div>
-        <div class="iw-cell">
-          <div class="iw-cell-label">Orchard Remaining</div>
-          <div class="iw-cell-value orchard" id="orchard-balance">—</div>
-        </div>
-        <div class="iw-cell">
-          <div class="iw-cell-label">Migrated, 24H</div>
-          <div class="iw-cell-value" id="iw-24h">—</div>
-        </div>
-        <div class="iw-cell">
-          <div class="iw-cell-label">Turnstile Txs (YTD)</div>
-          <div class="iw-cell-value" id="iw-txcount">—</div>
-        </div>
-      </div>
-
-      <div class="turnstile-title">WHERE DESHIELDED ZEC GOES (SINCE JAN 2026)</div>
-      <div class="turnstile-bars" id="turnstile-bars"></div>
-      <div class="turnstile-legend" id="turnstile-legend"></div>
 
       <div class="ironwood-source">
-        LIVE ON-CHAIN DATA VIA <a href="https://cipherscan.app/ironwood" target="_blank" rel="noopener">CIPHERSCAN'S OPEN API</a> · UPDATES EVERY 60S
+        LIVE DATA VIA <a href="https://zkp.baby" target="_blank" rel="noopener">ZKP.BABY</a> ·
+        IF THE EMBED ABOVE DOESN'T LOAD, <a href="https://zkp.baby" target="_blank" rel="noopener">OPEN IT DIRECTLY HERE</a>
       </div>
     </div>
   </section>
@@ -513,7 +522,7 @@
   </section>
 
   <footer>
-    <div>PRICE: COINGECKO · IRONWOOD: CIPHERSCAN · UPDATES EVERY 15–60S</div>
+    <div>PRICE: COINGECKO · CHART: COINPAPRIKA/COINGECKO VIA CORS PROXY · SHIELDED SUPPLY: ZKP.BABY · UPDATES EVERY 60S</div>
     <div><a href="/privacy.html">PRIVACY</a> · <a href="#" id="manage-consent-link">COOKIE SETTINGS</a> · © 2026 ZECTASTIC</div>
   </footer>
 
@@ -526,8 +535,9 @@
     <p>
       Zectastic runs on essential storage only — nothing more than remembering this
       choice and, if you enable it, your radio volume. We don't connect wallets,
-      collect addresses, or sell data. See the <a href="/privacy.html">privacy policy</a>
-      for the full breakdown.
+      collect addresses, or sell data. The Ironwood section embeds a live dashboard
+      from zkp.baby, which may set its own cookies we don't control. See the
+      <a href="/privacy.html">privacy policy</a> for the full breakdown.
     </p>
     <div class="consent-toggle-row">
       <div class="switch on" id="essential-switch" style="opacity:0.5; cursor:not-allowed;"></div>
@@ -582,6 +592,258 @@
     return '$' + Intl.NumberFormat('en-US', {notation:'compact', maximumFractionDigits:2}).format(n);
   }
 
+  // ---- market cap chart ----
+  // Data comes from zectastic-chart-worker.js, a small server-side proxy
+  // that fetches CoinPaprika (falling back to CoinGecko) and returns
+  // plain JSON to this page from the same trust boundary as the rest of
+  // the site — sidesteps the CORS/CSP issue that broke direct
+  // browser-to-third-party calls. See the Worker file for details.
+  const RANGE_LABELS = {'1': '24H', '7': '7D', '365': '1Y', 'max': 'ALL'};
+  const chartCache = {};
+  let priceChart = null;
+  let chartLoadToken = 0;
+
+  function fmtChartLabel(ts, range){
+    const d = new Date(ts);
+    if(range === '1'){
+      return d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:false});
+    }
+    if(range === '7'){
+      return d.toLocaleDateString('en-US', {weekday:'short', hour:'2-digit', hour12:false});
+    }
+    return d.toLocaleDateString('en-US', {month:'short', year: range === 'max' ? '2-digit' : undefined, day: range === '365' ? undefined : '2-digit'});
+  }
+
+  function fmtMarketCap(v){
+    return '$' + Intl.NumberFormat('en-US', {notation:'compact', maximumFractionDigits:2}).format(v);
+  }
+
+  function renderChart(labels, values, range, rangeLabelOverride){
+    const maxLabels = 8;
+    const step = Math.max(1, Math.ceil(labels.length / maxLabels));
+    const displayLabels = labels.map((l, i) => (i % step === 0 ? l : ''));
+
+    const ctx = document.getElementById('price-chart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+    gradient.addColorStop(0, 'rgba(244,183,40,0.28)');
+    gradient.addColorStop(1, 'rgba(244,183,40,0)');
+
+    if(priceChart) priceChart.destroy();
+    priceChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: displayLabels,
+        datasets: [{
+          data: values,
+          borderColor: '#F4B728',
+          backgroundColor: gradient,
+          fill: true,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: '#2FBF9F',
+          pointHoverBorderColor: '#2FBF9F',
+          tension: 0.15
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {intersect: false, mode: 'index'},
+        plugins: {
+          legend: {display: false},
+          tooltip: {
+            backgroundColor: '#14171A',
+            borderColor: '#262B30',
+            borderWidth: 1,
+            titleFont: {family: 'IBM Plex Mono', size: 11},
+            bodyFont: {family: 'IBM Plex Mono', size: 12, weight: '600'},
+            bodyColor: '#E8E6DF',
+            titleColor: '#8A9096',
+            padding: 10,
+            displayColors: false,
+            callbacks: {
+              label: (ctx) => fmtMarketCap(ctx.parsed.y)
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: {color: 'rgba(255,255,255,0.04)'},
+            ticks: {color: '#8A9096', font: {family: 'IBM Plex Mono', size: 10}, maxRotation: 0, autoSkip: false}
+          },
+          y: {
+            grid: {color: 'rgba(255,255,255,0.04)'},
+            ticks: {
+              color: '#8A9096', font: {family: 'IBM Plex Mono', size: 10},
+              callback: (v) => fmtMarketCap(v)
+            }
+          }
+        }
+      }
+    });
+    document.getElementById('chart-range-text').textContent = rangeLabelOverride || RANGE_LABELS[range];
+  }
+
+  function showChartError(message, range){
+    const wrap = document.getElementById('chart-wrap');
+    wrap.classList.remove('loading');
+    if(priceChart){ priceChart.destroy(); priceChart = null; }
+    const existing = wrap.querySelector('.chart-error');
+    if(existing) existing.remove();
+    const err = document.createElement('div');
+    err.className = 'chart-error';
+    err.innerHTML = `
+      <div>${message}</div>
+      <button class="chart-retry-btn" type="button">RETRY</button>
+    `;
+    err.querySelector('.chart-retry-btn').addEventListener('click', () => loadChart(range));
+    wrap.appendChild(err);
+  }
+
+  // Chart data via a public CORS-proxy relay — no deployment needed.
+  // This exists because direct browser calls from this static site to
+  // both api.coinpaprika.com and api.coingecko.com were blocked (almost
+  // certainly CORS, since a static host can't set the response headers
+  // that would allow those cross-origin calls itself). The proxy relays
+  // the request and adds the missing CORS header.
+  //
+  // Trade-off, stated plainly: this adds a third public dependency
+  // (allorigins.win) that this site doesn't control, and free public
+  // CORS proxies are occasionally slower or flakier than a direct API
+  // call would be. If this site ever gets access to real server-side
+  // hosting (a Cloudflare Worker, a Vercel/Netlify function, anything
+  // that can run code — see zectastic-chart-worker.js), switching to
+  // that is the more robust long-term fix. This proxy approach is the
+  // pragmatic option for a purely static host today.
+  const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+  function isoDate(d){ return d.toISOString().slice(0, 10); }
+
+  const RANGE_CONFIG = {
+    '1':   {interval: '1h', daysBack: 1},
+    '7':   {interval: '3h', daysBack: 7},
+    '365': {interval: '1d', daysBack: 358}, // see safety-margin note below
+    'max': {interval: '1d', daysBack: 358}
+  };
+
+  async function proxiedFetch(targetUrl){
+    const res = await fetch(CORS_PROXY + encodeURIComponent(targetUrl));
+    if(!res.ok){
+      throw {httpStatus: res.status, message: `HTTP ${res.status} via CORS proxy (target: ${targetUrl})`};
+    }
+    return res.json();
+  }
+
+  async function loadFromCoinPaprika(range){
+    const cfg = RANGE_CONFIG[range];
+    let data, labelOverride = null;
+
+    if(range === 'max'){
+      try{
+        data = await proxiedFetch(`https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=2016-10-28&interval=1d&limit=5000`);
+      }catch(e){
+        const fallbackStart = isoDate(new Date(Date.now() - cfg.daysBack * 86400000));
+        data = await proxiedFetch(`https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=${fallbackStart}&interval=1d&limit=5000`);
+      }
+      if(!Array.isArray(data) || data.length === 0) throw {message: 'CoinPaprika returned no data'};
+      const spanDays = Math.round((new Date(data[data.length - 1].timestamp) - new Date(data[0].timestamp)) / 86400000);
+      labelOverride = spanDays >= 350 ? `ALL (${Math.round(spanDays / 30)}MO AVAILABLE)` : `ALL (${spanDays}D AVAILABLE)`;
+    } else {
+      const startDate = isoDate(new Date(Date.now() - cfg.daysBack * 86400000));
+      data = await proxiedFetch(`https://api.coinpaprika.com/v1/tickers/zec-zcash/historical?start=${startDate}&interval=${cfg.interval}&limit=5000`);
+      if(!Array.isArray(data) || data.length === 0) throw {message: 'CoinPaprika returned no data'};
+    }
+
+    return {
+      labels: data.map(p => fmtChartLabel(p.timestamp, range)),
+      values: data.map(p => p.market_cap),
+      labelOverride
+    };
+  }
+
+  async function loadFromCoinGecko(range){
+    const daysParam = range === 'max' ? 'max' : range;
+    const data = await proxiedFetch(`https://api.coingecko.com/api/v3/coins/zcash/market_chart?vs_currency=usd&days=${daysParam}`);
+    if(!Array.isArray(data.market_caps) || data.market_caps.length === 0){
+      throw {message: 'CoinGecko returned no market_caps data'};
+    }
+    return {
+      labels: data.market_caps.map(p => fmtChartLabel(p[0], range)),
+      values: data.market_caps.map(p => p[1]),
+      labelOverride: null
+    };
+  }
+
+  function describeFetchError(e){
+    if(e instanceof TypeError){
+      return `blocked before reaching the server — likely a network issue reaching the CORS proxy itself (${e.message})`;
+    }
+    if(e && e.httpStatus === 429) return 'rate-limited (HTTP 429)';
+    if(e && e.message) return e.message;
+    return 'unknown error';
+  }
+
+  async function loadChart(range){
+    const myToken = ++chartLoadToken;
+    const wrap = document.getElementById('chart-wrap');
+    const existingError = wrap.querySelector('.chart-error');
+    if(existingError) existingError.remove();
+
+    if(chartCache[range]){
+      renderChart(chartCache[range].labels, chartCache[range].values, range, chartCache[range].labelOverride);
+      return;
+    }
+
+    wrap.classList.add('loading');
+
+    let result = null;
+    let paprikaError = null;
+    let geckoError = null;
+
+    try{
+      result = await loadFromCoinPaprika(range);
+    }catch(e){
+      console.error('[Chart] CoinPaprika (via proxy) failed for range', range, e);
+      paprikaError = e;
+    }
+
+    if(!result && myToken === chartLoadToken){
+      try{
+        result = await loadFromCoinGecko(range);
+        console.warn('[Chart] CoinPaprika failed, CoinGecko (via proxy) succeeded for range', range);
+      }catch(e){
+        console.error('[Chart] CoinGecko (via proxy) also failed for range', range, e);
+        geckoError = e;
+      }
+    }
+
+    if(myToken !== chartLoadToken) return;
+
+    if(result){
+      chartCache[range] = result;
+      wrap.classList.remove('loading');
+      renderChart(result.labels, result.values, range, result.labelOverride);
+    } else {
+      const paprikaMsg = paprikaError ? describeFetchError(paprikaError) : 'not attempted';
+      const geckoMsg = geckoError ? describeFetchError(geckoError) : 'not attempted';
+      showChartError(
+        `Chart failed to load.<br>CoinPaprika (via proxy): ${paprikaMsg}<br>CoinGecko (via proxy): ${geckoMsg}<br>If both mention the proxy itself, allorigins.win may be temporarily down — try Retry in a minute.`,
+        range
+      );
+    }
+  }
+
+  document.getElementById('range-toggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-range]');
+    if(!btn) return;
+    document.querySelectorAll('#range-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadChart(btn.dataset.range);
+  });
+
+  loadChart('1');
+
   async function loadData(){
     try{
       const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=zcash,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true');
@@ -627,75 +889,16 @@
     }catch(e){ /* silent — dashboard still functions without this */ }
   }
 
-  // Ironwood migration — live on-chain data from CipherScan's open,
-  // no-auth Zcash API (https://cipherscan.app/docs). Endpoints used:
-  // /api/supply, /api/pools/overview, /api/pools/turnstile
-  const CIPHERSCAN = 'https://api.mainnet.cipherscan.app';
-  const ZATOSHI = 100000000;
-
-  function fmtZEC(n){
-    if(n === null || n === undefined) return '—';
-    return Intl.NumberFormat('en-US', {maximumFractionDigits:0}).format(n) + ' ZEC';
-  }
-
-  async function loadIronwood(){
-    try{
-      const [supplyRes, overviewRes, turnstileRes] = await Promise.all([
-        fetch(CIPHERSCAN + '/api/supply'),
-        fetch(CIPHERSCAN + '/api/pools/overview'),
-        fetch(CIPHERSCAN + '/api/pools/turnstile?since=2026-01-01')
-      ]);
-      const supply = await supplyRes.json();
-      const overview = await overviewRes.json();
-      const turnstile = await turnstileRes.json();
-
-      const orchard = supply.find(p => p.id === 'orchard');
-      const ironwood = supply.find(p => p.id === 'ironwood');
-      const orchardZEC = orchard.chainValue;
-      const ironwoodZEC = ironwood.chainValue;
-      const pct = (ironwoodZEC / (orchardZEC + ironwoodZEC)) * 100;
-
-      scrambleInto(document.getElementById('iw-pct'), pct.toFixed(1) + '%');
-      document.getElementById('iw-bar-fill').style.width = pct.toFixed(1) + '%';
-      document.getElementById('iw-balance').textContent = fmtZEC(ironwoodZEC);
-      document.getElementById('orchard-balance').textContent = fmtZEC(orchardZEC);
-      document.getElementById('iw-txcount').textContent = Intl.NumberFormat('en-US').format(turnstile.summary.txCount);
-
-      // Orchard only decreases via the turnstile now that it's exit-only,
-      // so its 24h outflow is a direct read of ZEC migrated in the period.
-      const orchard24h = overview.deltas && overview.deltas.orchard && overview.deltas.orchard['24h'];
-      if(orchard24h !== null && orchard24h !== undefined){
-        document.getElementById('iw-24h').textContent = fmtZEC(Math.abs(orchard24h) / ZATOSHI);
-      }
-
-      // turnstile destination breakdown — where deshielded ZEC ends up
-      const s = turnstile.summary;
-      const segments = [
-        {label:'Transferred', pct:s.transferredPercent, color:'var(--teal)'},
-        {label:'Bridge', pct:s.bridgePercent, color:'var(--gold)'},
-        {label:'Held', pct:s.heldPercent, color:'#5B8DEF'},
-        {label:'Exchange', pct:s.exchangePercent, color:'var(--red)'},
-        {label:'Reshielded', pct:s.reshieldedPercent, color:'#B084F5'}
-      ];
-      const barsEl = document.getElementById('turnstile-bars');
-      const legendEl = document.getElementById('turnstile-legend');
-      barsEl.innerHTML = segments.map(seg =>
-        `<div class="turnstile-seg" style="width:${seg.pct}%; background:${seg.color};"></div>`
-      ).join('');
-      legendEl.innerHTML = segments.map(seg =>
-        `<span><span class="legend-dot" style="background:${seg.color};"></span>${seg.label} ${seg.pct.toFixed(1)}%</span>`
-      ).join('');
-
-    }catch(e){
-      document.getElementById('iw-pct').textContent = 'FEED UNAVAILABLE';
-    }
-  }
+  // Ironwood/shielded data is now shown via a live embed of zkp.baby's
+  // own dashboard (see the iframe in the markup) rather than a
+  // client-side API call — no field names to guess, no CORS to fight.
 
   loadData();
   loadDetail();
-  loadIronwood();
-  setInterval(loadData, 15000);
-  setInterval(loadIronwood, 60000);
+  // CoinGecko's keyless tier caps out as low as 5–15 req/min per browser.
+  // 60s (vs. an earlier, more aggressive 15s) leaves headroom for the
+  // chart and coin-detail calls sharing that same budget.
+  setInterval(loadData, 60000);
 
   // radio play/pause
   const audio = document.getElementById('radio-audio');
