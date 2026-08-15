@@ -160,34 +160,6 @@
     font-variant-numeric:tabular-nums;
   }
 
-  /* SHIELD BAND */
-  .shield-band{
-    background:var(--surface);
-    border:1px solid var(--line);
-    padding:28px 28px;
-    display:flex; flex-wrap:wrap; gap:28px; align-items:center; justify-content:space-between;
-  }
-  .shield-left{flex:1; min-width:240px;}
-  .shield-title{
-    font-family:var(--mono); font-weight:600; font-size:14px;
-    color:var(--teal); margin-bottom:6px; letter-spacing:0.05em;
-  }
-  .shield-desc{font-size:13px; color:var(--text-dim); line-height:1.5; max-width:420px;}
-  .shield-bar-wrap{flex:1; min-width:220px;}
-  .shield-bar-label{
-    display:flex; justify-content:space-between;
-    font-family:var(--mono); font-size:12px; color:var(--text-dim); margin-bottom:8px;
-  }
-  .shield-bar-label b{color:var(--teal);}
-  .shield-bar{
-    height:10px; background:var(--surface-2); border:1px solid var(--line);
-    overflow:hidden; position:relative;
-  }
-  .shield-bar-fill{
-    height:100%; background:linear-gradient(90deg, var(--teal), #5EE0BC);
-    width:0%; transition:width 1.2s ease;
-  }
-
   /* GAME TEASER */
   .transmission{
     background:
@@ -331,6 +303,87 @@
   #consent-tab:hover{border-color:var(--gold); color:var(--gold);}
   #consent-tab .dot{width:5px; height:5px; border-radius:50%; background:var(--teal);}
 
+  /* IRONWOOD MIGRATION */
+  .ironwood-band{
+    background:var(--surface); border:1px solid var(--line);
+    padding:28px;
+  }
+  .ironwood-top{
+    display:flex; flex-wrap:wrap; gap:24px; justify-content:space-between;
+    align-items:flex-start; margin-bottom:24px;
+  }
+  .ironwood-title{
+    font-family:var(--mono); font-weight:600; font-size:14px;
+    color:var(--teal); margin-bottom:6px; letter-spacing:0.05em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .ironwood-title .tag{
+    font-size:10px; background:rgba(47,191,159,0.12); color:var(--teal);
+    padding:2px 7px; border:1px solid rgba(47,191,159,0.3); letter-spacing:0.08em;
+  }
+  .ironwood-desc{font-size:13px; color:var(--text-dim); line-height:1.5; max-width:460px;}
+  .ironwood-pct{
+    font-family:var(--mono); font-weight:700; font-size:42px; color:var(--text);
+    line-height:1; text-align:right;
+  }
+  .ironwood-pct-label{
+    font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
+    letter-spacing:0.1em; text-align:right; margin-top:6px;
+  }
+  .migration-bar{
+    height:14px; background:var(--surface-2); border:1px solid var(--line);
+    overflow:hidden; margin-bottom:20px; display:flex;
+  }
+  .migration-bar-fill{
+    height:100%; background:linear-gradient(90deg, var(--teal), #5EE0BC);
+    width:0%; transition:width 1.2s ease;
+  }
+  .migration-bar-rest{
+    height:100%; background:repeating-linear-gradient(
+      45deg, rgba(255,75,75,0.15) 0px, rgba(255,75,75,0.15) 6px,
+      transparent 6px, transparent 12px
+    );
+    flex:1;
+  }
+  .iw-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); margin-bottom:24px;
+  }
+  .iw-cell{background:var(--surface); padding:16px;}
+  .iw-cell-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:0.08em;
+    color:var(--text-dim); text-transform:uppercase; margin-bottom:8px;
+  }
+  .iw-cell-value{
+    font-family:var(--mono); font-size:18px; font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+  .iw-cell-value.orchard{color:var(--red);}
+  .iw-cell-value.ironwood{color:var(--teal);}
+  .turnstile-title{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.08em;
+    color:var(--text-dim); text-transform:uppercase; margin-bottom:12px;
+  }
+  .turnstile-bars{display:flex; height:28px; overflow:hidden; border:1px solid var(--line); margin-bottom:10px;}
+  .turnstile-seg{height:100%; transition:width 0.8s ease;}
+  .turnstile-legend{
+    display:flex; flex-wrap:wrap; gap:14px;
+    font-family:var(--mono); font-size:11px; color:var(--text-dim);
+  }
+  .turnstile-legend span{display:flex; align-items:center; gap:6px;}
+  .legend-dot{width:8px; height:8px; flex-shrink:0;}
+  .ironwood-source{
+    font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
+    margin-top:20px; padding-top:16px; border-top:1px solid var(--line);
+  }
+  .ironwood-source a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4);}
+
+  @media (max-width:760px){
+    .iw-grid{grid-template-columns:repeat(2, 1fr);}
+    .ironwood-pct{text-align:left;}
+    .ironwood-pct-label{text-align:left;}
+  }
+
   @media (max-width:640px){
     #consent-banner{padding:18px;}
     .consent-actions{width:100%;}
@@ -382,15 +435,53 @@
   </section>
 
   <section class="section">
-    <div class="section-title">PRIVACY POOL</div>
-    <div class="shield-band">
-      <div class="shield-left">
-        <div class="shield-title">◈ SHIELDED ZEC</div>
-        <div class="shield-desc">ZEC held in shielded pools, hidden from the transparent chain. Source: zkp.baby.</div>
+    <div class="section-title">IRONWOOD MIGRATION</div>
+    <div class="ironwood-band">
+      <div class="ironwood-top">
+        <div>
+          <div class="ironwood-title">◈ ORCHARD → IRONWOOD <span class="tag">NU6.3 LIVE</span></div>
+          <div class="ironwood-desc">
+            Orchard is sealed and exit-only. ZEC can only leave through the turnstile,
+            which guarantees nothing exits that didn't legitimately enter — verifying
+            Zcash's shielded supply for the first time.
+          </div>
+        </div>
+        <div>
+          <div class="ironwood-pct" id="iw-pct">—%</div>
+          <div class="ironwood-pct-label">MIGRATED TO IRONWOOD</div>
+        </div>
       </div>
-      <div class="shield-bar-wrap">
-        <div class="shield-bar-label"><span>SHIELD RATIO</span><b id="shield-pct">—%</b></div>
-        <div class="shield-bar"><div class="shield-bar-fill" id="shield-fill"></div></div>
+
+      <div class="migration-bar">
+        <div class="migration-bar-fill" id="iw-bar-fill"></div>
+        <div class="migration-bar-rest"></div>
+      </div>
+
+      <div class="iw-grid">
+        <div class="iw-cell">
+          <div class="iw-cell-label">Ironwood Balance</div>
+          <div class="iw-cell-value ironwood" id="iw-balance">—</div>
+        </div>
+        <div class="iw-cell">
+          <div class="iw-cell-label">Orchard Remaining</div>
+          <div class="iw-cell-value orchard" id="orchard-balance">—</div>
+        </div>
+        <div class="iw-cell">
+          <div class="iw-cell-label">Migrated, 24H</div>
+          <div class="iw-cell-value" id="iw-24h">—</div>
+        </div>
+        <div class="iw-cell">
+          <div class="iw-cell-label">Turnstile Txs (YTD)</div>
+          <div class="iw-cell-value" id="iw-txcount">—</div>
+        </div>
+      </div>
+
+      <div class="turnstile-title">WHERE DESHIELDED ZEC GOES (SINCE JAN 2026)</div>
+      <div class="turnstile-bars" id="turnstile-bars"></div>
+      <div class="turnstile-legend" id="turnstile-legend"></div>
+
+      <div class="ironwood-source">
+        LIVE ON-CHAIN DATA VIA <a href="https://cipherscan.app/ironwood" target="_blank" rel="noopener">CIPHERSCAN</a> · UPDATES EVERY 60S
       </div>
     </div>
   </section>
@@ -535,17 +626,73 @@
     }catch(e){ /* silent — dashboard still functions without this */ }
   }
 
-  // shielded pool — zkp.baby has no known public CORS API; show a
-  // clearly-labeled placeholder state rather than fake data.
-  function loadShield(){
-    document.getElementById('shield-pct').textContent = 'DATA PENDING';
-    document.getElementById('shield-fill').style.width = '0%';
+  // Ironwood migration — live on-chain data from CipherScan's open API
+  // (https://cipherscan.app/docs), no key required.
+  const CIPHERSCAN = 'https://api.mainnet.cipherscan.app';
+  const ZATOSHI = 100000000;
+
+  function fmtZEC(n){
+    if(n === null || n === undefined) return '—';
+    return Intl.NumberFormat('en-US', {maximumFractionDigits:0}).format(n) + ' ZEC';
+  }
+
+  async function loadIronwood(){
+    try{
+      const [supplyRes, overviewRes, turnstileRes] = await Promise.all([
+        fetch(CIPHERSCAN + '/api/supply'),
+        fetch(CIPHERSCAN + '/api/pools/overview'),
+        fetch(CIPHERSCAN + '/api/pools/turnstile?since=2026-01-01')
+      ]);
+      const supply = await supplyRes.json();
+      const overview = await overviewRes.json();
+      const turnstile = await turnstileRes.json();
+
+      const orchard = supply.find(p => p.id === 'orchard');
+      const ironwood = supply.find(p => p.id === 'ironwood');
+      const orchardZEC = orchard.chainValue;
+      const ironwoodZEC = ironwood.chainValue;
+      const pct = (ironwoodZEC / (orchardZEC + ironwoodZEC)) * 100;
+
+      scrambleInto(document.getElementById('iw-pct'), pct.toFixed(1) + '%');
+      document.getElementById('iw-bar-fill').style.width = pct.toFixed(1) + '%';
+      document.getElementById('iw-balance').textContent = fmtZEC(ironwoodZEC);
+      document.getElementById('orchard-balance').textContent = fmtZEC(orchardZEC);
+      document.getElementById('iw-txcount').textContent = Intl.NumberFormat('en-US').format(turnstile.summary.txCount);
+
+      // Orchard only decreases via the turnstile, so its 24h outflow ≈ ZEC migrated
+      const orchard24h = overview.deltas && overview.deltas.orchard && overview.deltas.orchard['24h'];
+      if(orchard24h !== null && orchard24h !== undefined){
+        document.getElementById('iw-24h').textContent = fmtZEC(Math.abs(orchard24h) / ZATOSHI);
+      }
+
+      // turnstile destination breakdown
+      const s = turnstile.summary;
+      const segments = [
+        {label:'Transferred', pct:s.transferredPercent, color:'var(--teal)'},
+        {label:'Bridge', pct:s.bridgePercent, color:'var(--gold)'},
+        {label:'Held', pct:s.heldPercent, color:'#5B8DEF'},
+        {label:'Exchange', pct:s.exchangePercent, color:'var(--red)'},
+        {label:'Reshielded', pct:s.reshieldedPercent, color:'#B084F5'}
+      ];
+      const barsEl = document.getElementById('turnstile-bars');
+      const legendEl = document.getElementById('turnstile-legend');
+      barsEl.innerHTML = segments.map(seg =>
+        `<div class="turnstile-seg" style="width:${seg.pct}%; background:${seg.color};"></div>`
+      ).join('');
+      legendEl.innerHTML = segments.map(seg =>
+        `<span><span class="legend-dot" style="background:${seg.color};"></span>${seg.label} ${seg.pct.toFixed(1)}%</span>`
+      ).join('');
+
+    }catch(e){
+      document.getElementById('iw-pct').textContent = 'FEED UNAVAILABLE';
+    }
   }
 
   loadData();
   loadDetail();
-  loadShield();
+  loadIronwood();
   setInterval(loadData, 15000);
+  setInterval(loadIronwood, 60000);
 
   // radio play/pause
   const audio = document.getElementById('radio-audio');
