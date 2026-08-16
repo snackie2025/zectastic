@@ -3,103 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy — Zectastic</title>
+<title>Privacy · Zectastic</title>
+<meta name="description" content="What Zectastic does and doesn't collect, and how the third-party feeds it uses (CoinGecko, zkp.baby, DANCE.FM) handle your data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0B0D0F; --surface:#14171A; --surface-2:#1B1F23; --line:#262B30;
-    --text:#E8E6DF; --text-dim:#8A9096; --gold:#F4B728; --teal:#2FBF9F; --red:#FF4B4B;
-    --mono:'IBM Plex Mono', monospace; --sans:'Inter', sans-serif;
+    --bg:#0a0b0d;
+    --bg-raised:#111318;
+    --line:#22262e;
+    --text:#e8e6e0;
+    --muted:#8b8f98;
+    --gold:#f4c542;
+    --teal:#00d9c0;
+    --exposed:#ff6b4a;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased;}
-  a{color:var(--teal); border-bottom:1px solid rgba(47,191,159,0.4); text-decoration:none;}
-  a:hover{color:var(--gold); border-color:var(--gold);}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6;
+    background-image: repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+  }
+  a{color:var(--teal);}
+  .mono{font-family:var(--mono);}
   .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
-  header{border-bottom:1px solid var(--line); padding:20px 0;}
-  .logo{font-family:var(--mono); font-weight:700; font-size:15px; display:flex; align-items:center; gap:10px;}
-  .logo .mark{width:26px; height:26px; border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--gold);}
-  main{padding:56px 0 80px;}
-  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:0.15em; color:var(--gold); text-transform:uppercase; margin-bottom:14px;}
-  h1{font-family:var(--mono); font-size:clamp(28px,5vw,40px); margin-bottom:12px; line-height:1.1;}
-  .updated{font-family:var(--mono); font-size:12px; color:var(--text-dim); margin-bottom:40px;}
-  h2{font-family:var(--mono); font-size:16px; color:var(--teal); margin:36px 0 12px; letter-spacing:0.02em;}
-  p{font-size:15px; line-height:1.7; color:var(--text-dim); margin-bottom:14px;}
-  p b, li b{color:var(--text); font-weight:600;}
-  ul{margin:0 0 14px 20px; color:var(--text-dim);}
-  li{margin-bottom:8px; line-height:1.6; font-size:15px;}
-  table{width:100%; border-collapse:collapse; margin:16px 0 24px; font-size:13.5px;}
-  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);}
-  th{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; color:var(--text-dim); text-transform:uppercase;}
-  td{color:var(--text-dim);}
-  td b{color:var(--text);}
-  .callout{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--gold); padding:18px 20px; margin:24px 0;}
-  .callout p{margin-bottom:0; color:var(--text);}
-  footer{border-top:1px solid var(--line); padding:24px 0; font-family:var(--mono); font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  ::selection{background:var(--gold); color:#0a0b0d;}
+
+  header{position:sticky; top:0; z-index:50; background:rgba(10,11,13,0.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 24px; max-width:760px; margin:0 auto;}
+  .logo{font-family:var(--mono); font-weight:800; letter-spacing:0.04em; font-size:16px; display:flex; align-items:center; gap:8px;}
+  .logo .z{color:var(--gold);}
+  .logo .tag{color:var(--muted); font-weight:500; font-size:11px; letter-spacing:0.1em; border-left:1px solid var(--line); padding-left:10px; text-transform:uppercase;}
+  .back-link{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); text-decoration:none;}
+  .back-link:hover{color:var(--teal);}
+
+  .hero{padding:52px 0 36px; border-bottom:1px solid var(--line);}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:10px;}
+  h1{font-family:var(--mono); font-size:clamp(28px,5vw,40px); font-weight:800; letter-spacing:-0.01em; margin-bottom:14px;}
+  .lede{color:var(--muted); font-size:16px; max-width:600px;}
+  .updated{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:18px;}
+
+  section{padding:40px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2{font-family:var(--mono); font-size:18px; font-weight:800; letter-spacing:-0.005em; margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+  h2 .icon{color:var(--teal);}
+  p{color:var(--muted); font-size:15px; max-width:620px; margin-bottom:14px;}
+  p:last-child{margin-bottom:0;}
+  strong{color:var(--text);}
+
+  .service-table{border:1px solid var(--line); background:var(--bg-raised); margin-top:8px;}
+  .service-row{display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:var(--line);}
+  .service-row.header{background:var(--line);}
+  .service-row.header .cell{background:#161920; font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); font-weight:700;}
+  .cell{background:var(--bg-raised); padding:14px 16px;}
+  .cell .name{font-family:var(--mono); font-size:13px; font-weight:700; margin-bottom:4px;}
+  .cell p{font-size:13px; margin-bottom:0;}
+  @media(max-width:680px){
+    .service-row{grid-template-columns:1fr;}
+  }
+
+  ul{color:var(--muted); font-size:15px; margin:0 0 14px 20px; max-width:600px;}
+  li{margin-bottom:8px;}
+
+  .quick-list{list-style:none; margin-left:0; display:flex; flex-direction:column; gap:10px;}
+  .quick-list li{display:flex; align-items:flex-start; gap:10px; margin-bottom:0;}
+  .quick-list .mark{color:var(--teal); font-family:var(--mono); flex-shrink:0; margin-top:2px;}
+
+  footer{padding:32px 0; text-align:center;}
+  .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em;}
+  .foot-back{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold); text-decoration:none; margin-top:12px; display:inline-block;}
+  .foot-back:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="wrap">
-    <a href="/" style="border:none;"><div class="logo"><span class="mark">Z</span> ZECTASTIC</div></a>
+  <div class="nav">
+    <div class="logo"><span class="z">Z</span> ZECTASTIC <span class="tag">Privacy</span></div>
+    <a class="back-link" href="/">← Back to Tracker</a>
   </div>
 </header>
 
-<div class="wrap">
-  <main>
-    <div class="eyebrow">[ DATA CONSENT · PRIVACY ]</div>
-    <h1>Privacy Policy</h1>
-    <div class="updated">Last updated: August 15, 2026</div>
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">◈ Privacy</div>
+    <h1>What Zectastic does and doesn't do with your data</h1>
+    <p class="lede">Short version: there's no account, no wallet connection, and nothing to sell. Most of what you see is fetched live from other people's public feeds, and this page explains exactly which ones, and what they can see.</p>
+    <div class="updated">Last updated August 2026</div>
+  </div>
+</section>
 
-    <div class="callout">
-      <p><b>The short version:</b> Zectastic doesn't ask you to connect a wallet, doesn't collect your ZEC address, and doesn't sell data to anyone. We store the minimum needed to run a live price tracker and a browser game.</p>
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> The short version</h2>
+    <ul class="quick-list">
+      <li><span class="mark">→</span> Zectastic doesn't have user accounts, doesn't ask for a wallet address, and doesn't run analytics or advertising trackers.</li>
+      <li><span class="mark">→</span> The only thing stored locally is your cookie choice and, if you set one, your radio volume. Nothing here is sold or shared.</li>
+      <li><span class="mark">→</span> Live price, supply, and shielded-pool numbers come from third-party services (CoinGecko and zkp.baby) that your browser talks to directly. Their own privacy practices are outside our control, and linked below.</li>
+      <li><span class="mark">→</span> Playing the radio opens a direct audio connection to DANCE.FM, which can see your IP address for the duration of playback, same as any internet radio.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> What we store ourselves</h2>
+    <p>Zectastic stores essential preferences only, using your browser's local storage:</p>
+    <ul>
+      <li>Whether you've accepted or dismissed the cookie notice, so it doesn't show up on every visit.</li>
+      <li>Your radio volume, if you change it from the default.</li>
+    </ul>
+    <p>That's the entire list. We don't collect names, emails, wallet addresses, transaction history, or device fingerprints, and we don't run Google Analytics, Meta Pixel, or any similar tracker anywhere on the site.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> Third-party feeds this site uses</h2>
+    <p>To keep prices, supply figures, and the shielded pool dashboard live, your browser fetches data directly from the services below. That means each one can see technical details like your IP address and request timing when your browser calls them, the same as visiting their site directly. Zectastic itself never sees or stores that data.</p>
+    <div class="service-table">
+      <div class="service-row header">
+        <div class="cell">Service</div>
+        <div class="cell">Used for</div>
+        <div class="cell">Their policy</div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">CoinGecko</div><p>Live ZEC price, market cap, supply figures, and the flippening leaderboard.</p></div>
+        <div class="cell"><p>Public API, called directly from your browser every 60 seconds while a page is open.</p></div>
+        <div class="cell"><p><a href="https://www.coingecko.com/en/privacy" target="_blank" rel="noopener">coingecko.com/privacy</a></p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">zkp.baby</div><p>The embedded Ironwood shielded-pool dashboard on the tracker page.</p></div>
+        <div class="cell"><p>Loaded as an iframe, which may set its own cookies that Zectastic doesn't control or read.</p></div>
+        <div class="cell"><p><a href="https://zkp.baby" target="_blank" rel="noopener">zkp.baby</a></p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">DANCE.FM</div><p>The live audio stream behind the radio player and party mode.</p></div>
+        <div class="cell"><p>Only connects when you press play, streaming directly from their server for as long as it plays.</p></div>
+        <div class="cell"><p><a href="https://dance.fm" target="_blank" rel="noopener">dance.fm</a></p></div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <h2>01 — What we collect</h2>
-    <table>
-      <tr><th>Data</th><th>Purpose</th><th>Stored where</th></tr>
-      <tr><td><b>Cookie consent choice</b></td><td>Remember your preference so we don't ask every visit</td><td>Your browser (localStorage), not our servers</td></tr>
-      <tr><td><b>Game leaderboard score + display name</b></td><td>Show the global leaderboard</td><td>Our server, tied to a random session ID — not your identity</td></tr>
-      <tr><td><b>Basic server logs</b></td><td>Security, abuse prevention, uptime debugging</td><td>Our server, IP addresses auto-purged after 30 days</td></tr>
-    </table>
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> The Flippening page</h2>
+    <p>The flippening leaderboard pulls the same CoinGecko market data as the main tracker, plus a broader list of top coins for comparison. Party mode's confetti and screen effects run entirely in your browser and never leave your device. Starting party mode also starts the DANCE.FM stream described above.</p>
+  </div>
+</section>
 
-    <h2>02 — What we don't collect</h2>
-    <ul>
-      <li>We never request wallet connections, seed phrases, or private keys — Zectastic is a read-only price tracker and has no reason to ever ask for these.</li>
-      <li>We don't track you across other websites.</li>
-      <li>We don't build advertising profiles, and we don't sell or share data with data brokers.</li>
-      <li>No account or email sign-up is required to use the tracker or play the game.</li>
-    </ul>
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> No wallets, no addresses</h2>
+    <p>Zectastic never asks you to connect a wallet, paste an address, or sign anything. Nothing on this site can see your ZEC balance, your transaction history, or which pool your funds sit in. If you're ever asked to connect a wallet on a page claiming to be Zectastic, that page isn't us.</p>
+  </div>
+</section>
 
-    <h2>03 — Cookies &amp; local storage</h2>
-    <p>Zectastic uses <b>essential storage only</b> by default: a single entry in your browser recording your consent choice and, optionally, your radio volume. Neither is sent to our servers or any third party.</p>
-    <p>If we ever add optional, privacy-respecting analytics (no cross-site tracking, no ad targeting), it will stay off unless you switch it on in <a href="/#" onclick="return false;">Cookie Settings</a>. You can change your choice at any time from the footer of any page.</p>
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> Children's privacy</h2>
+    <p>Zectastic isn't directed at children, and we don't knowingly collect information from anyone under 13.</p>
+  </div>
+</section>
 
-    <h2>04 — Third-party data sources</h2>
-    <p>Live prices are pulled directly from <a href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko's</a> public API. Shielded pool, Ironwood migration, and market cap data is shown via an embedded live dashboard from <a href="https://zkp.baby" target="_blank" rel="noopener">zkp.baby</a> — since that's an embedded page rather than a data call, your browser communicates with zkp.baby directly and its own privacy practices apply to that part of the page. The radio stream is served by Zeno.fm. None of these requests send any personal data beyond what any standard web request includes (like your IP address, which each service may log per their own policies).</p>
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> Changes to this page</h2>
+    <p>As the site evolves, this page gets updated to match. Significant changes will be reflected in the date at the top. There's no mailing list to notify, since we don't collect emails to notify anyone with.</p>
+  </div>
+</section>
 
-    <h2>05 — The leaderboard</h2>
-    <p>Scores are validated server-side before posting — we don't trust client-submitted numbers at face value. Display names are filtered for abuse; don't use one that identifies you personally, since leaderboard entries are public by design.</p>
-
-    <h2>06 — Your choices</h2>
-    <ul>
-      <li>Clear your cookie consent choice anytime via <b>Cookie Settings</b> in the footer.</li>
-      <li>Clear localStorage manually in your browser settings to remove all locally stored data instantly.</li>
-      <li>Contact us to request removal of a leaderboard entry.</li>
-    </ul>
-
-    <h2>07 — Changes to this policy</h2>
-    <p>If this policy changes in a way that matters, we'll update the date at the top and note it on the homepage. We won't quietly expand what we collect.</p>
-  </main>
-
-  <footer>
-    <div>ZECTASTIC.COM</div>
-    <div><a href="/">← BACK TO TRACKER</a></div>
-  </footer>
-</div>
+<footer>
+  <div class="wrap">
+    <div class="foot-note">© 2026 ZECTASTIC</div>
+    <a class="foot-back" href="/">← Back to the Tracker</a>
+  </div>
+</footer>
 
 </body>
 </html>

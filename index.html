@@ -251,6 +251,9 @@
   /* FOOTER */
   footer{padding:32px 0; text-align:center;}
   .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em;}
+  .foot-links{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em; margin-top:10px;}
+  .foot-links a{color:var(--muted); text-decoration:none;}
+  .foot-links a:hover{color:var(--teal); text-decoration:underline;}
 
   /* COOKIE CONSENT */
   #consent{
@@ -629,11 +632,12 @@
 <footer>
   <div class="wrap">
     <div class="foot-note">PRICE, SUPPLY &amp; MARKET DATA: COINGECKO · SHIELDED POOL DATA: ZKP.BABY · RADIO: DANCE.FM · UPDATES EVERY 60S · © 2026 ZECTASTIC</div>
+    <div class="foot-links"><a href="/privacy.html">Privacy</a> · <a href="#" id="footCookieSettings">Cookie Settings</a></div>
   </div>
 </footer>
 
 <div id="consent">
-  <p>◈ Zectastic runs on essential storage only, remembering this choice and, if enabled, your radio volume. We don't connect wallets, collect addresses, or sell data. The Ironwood dashboard embeds zkp.baby, which may set its own cookies we don't control.</p>
+  <p>◈ Zectastic runs on essential storage only, remembering this choice and, if enabled, your radio volume. We don't connect wallets, collect addresses, or sell data. The Ironwood dashboard embeds zkp.baby, which may set its own cookies we don't control. Full details on the <a href="/privacy.html" style="color:var(--teal);">privacy page</a>.</p>
   <div class="actions">
     <button class="btn-ghost" id="essentialOnly">Essential Only</button>
     <button class="btn" id="acceptAll">Accept All</button>
@@ -647,6 +651,10 @@
   });
   document.getElementById('acceptAll').addEventListener('click', () => {
     document.getElementById('consent').classList.add('hidden');
+  });
+  document.getElementById('footCookieSettings').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('consent').classList.remove('hidden');
   });
 
   // ---- Radio play/pause, shared between the hero toggle and the radio section button ----
