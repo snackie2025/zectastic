@@ -6,7 +6,7 @@
 <title>Zectastic · ZEC Live Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0a0b0d;
@@ -644,16 +644,24 @@
 </div>
 
 <script>
-  // ---- Cookie consent (in-memory, no localStorage per artifact constraints) ----
-  document.getElementById('essentialOnly').addEventListener('click', () => {
-    document.getElementById('consent').classList.add('hidden');
-  });
-  document.getElementById('acceptAll').addEventListener('click', () => {
-    document.getElementById('consent').classList.add('hidden');
-  });
+  // ---- Cookie consent (persisted via localStorage) ----
+  const consentEl = document.getElementById('consent');
+  const CONSENT_KEY = 'zectastic-cookie-consent';
+
+  function hideConsent(choice){
+    localStorage.setItem(CONSENT_KEY, choice);
+    consentEl.classList.add('hidden');
+  }
+
+  if (localStorage.getItem(CONSENT_KEY)) {
+    consentEl.classList.add('hidden');
+  }
+
+  document.getElementById('essentialOnly').addEventListener('click', () => hideConsent('essential'));
+  document.getElementById('acceptAll').addEventListener('click', () => hideConsent('all'));
   document.getElementById('footCookieSettings').addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('consent').classList.remove('hidden');
+    consentEl.classList.remove('hidden');
   });
 
   // ---- Radio play/pause, shared between the hero toggle and the radio section button ----
