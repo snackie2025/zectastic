@@ -57,7 +57,7 @@
 
   main{position:relative; z-index:1;}
 
-  .hero{padding:56px 0 40px; border-bottom:1px solid var(--line); text-align:center;}
+  .hero{padding:36px 0 24px; border-bottom:1px solid var(--line); text-align:center;}
   .hero-title{
     font-family:var(--mono); font-weight:800; font-size:clamp(32px,7vw,58px); letter-spacing:-0.02em;
     background:linear-gradient(90deg, var(--gold), var(--teal));
@@ -65,15 +65,30 @@
     margin-bottom:10px;
   }
   .hero-sub{color:var(--muted); font-size:15px; max-width:520px; margin:0 auto 8px;}
-  .hero-price-block{margin:18px 0 30px;}
+  .hero-price-block{margin:12px 0 20px;}
   .hero-price-label{font-family:var(--mono); font-weight:800; font-size:14px; letter-spacing:0.16em; color:var(--muted); text-transform:uppercase; margin-bottom:8px;}
-  .hero-price-big{
-    font-family:var(--mono); font-weight:800; letter-spacing:-0.02em; color:var(--gold);
-    font-size:clamp(56px,15vw,128px); line-height:1;
-    animation:priceBlink 1s steps(1,end) infinite;
+  .hero-price-row{display:flex; align-items:center; justify-content:center; gap:14px;}
+  .hero-price-diamond{
+    font-size:clamp(20px,4vw,36px); color:var(--teal); flex-shrink:0;
+    animation:diamondPulse 1.4s ease-in-out infinite;
   }
-  @media (prefers-reduced-motion: reduce){ .hero-price-big{animation:none;} }
-  .hero-stats{display:flex; justify-content:center; gap:36px; flex-wrap:wrap; margin-bottom:28px;}
+  .hero-price-diamond.right{animation-delay:.7s;}
+  @keyframes diamondPulse{0%,100%{opacity:.35; transform:scale(0.9);} 50%{opacity:1; transform:scale(1.1);}}
+  .hero-price-big{
+    font-family:var(--mono); font-weight:800; letter-spacing:-0.02em;
+    font-size:clamp(56px,15vw,128px); line-height:1;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpolygon points='13,2 24,13 13,24 2,13' fill='%230a0b0d' fill-opacity='0.55'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(90deg, var(--gold) 0%, var(--gold) 100%);
+    background-size: 26px 26px, 100% 100%;
+    background-position: 0 0, 0 0;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: var(--gold);
+    animation:priceBlink 1s steps(1,end) infinite, shimmerFill 6s linear infinite;
+  }
+  @keyframes shimmerFill{ from{background-position:0 0, 0 0;} to{background-position:260px 130px, 0 0;} }
+  @media (prefers-reduced-motion: reduce){ .hero-price-big{animation:none;} .hero-price-diamond{animation:none;} }
+  .hero-stats{display:flex; justify-content:center; gap:36px; flex-wrap:wrap; margin-bottom:18px;}
   .hero-stat .k{font-family:var(--mono); font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
   .hero-stat .v{font-family:var(--mono); font-size:28px; font-weight:800; color:var(--text);}
   @keyframes priceBlink{0%,88%{opacity:1;}92%{opacity:.5;}96%{opacity:1;}100%{opacity:1;}}
@@ -89,7 +104,8 @@
   body.party-on .party-btn{background:var(--teal);}
   body.party-on .party-btn:hover{background:#3ffce0;}
 
-  section{padding:52px 0; border-bottom:1px solid var(--line); position:relative;}
+  section{padding:40px 0; border-bottom:1px solid var(--line); position:relative;}
+  #target{padding-top:20px; padding-bottom:28px;}
   .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:10px;}
   h2{font-family:var(--mono); font-size:clamp(20px,3vw,28px); font-weight:800; letter-spacing:-0.01em; margin-bottom:12px;}
   .lede{color:var(--muted); font-size:15px; max-width:600px; margin-bottom:32px;}
@@ -97,7 +113,7 @@
   /* NEXT TARGET CARD */
   .next-target{
     background:linear-gradient(135deg, rgba(244,197,66,0.1), rgba(0,217,192,0.06));
-    border:1px solid rgba(244,197,66,0.35); padding:26px; margin-bottom:32px;
+    border:1px solid rgba(244,197,66,0.35); padding:20px; margin-bottom:0;
     display:flex; align-items:center; gap:20px; flex-wrap:wrap;
   }
   .next-target .nt-icon{font-size:32px; flex-shrink:0;}
@@ -140,6 +156,37 @@
   .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em; margin-bottom:14px;}
   .foot-back{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold); text-decoration:none;}
   .foot-back:hover{text-decoration:underline;}
+
+  /* Keep the closest-flip card visible on the first screen on shorter/mobile viewports */
+  @media (max-width:640px){
+    .hero{padding:20px 0 16px;}
+    .hero-title{font-size:clamp(22px,7.5vw,32px); margin-bottom:6px;}
+    .hero-sub{font-size:12.5px; margin-bottom:0; max-width:320px;}
+    .hero-price-block{margin:8px 0 14px;}
+    .hero-price-label{font-size:11px; margin-bottom:4px;}
+    .hero-price-row{gap:8px;}
+    .hero-price-big{font-size:clamp(36px,13vw,64px);}
+    .hero-stats{gap:22px; margin-bottom:14px;}
+    .hero-stat .k{font-size:9px; margin-bottom:3px;}
+    .hero-stat .v{font-size:20px;}
+    .party-btn{padding:10px 20px; font-size:11.5px;}
+    section{padding:24px 0;}
+    #target{padding-top:14px; padding-bottom:20px;}
+    .eyebrow{font-size:10px; margin-bottom:6px;}
+    h2{font-size:clamp(16px,4.5vw,20px); margin-bottom:8px;}
+    .next-target{padding:14px; gap:12px;}
+    .next-target .nt-icon{font-size:24px;}
+    .nt-name{font-size:15px;}
+    .nt-detail{font-size:12px;}
+    .nt-progress-wrap{min-width:100%;}
+  }
+  @media (max-height:700px) and (min-width:641px){
+    .hero{padding:24px 0 16px;}
+    .hero-price-block{margin:8px 0 14px;}
+    .hero-stats{margin-bottom:14px;}
+    section{padding:28px 0;}
+    #target{padding-top:14px; padding-bottom:20px;}
+  }
 </style>
 </head>
 <body>
@@ -161,7 +208,11 @@
       <p class="hero-sub">How far ZEC is from flipping every coin still ranked above it, updated live from CoinGecko. Hit party mode and let it play.</p>
       <div class="hero-price-block">
         <div class="hero-price-label">ZEC / USD</div>
-        <div class="hero-price-big mono" id="zecPrice">—.—</div>
+        <div class="hero-price-row">
+          <span class="hero-price-diamond left">◈</span>
+          <div class="hero-price-big mono" id="zecPrice">—.—</div>
+          <span class="hero-price-diamond right">◈</span>
+        </div>
       </div>
       <div class="hero-stats">
         <div class="hero-stat rank"><div class="k">Current Rank</div><div class="v mono" id="zecRank">#—</div></div>
