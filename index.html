@@ -51,6 +51,90 @@
   .navlinks{display:none;}
   @media(min-width:760px){.navlinks{display:flex;}}
 
+
+  /* HEADER PRICE CHIP */
+  .tick{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--text); text-decoration:none; border:1px solid var(--line); padding:5px 10px; border-radius:2px; display:inline-flex; gap:8px; align-items:center; white-space:nowrap; background:rgba(17,19,24,0.6);}
+  .tick:hover{border-color:var(--gold);}
+  .tick .lbl{color:var(--muted); font-weight:400; letter-spacing:0.08em;}
+  .tick .p{color:var(--gold);}
+  .tick .d{font-size:11px; font-weight:600;}
+  .up{color:var(--teal);} .down{color:var(--exposed);}
+  @media(max-width:520px){.tick .d,.tick .lbl{display:none;}}
+
+  /* WELCOME INTRO */
+  .intro{position:relative; overflow:hidden; padding:84px 0 72px; border-bottom:1px solid var(--line);}
+  .intro .wrap{position:relative; z-index:1;}
+  .intro .bg{position:absolute; inset:0; background-image:radial-gradient(circle, rgba(139,143,152,0.22) 1px, transparent 1.4px); background-size:22px 22px; -webkit-mask-image:radial-gradient(ellipse at 70% 40%, #000 0%, transparent 70%); mask-image:radial-gradient(ellipse at 70% 40%, #000 0%, transparent 70%);}
+  .intro .pulse{position:absolute; width:8px; height:8px; border-radius:50%; background:var(--gold); opacity:0; animation:ipulse 5s ease-out infinite;}
+  .intro .pulse.t{background:var(--teal);}
+  @keyframes ipulse{0%{opacity:0; transform:scale(.4); box-shadow:0 0 0 0 rgba(244,197,66,.5);}12%{opacity:1; transform:scale(1);}60%,100%{opacity:0; transform:scale(1); box-shadow:0 0 0 28px rgba(244,197,66,0);}}
+  .intro h1{font-family:var(--mono); font-size:clamp(34px,6.4vw,64px); font-weight:800; letter-spacing:-0.02em; line-height:1.08; margin-bottom:16px;}
+  .intro h1 .z{color:var(--gold);}
+  .intro .lede{margin-bottom:26px;}
+  .hero-price{display:inline-flex; align-items:baseline; gap:10px; flex-wrap:wrap; font-family:var(--mono); border:1px solid var(--line); background:rgba(17,19,24,0.7); padding:10px 16px; margin-bottom:36px;}
+  .hero-price .lbl{font-size:11px; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase;}
+  .hero-price .p{font-size:24px; font-weight:800; color:var(--gold); font-variant-numeric:tabular-nums;}
+  .hero-price .d{font-size:12px; font-weight:600;}
+  .doors{display:grid; gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media(min-width:560px){.doors{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1000px){.doors{grid-template-columns:repeat(4,1fr);}}
+  .door{background:var(--bg); padding:24px; text-decoration:none; display:flex; flex-direction:column; gap:8px; transition:background .15s;}
+  .door:hover{background:var(--bg-raised);}
+  .door .ic{font-family:var(--mono); font-size:18px; color:var(--teal);}
+  .door.g .ic{color:var(--gold);}
+  .door h3{font-family:var(--mono); font-size:15px; text-transform:uppercase; letter-spacing:0.03em;}
+  .door p{color:var(--muted); font-size:14.5px; flex:1;}
+  .door .go{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; color:var(--gold); margin-top:6px;}
+  .door:hover .go{text-decoration:underline;}
+  @media (prefers-reduced-motion: reduce){.intro .pulse{animation:none; opacity:.5;}}
+
+
+  /* REDEMPTION ARC */
+  .arc{background:var(--bg-raised); border:1px solid var(--line);}
+  .arc-top{display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);}
+  .arc-top b{color:var(--gold); font-weight:700;}
+  .arc-play{font:inherit; letter-spacing:inherit; text-transform:inherit; color:var(--muted); background:none; border:1px solid var(--line); padding:4px 10px; cursor:pointer;}
+  .arc-play:hover{color:var(--gold); border-color:var(--gold);}
+  .arc-chart{padding:8px 8px 0;}
+  .arc-chart svg{display:block; width:100%; height:auto; overflow:visible;}
+  .arc-chart .grid{stroke:#1c2027; stroke-width:1;}
+  .arc-chart .ylab,.arc-chart .xlab{fill:#5d626c; font-family:var(--mono); font-size:11px;}
+  .arc-chart .line{fill:none; stroke:url(#arcg); stroke-width:2.4; stroke-linejoin:round; stroke-linecap:round;}
+  .arc-chart .stop{fill:var(--bg-raised); stroke:#3a404b; stroke-width:1.5; transition:fill .4s, stroke .4s;}
+  .arc-chart .stop.on{fill:var(--gold); stroke:var(--gold);}
+  .arc-chart .you{fill:var(--gold);}
+  .arc-chart .ring{fill:none; stroke:var(--gold); stroke-width:1.5; transform-box:fill-box; transform-origin:center; animation:arcring 2.2s ease-out infinite;}
+  @keyframes arcring{0%{transform:scale(.5); opacity:.9;}100%{transform:scale(3.2); opacity:0;}}
+  .arc-body{display:grid; gap:1px; background:var(--line); border-top:1px solid var(--line);}
+  @media(min-width:800px){.arc-body{grid-template-columns:1.35fr 1fr;}}
+  .arc-body>div{background:var(--bg-raised); padding:26px;}
+  .arc-when{font-family:var(--mono); font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;}
+  .arc-title{font-family:var(--mono); font-size:clamp(24px,4vw,34px); font-weight:800; letter-spacing:-0.01em; line-height:1.1; margin-bottom:12px;}
+  .arc-txt{color:var(--muted); font-size:15.5px; max-width:56ch; min-height:6.6em;}
+  .arc-price{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px;}
+  .arc-price b{color:var(--text);}
+  .arc-nav{display:flex; align-items:center; gap:14px; margin-top:20px; flex-wrap:wrap;}
+  .arc-btn{font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text); background:none; border:1px solid var(--line); padding:8px 14px; cursor:pointer;}
+  .arc-btn:hover{border-color:var(--gold); color:var(--gold);}
+  .arc-btn[disabled]{opacity:.35; cursor:default; border-color:var(--line); color:var(--muted);}
+  .arc-dots{display:flex; gap:8px;}
+  .arc-dots button{width:9px; height:9px; border-radius:50%; border:1px solid #4a505b; background:none; padding:0; cursor:pointer;}
+  .arc-dots button.on{background:var(--gold); border-color:var(--gold);}
+  .arc-dots button.cur{box-shadow:0 0 0 3px rgba(244,197,66,.25);}
+  .arc-list{list-style:none; font-family:var(--mono); font-size:13px;}
+  .arc-list li{display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); color:#5d626c; transition:color .5s;}
+  .arc-list li:last-child{border-bottom:none;}
+  .arc-list .bx{width:16px; flex-shrink:0; color:#3a404b; transition:color .5s;}
+  .arc-list li.on{color:var(--text);}
+  .arc-list li.on .bx{color:var(--gold);}
+  .arc-list li span em{display:block; font-style:normal; color:var(--muted); font-size:11.5px; margin-top:2px;}
+  .arc-end{display:none; gap:12px; flex-wrap:wrap; margin-top:20px;}
+  .arc-end.show{display:flex;}
+  .arc-end a{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-decoration:none; padding:9px 14px; border:1px solid var(--gold); color:var(--gold);}
+  .arc-end a.solid{background:var(--gold); color:#0a0b0d; font-weight:700;}
+  .arc-end a:hover{filter:brightness(1.15);}
+  @media (prefers-reduced-motion: reduce){.arc-chart .ring{animation:none; opacity:.5;}}
+
   /* HERO / TICKER */
   .hero{padding:56px 0 40px; border-bottom:1px solid var(--line);}
   .live-tag{
@@ -302,8 +386,9 @@
 
 <header>
   <div class="nav wrap">
-    <div class="logo"><span class="z">Z</span> ZECTASTIC</div>
+    <a class="logo" href="/" style="text-decoration:none;"><span class="z">Z</span> ZECTASTIC</a>
     <nav class="navlinks">
+      <a href="#arc">Arc</a>
       <a href="#tracker">Tracker</a>
       <a href="#supply">Supply</a>
       <a href="#why">Why</a>
@@ -314,8 +399,68 @@
       <a href="/zecmap.html" style="color:var(--gold);">Map ◈</a>
       <a href="/flippening.html" style="color:var(--gold);">Party ◈</a>
     </nav>
+    <a class="tick" href="#tracker" title="ZEC price"><span class="lbl">ZEC</span> <span class="p js-p">$–</span> <span class="d js-d"></span></a>
   </div>
 </header>
+
+<!-- WELCOME INTRO -->
+<section class="intro" id="welcome">
+  <div class="bg" aria-hidden="true">
+    <span class="pulse" style="left:62%;top:22%;animation-delay:0s"></span>
+    <span class="pulse" style="left:78%;top:48%;animation-delay:1.4s"></span>
+    <span class="pulse t" style="left:48%;top:66%;animation-delay:2.6s"></span>
+    <span class="pulse" style="left:88%;top:26%;animation-delay:3.4s"></span>
+    <span class="pulse t" style="left:70%;top:74%;animation-delay:.8s"></span>
+    <span class="pulse" style="left:55%;top:34%;animation-delay:4.2s"></span>
+  </div>
+  <div class="wrap">
+    <div class="eyebrow">◈ Welcome</div>
+    <h1>Welcome to <span class="z">Zectastic</span></h1>
+    <p class="lede">Zcash, tracked honestly: the price, how much exists, and what's actually private. Pick a door.</p>
+    <div class="hero-price"><span class="lbl">ZEC / USD</span> <span class="p js-p">$–</span> <span class="d js-d"></span></div>
+    <div class="doors">
+      <a class="door g" href="#arc"><span class="ic">◈</span><h3>The Redemption Arc</h3><p>Ten years of Zcash in one interactive chart. Hop on.</p><span class="go">Ride the arc ↓</span></a>
+      <a class="door" href="#tracker"><span class="ic">◈</span><h3>Tracker</h3><p>Live price, chart, supply and the shielded split.</p><span class="go">See the numbers ↓</span></a>
+      <a class="door g" href="/zecmap.html"><span class="ic">◈</span><h3>ZEC Map</h3><p>Watch the world buy ZEC in real time, with a hidden zone for shielded swaps.</p><span class="go">Open the map →</span></a>
+      <a class="door g" href="/flippening.html"><span class="ic">◈</span><h3>Flippening Party</h3><p>How far is ZEC from passing the coins above it? Party mode included.</p><span class="go">Join the party →</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- REDEMPTION ARC -->
+<section id="arc">
+  <div class="wrap">
+    <div class="eyebrow">◈ The Redemption Arc</div>
+    <h2>Every redemption arc starts at the bottom. Hop on.</h2>
+    <p class="lede">Ten years of Zcash in one line. Click through the chapters, or let it play, and watch the checklist fill in. Prefer reading? The <a href="#why" style="color:var(--gold);">Why ZEC</a> section is just below.</p>
+    <div class="arc" id="arcBox">
+      <div class="arc-top"><span>Chapter <b id="arcN">01</b> / <span id="arcT">08</span></span><button class="arc-play" id="arcPlay" type="button">Pause</button></div>
+      <div class="arc-chart"><svg id="arcSvg" viewBox="0 0 1000 380" role="img" aria-label="ZEC price history since 2016 on a log scale, with chapters from launch to today"></svg></div>
+      <div class="arc-body">
+        <div>
+          <div class="arc-when" id="arcWhen">Oct 2016</div>
+          <div class="arc-title" id="arcTitle">Launch day</div>
+          <p class="arc-txt" id="arcTxt" aria-live="polite"></p>
+          <div class="arc-price" id="arcPrice"></div>
+          <div class="arc-nav">
+            <button class="arc-btn" id="arcPrev" type="button">← Back</button>
+            <button class="arc-btn" id="arcNext" type="button">Next →</button>
+            <div class="arc-dots" id="arcDots"></div>
+          </div>
+          <div class="arc-end" id="arcEnd">
+            <a class="solid" href="#why">Read why ZEC →</a>
+            <a href="#tracker">Live numbers ↓</a>
+            <a href="/zecmap.html">Open the map →</a>
+          </div>
+        </div>
+        <div>
+          <div class="arc-when" style="color:var(--muted);">The checklist</div>
+          <ul class="arc-list" id="arcList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- HERO / TICKER (main feature, unchanged in spirit) -->
 <section class="hero" id="tracker" style="border-bottom:1px solid var(--line); padding-bottom:56px;">
@@ -844,6 +989,7 @@
       const max = m.max_supply || 21000000;
       const btcUsd = price / btcPrice;
 
+      if(!window.__kr) setChip(price, change);
       document.getElementById('price').textContent = fmtPlain(price);
       const deltaEl = document.getElementById('delta');
       deltaEl.textContent = (change >= 0 ? '▲ ' : '▼ ') + Math.abs(change).toFixed(2) + '%';
@@ -869,10 +1015,192 @@
     }
   }
 
+
+  /* Live header chip: Kraken ticker over WebSocket, so it moves in real time */
+  function setChip(p,c){
+    window.__zecPrice=p;
+    const f=p>=10?p.toFixed(2):p.toFixed(4);
+    document.querySelectorAll('.js-p').forEach(e=>e.textContent='$'+Number(f).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:p>=10?2:4}));
+    if(c!=null&&isFinite(c))document.querySelectorAll('.js-d').forEach(e=>{e.textContent=(c>=0?'▲ ':'▼ ')+Math.abs(c).toFixed(2)+'%';e.className='d js-d '+(c>=0?'up':'down')});
+  }
+  (function(){let w=1000;
+    function go(){let ws;try{ws=new WebSocket('wss://ws.kraken.com/v2')}catch(e){return}
+      ws.onopen=()=>{w=1000;ws.send(JSON.stringify({method:'subscribe',params:{channel:'ticker',symbol:['ZEC/USD']}}))};
+      ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.channel==='ticker'&&m.data)m.data.forEach(t=>(window.__kr=1,setChip(t.last,t.change_pct)))}catch(_){}};
+      ws.onclose=()=>{setTimeout(go,w);w=Math.min(w*2,30000)};ws.onerror=()=>ws.close();}
+    go();})();
+
   loadMarketData();
   refreshMcapChart();
   setInterval(loadMarketData, 60000);
   setInterval(refreshMcapChart, 60000);
+</script>
+
+<script>
+/* The Zcash Redemption Arc: real weekly ZEC/USD closes from Kraken, drawn on a log scale.
+   If the data can't load, a stylized arc (no numbers) is shown instead. */
+(function(){
+const $=s=>document.querySelector(s);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const NS="http://www.w3.org/2000/svg";
+const D=(y,m,d)=>Date.UTC(y,m-1,d);
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const LIST=[
+ ["Fixed supply","21 million coins, ever"],
+ ["Optional transparency","shielded or transparent, your choice"],
+ ["Real privacy","zero-knowledge proofs"],
+ ["Bitcoin-grade roots","Bitcoin's code and issuance logic"],
+ ["Battle-tested","live since 2016"],
+ ["True fungibility","shielded coins carry no history"]
+];
+const CH=[
+ {t:D(2016,10,28),when:"Oct 2016",title:"Launch day",txt:"Zcash goes live, built on Bitcoin's code with the same 21 million cap, and with shielded and transparent transactions side by side from day one. Then the launch-day price comes crashing down. Nobody said a redemption arc starts well.",chk:[0,1]},
+ {t:D(2018,10,28),when:"Oct 2018",title:"Sapling",txt:"Shielded transactions become fast and light enough for ordinary phones. Privacy stops being a lab demo.",chk:[2]},
+ {t:D(2020,11,18),when:"Nov 2020",title:"First halving",txt:"Issuance halves on schedule, Bitcoin-style. Same rules, no exceptions, no drama.",chk:[3]},
+ {t:D(2022,5,31),when:"May 2022",title:"Orchard and Halo",txt:"Shielded proofs that no longer need a trusted setup. The cryptography gets rebuilt in production while the market looks the other way.",chk:[4]},
+ {t:D(2024,11,23),when:"Nov 2024",title:"Second halving",txt:"Another halving, right on time. The builders keep building through the quiet years.",chk:[]},
+ {t:D(2026,7,28),when:"Jul 2026",title:"Ironwood",txt:"Ironwood becomes the shielded pool for new deposits, and a growing share of all ZEC now sits shielded. A coin that has been shielded carries no history with it.",chk:[5]},
+ {t:D(2026,8,25),when:"Aug 2026",title:"The ETF",txt:"Grayscale's spot Zcash ETF, ZCSH, starts trading on NYSE Arca. The coin that was written off now has a ticker.",chk:[]},
+ {t:null,when:"Today",title:"You are here",txt:"Fixed supply, real privacy, your choice of transparency, Bitcoin-grade roots, years of battle-testing. Zcash has it all. This is the story so far, not financial advice.",chk:[]}
+];
+const T0=D(2016,10,27);
+/* stylized fallback: [year, relative price], no numbers shown */
+const FB=[[2016.83,900],[2016.95,70],[2017.3,200],[2017.95,700],[2018.5,150],[2018.95,50],[2019.5,60],[2020,35],[2020.9,60],[2021.35,300],[2021.9,140],[2022.5,45],[2023.5,28],[2024.5,30],[2024.9,50],[2025.5,60],[2025.85,500],[2026.3,350],[2026.65,800],[2026.77,900]];
+const yr=y=>Date.UTC(Math.floor(y),0,1)+(y%1)*365.25*864e5;
+
+const svg=$("#arcSvg");
+const W=1000,H=380,ML=52,MR=18,MT=16,MB=30;
+let series=[],real=false,cur=0,timer=0,playing=!reduce,userStopped=false,seen=new Set([0]);
+let pathEl,markG,markEl,ringEl,stops=[],cum=[],pts=[],total=0,xy,curL=0,anim=0;
+
+const el=(n,a,p)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e};
+const endT=()=>Math.max(Date.now(),series.length?series[series.length-1][0]:0);
+const fmtP=v=>v>=100?"$"+Math.round(v).toLocaleString("en-US"):"$"+v.toFixed(2);
+
+function priceAt(t){
+ if(!real)return null;
+ let v=series[0][1];
+ for(const r of series){if(r[0]<=t)v=r[1];else break}
+ return v;
+}
+function build(){
+ svg.innerHTML="";
+ const t1=endT();
+ const lo=Math.min(...series.map(r=>r[1])),hi=Math.max(...series.map(r=>r[1]));
+ const yl=Math.pow(10,Math.floor(Math.log10(lo*.9))),yh=Math.pow(10,Math.ceil(Math.log10(hi*1.05)));
+ const X=t=>ML+(t-T0)/(t1-T0)*(W-ML-MR);
+ const Y=v=>MT+(1-(Math.log(v)-Math.log(yl))/(Math.log(yh)-Math.log(yl)))*(H-MT-MB);
+ xy=t=>[X(t),Y(priceAt(t)||interp(t))];
+ function interp(t){let a=series[0];for(const r of series){if(r[0]>t)return a[1]+(r[1]-a[1])*((t-a[0])/(r[0]-a[0]));a=r}return a[1]}
+ const defs=el("defs",{});
+ const g=el("linearGradient",{id:"arcg",gradientUnits:"userSpaceOnUse",x1:ML,x2:W-MR,y1:0,y2:0},defs);
+ el("stop",{offset:"0%","stop-color":"#f4c542"},g);el("stop",{offset:"100%","stop-color":"#00d9c0"},g);
+ for(let v=yl;v<=yh*1.001;v*=10){
+  el("line",{class:"grid",x1:ML,x2:W-MR,y1:Y(v),y2:Y(v)});
+  if(real){const t=el("text",{class:"ylab",x:ML-8,y:Y(v)+4,"text-anchor":"end"});t.textContent=v>=1000?"$"+(v/1000)+"k":"$"+v}
+ }
+ for(let y=2017;y<=new Date(t1).getUTCFullYear();y+=y<2020?1:1){
+  if(y%2===0||y===2017){const t=el("text",{class:"xlab",x:X(D(y,1,1)),y:H-8,"text-anchor":"middle"});t.textContent=y}
+ }
+ pts=series.map(r=>[X(r[0]),Y(r[1])]);
+ cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+ total=cum[cum.length-1];
+ pathEl=el("path",{class:"line",d:"M"+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join("L")});
+ pathEl.style.strokeDasharray=total;pathEl.style.strokeDashoffset=total;
+ stops=CH.map((c,i)=>{const t=c.t||series[series.length-1][0];const p=[X(t),Y(priceAt(t)||interp(t))];return el("circle",{class:"stop",cx:p[0],cy:p[1],r:4.5})});
+ markG=el("g",{});
+ ringEl=el("circle",{class:"ring",r:6,cx:0,cy:0},markG);
+ markEl=el("circle",{class:"you",r:6.5,cx:0,cy:0},markG);
+ curL=0;
+}
+function lenAt(t){
+ if(t>=series[series.length-1][0])return total;
+ let i=0;while(i<series.length-1&&series[i+1][0]<=t)i++;
+ const a=series[i],b=series[Math.min(i+1,series.length-1)];
+ const f=b[0]>a[0]?(t-a[0])/(b[0]-a[0]):0;
+ return cum[i]+(cum[Math.min(i+1,cum.length-1)]-cum[i])*f;
+}
+function moveTo(L,instant){
+ cancelAnimationFrame(anim);
+ const L0=curL;
+ const set=l=>{curL=l;pathEl.style.strokeDashoffset=total-l;const p=pathEl.getPointAtLength(l);markG.setAttribute("transform","translate("+p.x+" "+p.y+")")};
+ if(instant||reduce||L0===L){set(L);return}
+ const t0=performance.now(),Dur=1500;
+ const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+ const step=n=>{const k=Math.min(1,(n-t0)/Dur);set(L0+(L-L0)*ease(k));if(k<1)anim=requestAnimationFrame(step)};
+ anim=requestAnimationFrame(step);
+}
+function show(i,instant){
+ cur=Math.max(0,Math.min(CH.length-1,i));
+ const c=CH[cur],t=c.t||endT();
+ const L=lenAt(t);
+ moveTo(L,instant);
+ for(let k=0;k<=cur;k++)seen.add(k);
+ stops.forEach((s,k)=>s.classList.toggle("on",k<=cur));
+ $("#arcN").textContent=String(cur+1).padStart(2,"0");
+ $("#arcWhen").textContent=c.when;
+ $("#arcTitle").textContent=c.title;
+ $("#arcTxt").textContent=c.txt;
+ const pr=cur===CH.length-1?(window.__zecPrice||priceAt(t)):priceAt(t);
+ $("#arcPrice").innerHTML=pr&&real?(cur===CH.length-1?"ZEC right now: ":"ZEC at the time: ")+"<b>"+fmtP(pr)+"</b>":"";
+ const on=new Set();for(let k=0;k<=cur;k++)CH[k].chk.forEach(x=>on.add(x));
+ document.querySelectorAll("#arcList li").forEach((li,k)=>li.classList.toggle("on",on.has(k)));
+ document.querySelectorAll("#arcList .bx").forEach((b,k)=>b.textContent=on.has(k)?"✓":"□");
+ document.querySelectorAll("#arcDots button").forEach((b,k)=>{b.classList.toggle("on",k<=cur);b.classList.toggle("cur",k===cur)});
+ $("#arcPrev").disabled=cur===0;
+ $("#arcNext").textContent=cur===CH.length-1?"Replay ↺":"Next →";
+ $("#arcEnd").classList.toggle("show",cur===CH.length-1);
+}
+function schedule(){
+ clearTimeout(timer);
+ if(!playing)return;
+ timer=setTimeout(()=>{
+  if(cur>=CH.length-1){playing=false;setPlay();return}
+  show(cur+1);schedule();
+ },cur===0?7500:6500);
+}
+function setPlay(){$("#arcPlay").textContent=playing?"Pause":"Play"}
+function stop(){playing=false;userStopped=true;clearTimeout(timer);setPlay()}
+
+/* static UI */
+$("#arcT").textContent=String(CH.length).padStart(2,"0");
+$("#arcList").innerHTML=LIST.map(l=>'<li><span class="bx">□</span><span>'+l[0]+'<em>'+l[1]+'</em></span></li>').join("");
+$("#arcDots").innerHTML=CH.map((c,i)=>'<button type="button" aria-label="Chapter '+(i+1)+': '+c.title+'"></button>').join("");
+document.querySelectorAll("#arcDots button").forEach((b,i)=>b.addEventListener("click",()=>{stop();show(i)}));
+$("#arcPrev").addEventListener("click",()=>{stop();show(cur-1)});
+$("#arcNext").addEventListener("click",()=>{stop();show(cur>=CH.length-1?0:cur+1)});
+$("#arcPlay").addEventListener("click",()=>{
+ playing=!playing;userStopped=!playing;setPlay();
+ if(playing){if(cur>=CH.length-1)show(0);schedule()}else clearTimeout(timer);
+});
+$("#arcBox").setAttribute("tabindex","0");
+$("#arcBox").addEventListener("keydown",e=>{
+ if(e.key==="ArrowRight"){stop();show(cur+1)}
+ if(e.key==="ArrowLeft"){stop();show(cur-1)}
+});
+
+/* start with the stylized arc right away, swap in the real data when it arrives */
+series=FB.map(r=>[yr(r[0]),r[1]]);real=false;
+build();show(0,true);
+let started=false;
+function start(){
+ if(started)return;started=true;
+ if(!reduce)setTimeout(()=>{show(0);schedule()},400);else show(0,true);
+}
+if("IntersectionObserver" in window){
+ new IntersectionObserver((en,ob)=>{if(en[0].isIntersecting){start();ob.disconnect()}},{threshold:.35}).observe($("#arcBox"));
+}else start();
+
+fetch("https://api.kraken.com/0/public/OHLC?pair=ZECUSD&interval=10080").then(r=>r.json()).then(j=>{
+ const rows=j.result[Object.keys(j.result).find(k=>k!=="last")];
+ const s=rows.map(r=>[+r[0]*1000,+r[4]]).filter(r=>r[0]>0&&r[1]>0);
+ if(s.length<100)throw 0;
+ series=s;real=true;
+ const keep=cur;
+ build();show(keep,true);
+ if(started&&playing)schedule();
+}).catch(()=>{});
+})();
 </script>
 
 </body>
