@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZEC map: live buys and the shielded zone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{--sea:#0a1620;--sea2:#0d1e2a;--land:#16303a;--edge:#24505e;--gold:#f4b728;--veil:#8f7cff;--veil2:#bdb3ff;--ink:#f3ecdd;--dim:#8aa3ad;--up:#7fe0b8;--down:#ff8a7a}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--sea);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;overflow:hidden}
+#map{position:fixed;inset:0;width:100%;height:100%}
+.land{fill:var(--land);stroke:var(--edge);stroke-width:.5}
+.sphere{fill:var(--sea2);stroke:var(--edge);stroke-width:.8}
+.grat{fill:none;stroke:#1a3340;stroke-width:.4}
+.ring{fill:none;stroke:var(--gold);stroke-width:1.4;transform-box:fill-box;transform-origin:center;animation:ring 2.4s cubic-bezier(.2,.6,.3,1) forwards}
+.dot{fill:var(--gold);transform-box:fill-box;transform-origin:center;animation:dot 3s ease-out forwards}
+.veil.ring{stroke:var(--veil)}
+.veil.dot{fill:var(--veil2)}
+.tag{fill:var(--gold);font-size:11px;font-weight:700;text-anchor:middle;animation:tag 2.4s ease-out forwards}
+.blob{fill:var(--veil);animation:drift 9s ease-in-out infinite alternate}
+.blob:nth-child(2){animation-delay:-3s;animation-duration:11s}
+.blob:nth-child(3){animation-delay:-6s;animation-duration:13s}
+.zring{fill:none;stroke:var(--veil2);stroke-opacity:.35;stroke-width:1;stroke-dasharray:2 7;transform-box:fill-box;transform-origin:center;animation:spin 40s linear infinite}
+.zone{fill:var(--veil2);font-size:12px;font-weight:700;text-anchor:middle}
+.zone.sub{fill:var(--dim);font-size:10.5px;font-weight:400}
+@keyframes ring{from{transform:scale(.2);opacity:.95}to{transform:scale(var(--s));opacity:0}}
+@keyframes dot{0%{opacity:0;transform:scale(.4)}12%{opacity:1;transform:scale(1)}100%{opacity:0}}
+@keyframes tag{0%{opacity:0;transform:translateY(0)}15%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+@keyframes drift{from{transform:translate(-8px,4px)}to{transform:translate(10px,-6px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fade{from{opacity:.8}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+ .ring{animation:fade 2s forwards;transform:scale(calc(var(--s)*.5))}
+ .dot,.tag{animation:fade 2.5s forwards}
+ .blob,.zring{animation:none}
+}
+.center{position:fixed;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none;padding:0 12px}
+#price{font-size:clamp(3rem,10vw,6.8rem);font-weight:700;letter-spacing:-.025em;line-height:1.05;font-variant-numeric:tabular-nums;text-shadow:0 2px 36px var(--sea),0 0 12px var(--sea);transition:color 1.4s}
+#price[data-dir=up]{color:var(--up);transition:none}
+#price[data-dir=down]{color:var(--down);transition:none}
+.btc{margin-top:.5rem;font-size:clamp(.85rem,2.2vw,1.1rem);color:var(--dim);font-variant-numeric:tabular-nums;text-shadow:0 1px 14px var(--sea),0 0 8px var(--sea)}
+.btc b{color:var(--ink);font-weight:400}
+.up{color:var(--up)}.down{color:var(--down)}
+header{position:fixed;top:0;left:0;padding:max(14px,env(safe-area-inset-top)) 16px 0;pointer-events:none}
+h1{margin:0;font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+.status{margin-top:2px;font-size:.8rem;color:var(--dim)}
+.status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#555;margin-right:6px;vertical-align:1px}
+.status.on i{background:var(--up)}
+.foot{position:fixed;left:0;bottom:0;padding:0 16px max(12px,env(safe-area-inset-bottom));max-width:52ch;font-size:.78rem;color:var(--dim);line-height:1.45;pointer-events:none}
+.foot p{margin:.5rem 0 0;font-size:.72rem;opacity:.8}
+.foot strong{color:var(--ink);font-weight:400;font-variant-numeric:tabular-nums}
+.foot .v{color:var(--veil2)}
+/* Portrait phones: price sits on top, the map gets the space below it */
+body.portrait .center{place-content:start center;padding-top:calc(max(14px,env(safe-area-inset-top)) + 58px)}
+body.portrait #price{font-size:clamp(3rem,19vw,5.4rem)}
+body.portrait .foot{right:0;max-width:none}
+body.portrait .foot p{font-size:.68rem}
+</style>
+</head>
+<body>
+<svg id="map" role="img" aria-label="World map showing live Zcash buys flying into the ZEC price, with a hidden shielded zone in the Atlantic">
+ <defs>
+  <filter id="blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+  <symbol id="zl" viewBox="-10 -10 20 20">
+   <circle r="10" fill="#f4b728"/>
+   <g stroke="#1b1405" fill="none" stroke-width="1.7" stroke-linecap="square"><path d="M-4.2-4.3H4.2L-4.2 4.3H4.2"/><path d="M0-7.4V7.4"/></g>
+  </symbol>
+ </defs>
+</svg>
+<header>
+ <h1>ZEC buys, live</h1>
+ <div class="status" id="status"><i></i><span>Connecting</span></div>
+</header>
+<div class="center">
+ <div id="pb">
+  <div id="price" aria-live="off">$–</div>
+  <div class="btc" id="btc">ZEC/BTC –</div>
+ </div>
+</div>
+<div class="foot">
+ <div><strong id="bpm">0</strong> buys in the last minute</div>
+ <div class="v"><strong id="shn">0</strong> shielded events (simulated)</div>
+ <p>Buy locations are estimated from the currency of each trade. The shielded zone shows that activity happens, never who or where.</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const svg=d3.select("#map");
+const gMap=svg.append("g"), gFog=svg.append("g"), gPulse=svg.append("g");
+const priceEl=$("#price");
+
+/* Where a buy shows up, by the currency it was paid in. A proxy, not a real location. */
+const PLACES={
+ USD:[[-74,40.7],[-87.6,41.9],[-118.2,34],[-80.2,25.8],[-96.8,32.8]],
+ EUR:[[13.4,52.5],[2.35,48.9],[-3.7,40.4],[12.5,41.9],[4.9,52.4]],
+ GBP:[[-.1,51.5],[-2.2,53.5]],
+ JPY:[[139.7,35.7],[135.5,34.7]],
+ CAD:[[-79.4,43.7],[-123.1,49.3]],
+ AUD:[[151.2,-33.9],[144.96,-37.8]],
+ CHF:[[8.5,47.4]],
+ BRL:[[-46.6,-23.5],[-43.2,-22.9]],
+ TRY:[[29,41],[32.9,39.9]]
+};
+const FOG=[-20,-35]; // the shielded zone: open South Atlantic, clear of the price
+
+let W,H,proj,fogXY,R,land=[];
+function draw(){
+ W=innerWidth;H=innerHeight;
+ const portrait=H>W*1.05;
+ document.body.classList.toggle("portrait",portrait);
+ let top=8,bot=H-8;
+ if(portrait){
+  top=$("#pb").getBoundingClientRect().bottom+10;
+  bot=$(".foot").getBoundingClientRect().top-6;
+ }
+ proj=d3.geoNaturalEarth1().fitExtent([[8,top],[W-8,Math.max(bot,top+120)]],{type:"Sphere"});
+ const path=d3.geoPath(proj);
+ const bb=path.bounds({type:"Sphere"});
+ R=Math.max(18,(bb[1][0]-bb[0][0])*.045);
+ gMap.selectAll("*").remove();
+ gMap.append("path").attr("class","sphere").attr("d",path({type:"Sphere"}));
+ gMap.append("path").attr("class","grat").attr("d",path(d3.geoGraticule10()));
+ gMap.selectAll(".land").data(land).join("path").attr("class","land").attr("d",path);
+ fogXY=proj(FOG);
+ if(!portrait){ // never let the zone sit behind the price
+  const b=$("#pb").getBoundingClientRect();
+  if(Math.abs(fogXY[0]-(b.left+b.width/2))<b.width/2+R && fogXY[1]>b.top-R*1.3 && fogXY[1]<b.bottom+R*1.3) fogXY[1]=b.bottom+R*1.4;
+ }
+ fogXY[1]=Math.min(fogXY[1],H-R*1.6-34);
+ gFog.selectAll("*").remove();
+ const g=gFog.append("g").attr("transform",`translate(${fogXY})`);
+ const b2=g.append("g").attr("filter","url(#blur)");
+ [[0,0,1,.5],[.5,.2,.7,.4],[-.5,-.15,.8,.4]].forEach(([dx,dy,k,o])=>
+  b2.append("circle").attr("class","blob").attr("cx",dx*R).attr("cy",dy*R).attr("r",k*R).attr("opacity",o));
+ g.append("circle").attr("class","zring").attr("r",R*1.3);
+ g.append("text").attr("class","zone").attr("y",R*1.3+18).text("Shielded zone");
+ g.append("text").attr("class","zone sub").attr("y",R*1.3+33).text("amounts and places hidden");
+}
+draw();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(w=>{
+ land=topojson.feature(w,w.objects.countries).features.filter(f=>String(f.id)!=="010");
+ draw();
+}).catch(()=>{});
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(draw,150)});
+
+/* Price highlight when a logo lands */
+function hit(usd){
+ const k=Math.min(1,.4+Math.sqrt(usd||0)/80);
+ const base="0 2px 36px #0a1620,0 0 12px #0a1620";
+ priceEl.animate([
+  {textShadow:base,transform:"scale(1)"},
+  {textShadow:`0 0 ${20+30*k}px rgba(244,183,40,${.55+.4*k}),0 0 10px rgba(255,214,120,${.5+.4*k})`,color:"#ffe19a",transform:`scale(${reduce?1:1+.025*k})`,offset:.25},
+  {textShadow:base,transform:"scale(1)"}
+ ],{duration:650,easing:"ease-out"});
+}
+
+/* Zcash logos flying from the buy into the price */
+const flyers=[];let raf=0;
+function fly(S,usd){
+ if(flyers.length>60)return;
+ const r=8+Math.min(8,Math.sqrt(usd)/14);
+ const g=gPulse.append("g").attr("transform",`translate(${S})`);
+ const inner=g.append("g");
+ inner.append("circle").attr("r",r*1.7).attr("fill","#f4b728").attr("opacity",.22);
+ inner.append("use").attr("href","#zl").attr("x",-r).attr("y",-r).attr("width",2*r).attr("height",2*r);
+ const b=priceEl.getBoundingClientRect();
+ const T=[clamp(S[0],b.left+b.width*.1,b.right-b.width*.1),clamp(S[1],b.top+b.height*.2,b.bottom-b.height*.2)];
+ const dx=T[0]-S[0],dy=T[1]-S[1],dist=Math.hypot(dx,dy)||1;
+ const C=[S[0]+dx/2-dy*.18,S[1]+dy/2+dx*.18-dist*.12];
+ flyers.push({g:g.node(),inner:inner.node(),S,T,C,t0:performance.now(),pop:reduce?0:320,D:reduce?200:900+dist*1.1,usd});
+ if(!raf)raf=requestAnimationFrame(tick);
+}
+function tick(now){
+ for(let i=flyers.length-1;i>=0;i--){
+  const f=flyers[i],e=now-f.t0;
+  let x,y,s;
+  if(e<f.pop){const k=e/f.pop;x=f.S[0];y=f.S[1];s=1.15*(1-Math.pow(1-k,3))}
+  else{
+   const p=Math.min(1,(e-f.pop)/f.D),q=p*p,u=1-q;
+   x=u*u*f.S[0]+2*u*q*f.C[0]+q*q*f.T[0];
+   y=u*u*f.S[1]+2*u*q*f.C[1]+q*q*f.T[1];
+   s=1-.45*q;
+   if(p>=1){f.g.remove();flyers.splice(i,1);hit(f.usd);continue}
+  }
+  f.g.setAttribute("transform",`translate(${x},${y})`);
+  f.inner.setAttribute("transform",`scale(${s})`);
+ }
+ raf=flyers.length?requestAnimationFrame(tick):0;
+}
+
+/* Pulses */
+function spawn(xy,size,dotR,cls,label){
+ if(gPulse.node().childElementCount>120)return;
+ const g=gPulse.append("g").attr("transform",`translate(${xy})`);
+ g.append("circle").attr("class","ring "+cls).attr("r",10).style("--s",size/10);
+ if(dotR>0)g.append("circle").attr("class","dot "+cls).attr("r",dotR);
+ if(label)g.append("text").attr("class","tag").attr("y",-size*.35-4).text(label);
+ setTimeout(()=>g.remove(),3300);
+}
+const buysT=[];
+function onBuy(cur,qty,price){
+ const pts=PLACES[cur];if(!pts||!proj||!(qty>0))return;
+ const usd=qty*(cur==="USD"||!zec?price:zec);
+ const p=pts[Math.random()*pts.length|0];
+ const xy=proj([p[0]+(Math.random()-.5)*1.6,p[1]+(Math.random()-.5)*1.2]);
+ spawn(xy,14+Math.min(60,Math.sqrt(usd)*.9),0,"",usd>=1500?`+${qty.toFixed(1)} ZEC`:"");
+ fly(xy,usd);
+ buysT.push(Date.now());
+}
+let shielded=0;
+/* Hook for real shielded data: call window.zecmap.shielded(n) once per shielded event batch. */
+function veil(n){
+ for(let i=0;i<(n||1);i++){
+  const a=Math.random()*6.283,d=Math.random()*R*.55;
+  spawn([fogXY[0]+Math.cos(a)*d,fogXY[1]+Math.sin(a)*d],20+Math.random()*26,2.5,"veil","");
+  shielded++;
+ }
+ $("#shn").textContent=shielded;
+}
+window.zecmap={shielded:veil};
+(function loop(){veil(Math.random()<.2?2:1);setTimeout(loop,700+Math.random()*2400)})();
+setInterval(()=>{const c=Date.now()-6e4;while(buysT.length&&buysT[0]<c)buysT.shift();$("#bpm").textContent=buysT.length},1000);
+
+/* Prices */
+let zec=null,btc=null,zecChg=null,btcChg=null,last=null;
+const fmt=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"});
+function render(){
+ if(zec){
+  priceEl.textContent=fmt.format(zec);
+  if(last!==null&&zec!==last){priceEl.dataset.dir=zec>last?"up":"down";setTimeout(()=>{delete priceEl.dataset.dir},80)}
+  last=zec;
+ }
+ if(zec&&btc){
+  let h=`ZEC/BTC <b>₿${(zec/btc).toFixed(6)}</b>`;
+  if(zecChg!=null&&btcChg!=null){
+   const ch=((1+zecChg/100)/(1+btcChg/100)-1)*100;
+   h+=` &nbsp;<span class="${ch<0?"down":"up"}">${ch<0?"▼":"▲"} ${Math.abs(ch).toFixed(2)}% against BTC in 24h</span>`;
+  }
+  $("#btc").innerHTML=h;
+ }
+}
+
+/* Exchange feeds (public WebSockets, reconnect with backoff) */
+const live=new Set();
+function status(){
+ const el=$("#status");el.classList.toggle("on",live.size>0);
+ el.lastChild.textContent=live.size?"Live from "+[...live].join(", "):"Connecting, retrying if needed";
+}
+function link(name,url,onopen,onmsg){
+ let wait=1000;
+ const retry=()=>{setTimeout(go,wait);wait=Math.min(wait*2,30000)};
+ function go(){
+  let ws;try{ws=new WebSocket(url)}catch(e){return retry()}
+  ws.onopen=()=>{wait=1000;live.add(name);status();onopen(ws)};
+  ws.onmessage=e=>{try{onmsg(JSON.parse(e.data))}catch(_){}};
+  ws.onclose=()=>{live.delete(name);status();retry()};
+  ws.onerror=()=>ws.close();
+ }
+ go();
+}
+const send=(ws,o)=>ws.send(JSON.stringify(o));
+
+link("Kraken","wss://ws.kraken.com/v2",ws=>{
+ send(ws,{method:"subscribe",params:{channel:"ticker",symbol:["ZEC/USD","BTC/USD"]}});
+ ["USD","EUR","GBP","CAD","AUD","CHF","JPY"].forEach(c=>
+  send(ws,{method:"subscribe",params:{channel:"trade",symbol:["ZEC/"+c],snapshot:false}}));
+},m=>{
+ if(m.channel==="ticker"&&m.data)m.data.forEach(t=>{
+  if(t.symbol==="ZEC/USD"){zec=t.last;zecChg=t.change_pct}
+  else if(t.symbol==="BTC/USD"){btc=t.last;btcChg=t.change_pct}
+  render();
+ });
+ if(m.channel==="trade"&&m.type==="update")m.data.forEach(t=>{
+  if(t.side==="buy")onBuy(t.symbol.split("/")[1],t.qty,t.price);
+  if(t.symbol==="ZEC/USD"){zec=t.price;render()}
+ });
+});
+
+link("Coinbase","wss://ws-feed.exchange.coinbase.com",ws=>{
+ ["ZEC-USD","ZEC-EUR","ZEC-GBP"].forEach(p=>send(ws,{type:"subscribe",product_ids:[p],channels:["matches"]}));
+},m=>{
+ if(m.type!=="match")return;
+ // Coinbase reports the maker side, so a taker buy arrives as side "sell"
+ if(m.side==="sell")onBuy(m.product_id.split("-")[1],+m.size,+m.price);
+ if(m.product_id==="ZEC-USD"){zec=+m.price;render()}
+});
+
+link("Binance","wss://stream.binance.com:9443/stream?streams="+
+ ["eur","brl","try","gbp","jpy","aud"].map(c=>"zec"+c+"@trade").join("/"),()=>{},m=>{
+ const t=m.data;
+ if(t&&t.e==="trade"&&!t.m)onBuy(t.s.slice(3),+t.q,+t.p); // m=false: the buyer took the trade
+});
+status();
+})();
+</script>
+</body>
+</html>
