@@ -1,90 +1,221 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ZEC map: live buys and the shielded zone</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ZEC Map · Zectastic</title>
+<meta name="description" content="Live ZEC buys on a world map, flying into the price, with swaps into ZEC surfacing in a hidden shielded zone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
-:root{--sea:#0a1620;--sea2:#0d1e2a;--land:#16303a;--edge:#24505e;--gold:#f4b728;--veil:#8f7cff;--veil2:#bdb3ff;--ink:#f3ecdd;--dim:#8aa3ad;--up:#7fe0b8;--down:#ff8a7a}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--sea);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;overflow:hidden}
-#map{position:fixed;inset:0;width:100%;height:100%}
-.land{fill:var(--land);stroke:var(--edge);stroke-width:.5}
-.sphere{fill:var(--sea2);stroke:var(--edge);stroke-width:.8}
-.grat{fill:none;stroke:#1a3340;stroke-width:.4}
-.ring{fill:none;stroke:var(--gold);stroke-width:1.4;transform-box:fill-box;transform-origin:center;animation:ring 2.4s cubic-bezier(.2,.6,.3,1) forwards}
-.dot{fill:var(--gold);transform-box:fill-box;transform-origin:center;animation:dot 3s ease-out forwards}
-.veil.ring{stroke:var(--veil)}
-.veil.dot{fill:var(--veil2)}
-.tag{fill:var(--gold);font-size:11px;font-weight:700;text-anchor:middle;animation:tag 2.4s ease-out forwards}
-.blob{fill:var(--veil);animation:drift 9s ease-in-out infinite alternate}
-.blob:nth-child(2){animation-delay:-3s;animation-duration:11s}
-.blob:nth-child(3){animation-delay:-6s;animation-duration:13s}
-.zring{fill:none;stroke:var(--veil2);stroke-opacity:.35;stroke-width:1;stroke-dasharray:2 7;transform-box:fill-box;transform-origin:center;animation:spin 40s linear infinite}
-.zone{fill:var(--veil2);font-size:12px;font-weight:700;text-anchor:middle}
-.zone.sub{fill:var(--dim);font-size:10.5px;font-weight:400}
-@keyframes ring{from{transform:scale(.2);opacity:.95}to{transform:scale(var(--s));opacity:0}}
-@keyframes dot{0%{opacity:0;transform:scale(.4)}12%{opacity:1;transform:scale(1)}100%{opacity:0}}
-@keyframes tag{0%{opacity:0;transform:translateY(0)}15%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
-@keyframes drift{from{transform:translate(-8px,4px)}to{transform:translate(10px,-6px)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fade{from{opacity:.8}to{opacity:0}}
-@media (prefers-reduced-motion:reduce){
- .ring{animation:fade 2s forwards;transform:scale(calc(var(--s)*.5))}
- .dot,.tag{animation:fade 2.5s forwards}
- .blob,.zring{animation:none}
-}
-.center{position:fixed;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none;padding:0 12px}
-#price{font-size:clamp(3rem,10vw,6.8rem);font-weight:700;letter-spacing:-.025em;line-height:1.05;font-variant-numeric:tabular-nums;text-shadow:0 2px 36px var(--sea),0 0 12px var(--sea);transition:color 1.4s}
-#price[data-dir=up]{color:var(--up);transition:none}
-#price[data-dir=down]{color:var(--down);transition:none}
-.btc{margin-top:.5rem;font-size:clamp(.85rem,2.2vw,1.1rem);color:var(--dim);font-variant-numeric:tabular-nums;text-shadow:0 1px 14px var(--sea),0 0 8px var(--sea)}
-.btc b{color:var(--ink);font-weight:400}
-.up{color:var(--up)}.down{color:var(--down)}
-header{position:fixed;top:0;left:0;padding:max(14px,env(safe-area-inset-top)) 16px 0;pointer-events:none}
-h1{margin:0;font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
-.status{margin-top:2px;font-size:.8rem;color:var(--dim)}
-.status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#555;margin-right:6px;vertical-align:1px}
-.status.on i{background:var(--up)}
-.foot{position:fixed;left:0;bottom:0;padding:0 16px max(12px,env(safe-area-inset-bottom));max-width:52ch;font-size:.78rem;color:var(--dim);line-height:1.45;pointer-events:none}
-.foot p{margin:.5rem 0 0;font-size:.72rem;opacity:.8}
-.foot strong{color:var(--ink);font-weight:400;font-variant-numeric:tabular-nums}
-.foot .v{color:var(--veil2)}
-/* Portrait phones: price sits on top, the map gets the space below it */
-body.portrait .center{place-content:start center;padding-top:calc(max(14px,env(safe-area-inset-top)) + 58px)}
-body.portrait #price{font-size:clamp(3rem,19vw,5.4rem)}
-body.portrait .foot{right:0;max-width:none}
-body.portrait .foot p{font-size:.68rem}
+  :root{
+    --bg:#0a0b0d;
+    --bg-raised:#111318;
+    --line:#22262e;
+    --text:#e8e6e0;
+    --muted:#8b8f98;
+    --gold:#f4c542;
+    --teal:#00d9c0;
+    --exposed:#ff6b4a;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.5;
+    background-image:
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+  }
+  a{color:inherit;}
+  .mono{font-family:var(--mono);}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  ::selection{background:var(--gold); color:#0a0b0d;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+
+  /* HEADER (same as the homepage) */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,11,13,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 24px;}
+  .logo{font-family:var(--mono); font-weight:800; letter-spacing:0.04em; font-size:18px; display:flex; align-items:center; gap:8px; text-decoration:none;}
+  .logo .z{color:var(--gold);}
+  .navlinks{display:flex; gap:28px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
+  .navlinks a{color:var(--muted); text-decoration:none; transition:color .15s;}
+  .navlinks a:hover{color:var(--gold);}
+  .navlinks a[aria-current]{color:var(--gold); border-bottom:1px solid var(--gold);}
+  .navlinks{display:none;}
+  .navback{font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); text-decoration:none;}
+  .navback:hover{color:var(--gold);}
+  @media(min-width:760px){.navlinks{display:flex;} .navback{display:none;}}
+
+  /* MAP STAGE */
+  .stage{position:relative; height:calc(100vh - 61px); height:calc(100dvh - 61px); min-height:460px; overflow:hidden; border-bottom:1px solid var(--line);}
+  #map{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .sphere{fill:#0d0f13; stroke:#2b313b; stroke-width:.8;}
+  .grat{fill:none; stroke:#171a20; stroke-width:.4;}
+  .land{fill:#1a1f27; stroke:#2e3540; stroke-width:.5;}
+  .ring{fill:none; stroke:var(--gold); stroke-width:1.4; transform-box:fill-box; transform-origin:center; animation:ring 2.4s cubic-bezier(.2,.6,.3,1) forwards;}
+  .dot{fill:var(--gold); transform-box:fill-box; transform-origin:center; animation:dot 3s ease-out forwards;}
+  .veil.ring{stroke:var(--teal);}
+  .veil.dot{fill:var(--teal);}
+  .tag{fill:var(--gold); font-family:var(--mono); font-size:11px; font-weight:700; text-anchor:middle; animation:tag 2.4s ease-out forwards;}
+  .tag.veil{fill:var(--teal);}
+  .blob{fill:var(--teal); animation:drift 9s ease-in-out infinite alternate;}
+  .blob:nth-child(2){animation-delay:-3s; animation-duration:11s;}
+  .blob:nth-child(3){animation-delay:-6s; animation-duration:13s;}
+  .zring{fill:none; stroke:var(--teal); stroke-opacity:.4; stroke-width:1; stroke-dasharray:2 7; transform-box:fill-box; transform-origin:center; animation:spin 40s linear infinite;}
+  .zone{fill:var(--teal); font-family:var(--mono); font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; text-anchor:middle;}
+  .zone.sub{fill:var(--muted); font-size:10.5px; font-weight:400; letter-spacing:0; text-transform:none;}
+  @keyframes ring{from{transform:scale(.2); opacity:.95;}to{transform:scale(var(--s)); opacity:0;}}
+  @keyframes dot{0%{opacity:0; transform:scale(.4);}12%{opacity:1; transform:scale(1);}100%{opacity:0;}}
+  @keyframes tag{0%{opacity:0; transform:translateY(0);}15%{opacity:1;}100%{opacity:0; transform:translateY(-14px);}}
+  @keyframes drift{from{transform:translate(-8px,4px);}to{transform:translate(10px,-6px);}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes fade{from{opacity:.8;}to{opacity:0;}}
+  @media (prefers-reduced-motion: reduce){
+    .ring{animation:fade 2s forwards; transform:scale(calc(var(--s)*.5));}
+    .dot,.tag{animation:fade 2.5s forwards;}
+    .blob,.zring{animation:none;}
+  }
+
+  .live-tag{
+    position:absolute; top:14px; left:16px; z-index:2; max-width:calc(100% - 32px);
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; line-height:1.4;
+    color:var(--muted); border:1px solid var(--line); background:rgba(10,11,13,0.7);
+    padding:4px 10px; border-radius:2px; pointer-events:none;
+  }
+  .live-dot{width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0;}
+  .live-tag.on{color:var(--teal); border-color:rgba(0,217,192,0.4);}
+  .live-tag.on .live-dot{animation:pulse 1.6s infinite;}
+
+  .center{position:absolute; inset:0; display:grid; place-content:center; text-align:center; pointer-events:none; padding:0 12px;}
+  .zec-usd-label{font-family:var(--mono); font-weight:800; font-size:14px; letter-spacing:0.14em; color:var(--text); text-transform:uppercase; margin-bottom:4px; text-shadow:0 0 12px var(--bg);}
+  #price{font-family:var(--mono); font-weight:800; font-size:clamp(48px,10vw,88px); line-height:1.05; letter-spacing:-0.02em; color:var(--gold); font-variant-numeric:tabular-nums; text-shadow:0 2px 36px #0a0b0d,0 0 12px #0a0b0d; transition:color 1.2s;}
+  #price[data-dir=up]{color:var(--teal); transition:none;}
+  #price[data-dir=down]{color:var(--exposed); transition:none;}
+  .btc{margin-top:.6rem; font-family:var(--mono); font-size:clamp(12px,2.2vw,14px); color:var(--muted); font-variant-numeric:tabular-nums; text-shadow:0 1px 14px #0a0b0d,0 0 8px #0a0b0d;}
+  .btc b{color:var(--text); font-weight:600;}
+  .up{color:var(--teal);} .down{color:var(--exposed);}
+  .stage.portrait .center{place-content:start center; padding-top:64px;}
+  .stage.portrait #price{font-size:clamp(44px,17vw,76px);}
+
+  .counters{position:absolute; left:16px; bottom:12px; right:16px; z-index:2; font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.6; pointer-events:none;}
+  .counters b{color:var(--text); font-weight:700; font-variant-numeric:tabular-nums;}
+  .counters .t b{color:var(--teal);}
+  .counters .err{color:var(--exposed); font-size:11px; max-width:52ch;}
+
+  /* SECTION SHELL (same as the homepage) */
+  section{padding:64px 0; border-bottom:1px solid var(--line);}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:10px;}
+  h2{font-family:var(--mono); font-size:clamp(22px,3.4vw,32px); font-weight:800; letter-spacing:-0.01em; margin-bottom:14px;}
+  .lede{color:var(--muted); font-size:16px; max-width:640px; margin-bottom:36px;}
+  .card-grid{display:grid; gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media(min-width:700px){.card-grid{grid-template-columns:repeat(3,1fr);}}
+  .why-card{background:var(--bg); padding:26px;}
+  .why-card .icon{color:var(--teal); font-family:var(--mono); font-size:18px; margin-bottom:14px;}
+  .why-card .icon.g{color:var(--gold);}
+  .why-card h3{font-family:var(--mono); font-size:15px; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.03em;}
+  .why-card p{color:var(--muted); font-size:14.5px;}
+
+  /* FOOTER (same as the homepage) */
+  footer{padding:32px 0; text-align:center;}
+  .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em;}
+  .foot-links{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em; margin-top:10px;}
+  .foot-links a{color:var(--muted); text-decoration:none;}
+  .foot-links a:hover{color:var(--teal); text-decoration:underline;}
 </style>
 </head>
 <body>
-<svg id="map" role="img" aria-label="World map showing live Zcash buys flying into the ZEC price, with a hidden shielded zone in the Atlantic">
- <defs>
-  <filter id="blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
-  <symbol id="zl" viewBox="-10 -10 20 20">
-   <circle r="10" fill="#f4b728"/>
-   <g stroke="#1b1405" fill="none" stroke-width="1.7" stroke-linecap="square"><path d="M-4.2-4.3H4.2L-4.2 4.3H4.2"/><path d="M0-7.4V7.4"/></g>
-  </symbol>
- </defs>
-</svg>
+
 <header>
- <h1>ZEC buys, live</h1>
- <div class="status" id="status"><i></i><span>Connecting</span></div>
+  <div class="nav wrap">
+    <a class="logo" href="/"><span class="z">Z</span> ZECTASTIC</a>
+    <nav class="navlinks">
+      <a href="/#tracker">Tracker</a>
+      <a href="/#supply">Supply</a>
+      <a href="/#why">Why</a>
+      <a href="/#how">How</a>
+      <a href="/#ux">UX</a>
+      <a href="/#game">Game</a>
+      <a href="/#radio">Radio</a>
+      <a href="/zecmap.html" aria-current="page">Map ◈</a>
+      <a href="/flippening.html" style="color:var(--gold);">Party ◈</a>
+    </nav>
+    <a class="navback" href="/">← Tracker</a>
+  </div>
 </header>
-<div class="center">
- <div id="pb">
-  <div id="price" aria-live="off">$–</div>
-  <div class="btc" id="btc">ZEC/BTC –</div>
- </div>
-</div>
-<div class="foot">
- <div><strong id="bpm">0</strong> buys in the last minute</div>
- <div class="v"><strong id="shn">0</strong> shielded events (simulated)</div>
- <p>Buy locations are estimated from the currency of each trade. The shielded zone shows that activity happens, never who or where.</p>
-</div>
+
+<main>
+  <div class="stage" id="stage">
+    <svg id="map" role="img" aria-label="World map showing live Zcash buys flying into the ZEC price, with a hidden shielded zone in the Atlantic">
+      <defs>
+        <filter id="blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+        <symbol id="zl" viewBox="-10 -10 20 20">
+          <circle r="10" fill="#f4c542"/>
+          <g stroke="#0a0b0d" fill="none" stroke-width="1.7" stroke-linecap="square"><path d="M-4.2-4.3H4.2L-4.2 4.3H4.2"/><path d="M0-7.4V7.4"/></g>
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="live-tag" id="status"><span class="live-dot"></span><span id="statusText">Connecting</span></div>
+
+    <div class="center">
+      <div id="pb">
+        <div class="zec-usd-label">ZEC USD</div>
+        <div id="price" aria-live="off">$–</div>
+        <div class="btc" id="btc">ZEC/BTC –</div>
+      </div>
+    </div>
+
+    <div class="counters">
+      <div><b id="bpm">0</b> buys in the last minute</div>
+      <div class="t"><b id="shn">0</b> swaps into ZEC via NEAR Intents</div>
+      <div class="err" id="swerr" style="display:none"></div>
+    </div>
+  </div>
+
+  <section id="reading" style="border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="eyebrow">◈ How to read the map</div>
+      <h2>Gold pulses are buys. The teal zone is everything you can't place.</h2>
+      <p class="lede">Each buy flies into the price and lights it up. Swaps from other chains into ZEC surface in the shielded zone, because there is no honest place to put them on a map.</p>
+      <div class="card-grid">
+        <div class="why-card">
+          <div class="icon g">◈</div>
+          <h3>Exchange buys</h3>
+          <p>Every buy on Kraken, Coinbase and Binance appears as it happens. Locations are estimated from the currency of each trade: EUR lands in Europe, JPY in Japan, USD across a few US cities.</p>
+        </div>
+        <div class="why-card">
+          <div class="icon">◈</div>
+          <h3>Swaps into ZEC</h3>
+          <p>Swaps from other chains into ZEC through NEAR Intents show up in the zone. Only chain and size are used, never addresses. They appear a few minutes after they settle, and some go to shielded addresses, some to transparent ones.</p>
+        </div>
+        <div class="why-card">
+          <div class="icon">◈</div>
+          <h3>Why a hidden zone</h3>
+          <p>Shielded Zcash hides amounts and parties, so there is nothing to place on a map. The zone shows that activity happens, not who or where.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-note">BUYS &amp; PRICE: KRAKEN · COINBASE · BINANCE · SWAPS: NEAR INTENTS VIA ZECBLOCK · MAP: NATURAL EARTH · © 2026 ZECTASTIC</div>
+    <div class="foot-links"><a href="/">Tracker</a> · <a href="/privacy.html">Privacy</a></div>
+  </div>
+</footer>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script>
@@ -93,6 +224,8 @@ const $=s=>document.querySelector(s);
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const svg=d3.select("#map");
+const stageEl=$("#stage"),svgEl=$("#map");
+const rel=r=>{const s=svgEl.getBoundingClientRect();return{left:r.left-s.left,right:r.right-s.left,top:r.top-s.top,bottom:r.bottom-s.top,width:r.width,height:r.height}};
 const gMap=svg.append("g"), gFog=svg.append("g"), gPulse=svg.append("g");
 const priceEl=$("#price");
 
@@ -112,13 +245,14 @@ const FOG=[-20,-35]; // the shielded zone: open South Atlantic, clear of the pri
 
 let W,H,proj,fogXY,R,land=[];
 function draw(){
- W=innerWidth;H=innerHeight;
+ const sr=svgEl.getBoundingClientRect();
+ W=sr.width;H=sr.height;
  const portrait=H>W*1.05;
- document.body.classList.toggle("portrait",portrait);
+ stageEl.classList.toggle("portrait",portrait);
  let top=8,bot=H-8;
  if(portrait){
-  top=$("#pb").getBoundingClientRect().bottom+10;
-  bot=$(".foot").getBoundingClientRect().top-6;
+  top=rel($("#pb").getBoundingClientRect()).bottom+10;
+  bot=rel($(".counters").getBoundingClientRect()).top-6;
  }
  proj=d3.geoNaturalEarth1().fitExtent([[8,top],[W-8,Math.max(bot,top+120)]],{type:"Sphere"});
  const path=d3.geoPath(proj);
@@ -130,7 +264,7 @@ function draw(){
  gMap.selectAll(".land").data(land).join("path").attr("class","land").attr("d",path);
  fogXY=proj(FOG);
  if(!portrait){ // never let the zone sit behind the price
-  const b=$("#pb").getBoundingClientRect();
+  const b=rel($("#pb").getBoundingClientRect());
   if(Math.abs(fogXY[0]-(b.left+b.width/2))<b.width/2+R && fogXY[1]>b.top-R*1.3 && fogXY[1]<b.bottom+R*1.3) fogXY[1]=b.bottom+R*1.4;
  }
  fogXY[1]=Math.min(fogXY[1],H-R*1.6-34);
@@ -141,7 +275,7 @@ function draw(){
   b2.append("circle").attr("class","blob").attr("cx",dx*R).attr("cy",dy*R).attr("r",k*R).attr("opacity",o));
  g.append("circle").attr("class","zring").attr("r",R*1.3);
  g.append("text").attr("class","zone").attr("y",R*1.3+18).text("Shielded zone");
- g.append("text").attr("class","zone sub").attr("y",R*1.3+33).text("amounts and places hidden");
+ g.append("text").attr("class","zone sub").attr("y",R*1.3+33).text("swaps into ZEC, no locations");
 }
 draw();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
@@ -154,10 +288,10 @@ let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(draw,150)})
 /* Price highlight when a logo lands */
 function hit(usd){
  const k=Math.min(1,.4+Math.sqrt(usd||0)/80);
- const base="0 2px 36px #0a1620,0 0 12px #0a1620";
+ const base="0 2px 36px #0a0b0d,0 0 12px #0a0b0d";
  priceEl.animate([
   {textShadow:base,transform:"scale(1)"},
-  {textShadow:`0 0 ${20+30*k}px rgba(244,183,40,${.55+.4*k}),0 0 10px rgba(255,214,120,${.5+.4*k})`,color:"#ffe19a",transform:`scale(${reduce?1:1+.025*k})`,offset:.25},
+  {textShadow:`0 0 ${20+30*k}px rgba(244,197,66,${.55+.4*k}),0 0 10px rgba(255,214,120,${.5+.4*k})`,color:"#ffe19a",transform:`scale(${reduce?1:1+.025*k})`,offset:.25},
   {textShadow:base,transform:"scale(1)"}
  ],{duration:650,easing:"ease-out"});
 }
@@ -169,9 +303,9 @@ function fly(S,usd){
  const r=8+Math.min(8,Math.sqrt(usd)/14);
  const g=gPulse.append("g").attr("transform",`translate(${S})`);
  const inner=g.append("g");
- inner.append("circle").attr("r",r*1.7).attr("fill","#f4b728").attr("opacity",.22);
+ inner.append("circle").attr("r",r*1.7).attr("fill","#f4c542").attr("opacity",.22);
  inner.append("use").attr("href","#zl").attr("x",-r).attr("y",-r).attr("width",2*r).attr("height",2*r);
- const b=priceEl.getBoundingClientRect();
+ const b=rel(priceEl.getBoundingClientRect());
  const T=[clamp(S[0],b.left+b.width*.1,b.right-b.width*.1),clamp(S[1],b.top+b.height*.2,b.bottom-b.height*.2)];
  const dx=T[0]-S[0],dy=T[1]-S[1],dist=Math.hypot(dx,dy)||1;
  const C=[S[0]+dx/2-dy*.18,S[1]+dy/2+dx*.18-dist*.12];
@@ -202,7 +336,7 @@ function spawn(xy,size,dotR,cls,label){
  const g=gPulse.append("g").attr("transform",`translate(${xy})`);
  g.append("circle").attr("class","ring "+cls).attr("r",10).style("--s",size/10);
  if(dotR>0)g.append("circle").attr("class","dot "+cls).attr("r",dotR);
- if(label)g.append("text").attr("class","tag").attr("y",-size*.35-4).text(label);
+ if(label)g.append("text").attr("class","tag "+cls).attr("y",-size*.35-4).text(label);
  setTimeout(()=>g.remove(),3300);
 }
 const buysT=[];
@@ -216,17 +350,11 @@ function onBuy(cur,qty,price){
  buysT.push(Date.now());
 }
 let shielded=0;
-/* Hook for real shielded data: call window.zecmap.shielded(n) once per shielded event batch. */
-function veil(n){
- for(let i=0;i<(n||1);i++){
-  const a=Math.random()*6.283,d=Math.random()*R*.55;
-  spawn([fogXY[0]+Math.cos(a)*d,fogXY[1]+Math.sin(a)*d],20+Math.random()*26,2.5,"veil","");
-  shielded++;
- }
- $("#shn").textContent=shielded;
+function veil(usd,label){
+ const a=Math.random()*6.283,d=Math.random()*R*.55;
+ spawn([fogXY[0]+Math.cos(a)*d,fogXY[1]+Math.sin(a)*d],18+Math.min(46,Math.sqrt(usd||0)*.7),2.5,"veil",label||"");
+ shielded++;$("#shn").textContent=shielded;
 }
-window.zecmap={shielded:veil};
-(function loop(){veil(Math.random()<.2?2:1);setTimeout(loop,700+Math.random()*2400)})();
 setInterval(()=>{const c=Date.now()-6e4;while(buysT.length&&buysT[0]<c)buysT.shift();$("#bpm").textContent=buysT.length},1000);
 
 /* Prices */
@@ -251,8 +379,8 @@ function render(){
 /* Exchange feeds (public WebSockets, reconnect with backoff) */
 const live=new Set();
 function status(){
- const el=$("#status");el.classList.toggle("on",live.size>0);
- el.lastChild.textContent=live.size?"Live from "+[...live].join(", "):"Connecting, retrying if needed";
+ $("#status").classList.toggle("on",live.size>0);
+ $("#statusText").textContent=live.size?"Live: "+[...live].join(", "):"Connecting";
 }
 function link(name,url,onopen,onmsg){
  let wait=1000;
@@ -298,6 +426,35 @@ link("Binance","wss://stream.binance.com:9443/stream?streams="+
  const t=m.data;
  if(t&&t.e==="trade"&&!t.m)onBuy(t.s.slice(3),+t.q,+t.p); // m=false: the buyer took the trade
 });
+
+/* Swaps into ZEC via NEAR Intents, from the public ZecBlock API.
+   Only chain, token and size are used. Addresses in the response are ignored on purpose. */
+/* If the browser blocks the API (CORS), deploy swaps-proxy.js as a Cloudflare Worker and put its URL here. */
+const PROXY="";
+const SWAPS=(PROXY||"https://api.zecblock.com/v1/crosschain/swaps")+"?direction=inflow&status=SUCCESS&period=24h&limit=50";
+function swapErr(m){const el=$("#swerr");el.textContent=m;el.style.display=m?"block":"none"}
+const seen=new Set(),queue=[];let primed=false;
+async function pollSwaps(){
+ try{
+  const r=await fetch(SWAPS);
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const j=await r.json();
+  const fresh=((j.data&&j.data.swaps)||[]).filter(x=>x.id&&!seen.has(x.id));
+  fresh.forEach(x=>seen.add(x.id));
+  // first load: replay the latest 12 so the zone is alive right away
+  (primed?fresh:fresh.slice(0,12)).reverse().forEach(x=>queue.push(x)); // oldest first
+  primed=true;
+  live.add("NEAR Intents");swapErr("");
+ }catch(e){live.delete("NEAR Intents");
+  swapErr(e instanceof TypeError?"Swap feed blocked by the browser (CORS). Use the proxy, see swaps-proxy.js.":"Swap feed error: "+e.message)}
+ status();
+}
+(function drain(){
+ const x=queue.shift();
+ if(x&&proj){const usd=+x.amountUsd||0;veil(usd,usd>=1500?`${x.sourceToken} → ZEC`:"")}
+ setTimeout(drain,clamp(20000/(queue.length+1),400,5000));
+})();
+pollSwaps();setInterval(pollSwaps,30000);
 status();
 })();
 </script>
