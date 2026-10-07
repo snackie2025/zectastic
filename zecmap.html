@@ -169,6 +169,10 @@
           <circle r="10" fill="#f4c542"/>
           <g stroke="#0a0b0d" fill="none" stroke-width="1.7" stroke-linecap="square"><path d="M-4.2-4.3H4.2L-4.2 4.3H4.2"/><path d="M0-7.4V7.4"/></g>
         </symbol>
+        <symbol id="zlt" viewBox="-10 -10 20 20">
+          <circle r="10" fill="#00d9c0"/>
+          <g stroke="#0a0b0d" fill="none" stroke-width="1.7" stroke-linecap="square"><path d="M-4.2-4.3H4.2L-4.2 4.3H4.2"/><path d="M0-7.4V7.4"/></g>
+        </symbol>
       </defs>
     </svg>
 
@@ -184,8 +188,8 @@
 
     <div class="counters">
       <div><b id="bpm">0</b> buys in the last minute</div>
-      <div class="t"><b id="shn">0</b> swaps into ZEC via NEAR Intents</div>
-      <div class="t" id="lastrow" style="display:none">latest: <b id="last"></b></div>
+      <div class="t"><b id="shn">0</b> <span id="shl">swaps into ZEC via NEAR Intents</span></div>
+      <div class="t" id="lastrow" style="display:none"><span id="lastl">latest:</span> <b id="last"></b></div>
     </div>
   </div>
 
@@ -198,12 +202,12 @@
         <div class="why-card">
           <div class="icon g">◈</div>
           <h3>Exchange buys</h3>
-          <p>Every buy on Kraken, Coinbase and Binance appears as it happens. Locations are estimated from the currency of each trade: EUR lands in Europe, JPY in Japan, USD across a few US cities.</p>
+          <p>Every buy on Kraken, Coinbase, Gemini, Binance, Bitfinex, OKX, Bybit, Gate and Bitget appears as it happens. Trades paid in a local currency land in that region: EUR in Europe, JPY in Japan, USD across US cities. Trades paid in USDT, USDC or BTC have no real location, so they are scattered across crypto hubs around the world.</p>
         </div>
         <div class="why-card">
           <div class="icon">◈</div>
           <h3>Swaps into ZEC</h3>
-          <p>Swaps from other chains into ZEC through NEAR Intents show up in the zone. Only chain and size are used, never addresses. They appear a few minutes after they settle, and some go to shielded addresses, some to transparent ones.</p>
+          <p>Swaps from other chains into ZEC through NEAR Intents rise out of the zone as teal logos and fly into the price. Only chain and size are used, never addresses. If the live swap feed cannot be reached from your browser, the zone replays recent real swaps and says so in the counter.</p>
         </div>
         <div class="why-card">
           <div class="icon">◈</div>
@@ -217,7 +221,7 @@
 
 <footer>
   <div class="wrap">
-    <div class="foot-note">BUYS &amp; PRICE: KRAKEN · COINBASE · BINANCE · SWAPS: NEAR INTENTS VIA ZECBLOCK · MAP: NATURAL EARTH · © 2026 ZECTASTIC</div>
+    <div class="foot-note">BUYS &amp; PRICE: KRAKEN · COINBASE · GEMINI · BINANCE · BITFINEX · OKX · BYBIT · GATE · BITGET · SWAPS: NEAR INTENTS VIA ZECBLOCK · MAP: NATURAL EARTH · © 2026 ZECTASTIC</div>
     <div class="foot-links"><a href="/">Tracker</a> · <a href="/privacy.html">Privacy</a></div>
   </div>
 </footer>
@@ -247,6 +251,8 @@ const PLACES={
  BRL:[[-46.6,-23.5],[-43.2,-22.9]],
  TRY:[[29,41],[32.9,39.9]]
 };
+/* Pairs quoted in USDT, USDC or BTC have no country. Scatter them over crypto hubs worldwide. */
+const HUBS=[[-74,40.7],[-80.2,25.8],[-79.4,43.7],[-0.1,51.5],[13.4,52.5],[4.9,52.4],[8.5,47.4],[55.3,25.2],[29,41],[3.4,6.5],[28,-26.2],[36.8,-1.3],[72.9,19.1],[103.8,1.35],[114.2,22.3],[127,37.6],[139.7,35.7],[151.2,-33.9],[-46.6,-23.5],[-58.4,-34.6],[-99.1,19.4],[-74.1,4.7],[30.5,50.4],[21,52.2],[-9.1,38.7],[100.5,13.8],[106.8,-6.2],[121,14.6],[106.7,10.8],[31.2,30],[34.8,32.1],[-118.2,34],[-122.4,37.8],[2.35,48.9],[-3.7,40.4]];
 const FOG=[-20,-35]; // the shielded zone: open South Atlantic, clear of the price
 
 let W,H,proj,fogXY,R,land=[];
@@ -292,31 +298,37 @@ d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(w
 }).catch(()=>{});
 let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(draw,150)});
 
-/* Price highlight when a logo lands */
-function hit(usd){
+/* Price highlight when a logo lands (gold for buys, teal for swaps) */
+let lastHit=0;
+function hit(usd,sw){
+ const n=performance.now();
+ if(n-lastHit<110&&!(usd>=2500))return;
+ lastHit=n;
  const k=Math.min(1,.4+Math.sqrt(usd||0)/80);
+ const c=sw?"0,217,192":"244,197,66",c2=sw?"140,255,236":"255,214,120",col=sw?"#9ffff1":"#ffe19a";
  const base="0 2px 36px #0a0b0d,0 0 12px #0a0b0d";
  priceEl.animate([
   {textShadow:base,transform:"scale(1)"},
-  {textShadow:`0 0 ${20+30*k}px rgba(244,197,66,${.55+.4*k}),0 0 10px rgba(255,214,120,${.5+.4*k})`,color:"#ffe19a",transform:`scale(${reduce?1:1+.025*k})`,offset:.25},
+  {textShadow:`0 0 ${20+30*k}px rgba(${c},${.55+.4*k}),0 0 10px rgba(${c2},${.5+.4*k})`,color:col,transform:`scale(${reduce?1:1+.025*k})`,offset:.25},
   {textShadow:base,transform:"scale(1)"}
  ],{duration:650,easing:"ease-out"});
 }
 
-/* Zcash logos flying from the buy into the price */
+/* Zcash logos flying into the price. kind "s" = teal swap logo. */
 const flyers=[];let raf=0;
-function fly(S,usd){
- if(flyers.length>60)return;
+function fly(S,usd,kind){
+ const sw=kind==="s";
+ if(flyers.length>(sw?100:85))return;
  const r=8+Math.min(8,Math.sqrt(usd)/14);
  const g=gPulse.append("g").attr("transform",`translate(${S})`);
  const inner=g.append("g");
- inner.append("circle").attr("r",r*1.7).attr("fill","#f4c542").attr("opacity",.22);
- inner.append("use").attr("href","#zl").attr("x",-r).attr("y",-r).attr("width",2*r).attr("height",2*r);
+ inner.append("circle").attr("r",r*1.7).attr("fill",sw?"#00d9c0":"#f4c542").attr("opacity",.22);
+ inner.append("use").attr("href",sw?"#zlt":"#zl").attr("x",-r).attr("y",-r).attr("width",2*r).attr("height",2*r);
  const b=rel(priceEl.getBoundingClientRect());
  const T=[clamp(S[0],b.left+b.width*.1,b.right-b.width*.1),clamp(S[1],b.top+b.height*.2,b.bottom-b.height*.2)];
  const dx=T[0]-S[0],dy=T[1]-S[1],dist=Math.hypot(dx,dy)||1;
  const C=[S[0]+dx/2-dy*.18,S[1]+dy/2+dx*.18-dist*.12];
- flyers.push({g:g.node(),inner:inner.node(),S,T,C,t0:performance.now(),pop:reduce?0:320,D:reduce?200:900+dist*1.1,usd});
+ flyers.push({g:g.node(),inner:inner.node(),S,T,C,t0:performance.now(),pop:reduce?0:(sw?420:320),D:reduce?200:900+dist*1.1,usd,sw});
  if(!raf)raf=requestAnimationFrame(tick);
 }
 function tick(now){
@@ -329,7 +341,7 @@ function tick(now){
    x=u*u*f.S[0]+2*u*q*f.C[0]+q*q*f.T[0];
    y=u*u*f.S[1]+2*u*q*f.C[1]+q*q*f.T[1];
    s=1-.45*q;
-   if(p>=1){f.g.remove();flyers.splice(i,1);hit(f.usd);continue}
+   if(p>=1){f.g.remove();flyers.splice(i,1);hit(f.usd,f.sw);continue}
   }
   f.g.setAttribute("transform",`translate(${x},${y})`);
   f.inner.setAttribute("transform",`scale(${s})`);
@@ -347,21 +359,47 @@ function spawn(xy,size,dotR,cls,label){
  setTimeout(()=>g.remove(),3300);
 }
 const buysT=[];
+const USDLIKE={USD:1,USDT:1,USDC:1};
+/* Logo budget: about 8 logos a second, whales always get through. Every trade is still counted. */
+let tok=14,tokT=performance.now();
+function allow(usd){
+ const n=performance.now();tok=Math.min(14,tok+(n-tokT)/125);tokT=n;
+ if(usd>=2500)return true;
+ if(tok>=1){tok--;return true}
+ return false;
+}
 function onBuy(cur,qty,price){
- const pts=PLACES[cur];if(!pts||!proj||!(qty>0))return;
- const usd=qty*(cur==="USD"||!zec?price:zec);
+ if(!(qty>0))return;
+ if(USDLIKE[cur]&&cur!=="USD"&&!zec&&price>0){zec=price;render()}
+ const usd=qty*(USDLIKE[cur]?price:(zec||(PLACES[cur]?price:0)));
+ buysT.push(Date.now());
+ if(!proj||document.hidden||!allow(usd))return;
+ const pts=PLACES[cur]||HUBS;
  const p=pts[Math.random()*pts.length|0];
  const xy=proj([p[0]+(Math.random()-.5)*1.6,p[1]+(Math.random()-.5)*1.2]);
  spawn(xy,14+Math.min(60,Math.sqrt(usd)*.9),0,"",usd>=1500?`+${qty.toFixed(1)} ZEC`:"");
  fly(xy,usd);
- buysT.push(Date.now());
 }
-let shielded=0;
-function veil(usd,label){
+let shielded=0,mode="live";
+function setMode(m){
+ if(m===mode)return;
+ mode=m;shielded=0;$("#shn").textContent=0;
+ $("#shl").textContent=m==="live"?"swaps into ZEC via NEAR Intents":"recent swaps into ZEC, replayed";
+ $("#lastl").textContent=m==="live"?"latest:":"replaying:";
+}
+/* A swap rises out of the zone as a teal logo and flies into the price. */
+function swapFx(x,real){
+ if(!proj||!fogXY)return;
+ setMode(real?"live":"replay");
+ const usd=+x.amountUsd||0;
  const a=Math.random()*6.283,d=Math.random()*R*.55;
- spawn([fogXY[0]+Math.cos(a)*d,fogXY[1]+Math.sin(a)*d],18+Math.min(46,Math.sqrt(usd||0)*.7),2.5,"veil",label||"");
- if(usd>=1500)spawn(fogXY,R*2.4,0,"veil burst",""); // big swaps send a shockwave through the zone
+ const xy=[fogXY[0]+Math.cos(a)*d,fogXY[1]+Math.sin(a)*d];
+ spawn(xy,18+Math.min(46,Math.sqrt(usd)*.7),2.5,"veil",usd>=500?`${x.sourceToken} → ZEC`:"");
+ if(usd>=1500)spawn(fogXY,R*2.4,0,"veil burst","");
+ if(!document.hidden)fly(xy,Math.max(usd,60),"s");
  shielded++;$("#shn").textContent=shielded;
+ $("#last").textContent=`${(+x.zecAmount||0).toFixed(2)} ZEC from ${x.sourceToken} on ${String(x.sourceChain||"").toUpperCase()}`;
+ $("#lastrow").style.display="block";
 }
 /* Ambient glow: faint sparks so the zone never looks dead. Decorative only, never counted. */
 (function ambient(){
@@ -393,20 +431,30 @@ function render(){
  }
 }
 
-/* Exchange feeds (public WebSockets, reconnect with backoff) */
+/* Optional diagnostics: add ?debug to the URL */
+const DBG=/[?&]debug/.test(location.search);let dbgEl;
+function dbg(m){
+ if(!DBG)return;
+ if(!dbgEl){dbgEl=document.createElement("pre");dbgEl.style.cssText="position:fixed;right:8px;bottom:8px;z-index:9;max-width:90vw;max-height:40vh;overflow:auto;margin:0;padding:8px;background:rgba(10,11,13,.92);border:1px solid #22262e;color:#8b8f98;font:11px/1.4 monospace;white-space:pre-wrap";document.body.appendChild(dbgEl)}
+ dbgEl.textContent=(new Date().toLocaleTimeString()+" "+m+"\n"+dbgEl.textContent).slice(0,3000);
+}
+
+/* Exchange feeds (public WebSockets, reconnect with backoff, optional keepalive) */
 const live=new Set();
 function status(){
- $("#status").classList.toggle("on",live.size>0);
- $("#statusText").textContent=live.size?"Live: "+[...live].join(", "):"Connecting";
+ const ex=[...live].filter(n=>n!=="NEAR Intents").length,sw=live.has("NEAR Intents");
+ $("#status").classList.toggle("on",ex>0||sw);
+ $("#statusText").textContent=ex||sw?"Live: "+(ex?ex+(ex===1?" exchange":" exchanges"):"")+(ex&&sw?" + ":"")+(sw?"NEAR Intents":""):"Connecting";
 }
-function link(name,url,onopen,onmsg){
+function link(name,url,onopen,onmsg,ka){
  let wait=1000;
  const retry=()=>{setTimeout(go,wait);wait=Math.min(wait*2,30000)};
  function go(){
-  let ws;try{ws=new WebSocket(url)}catch(e){return retry()}
-  ws.onopen=()=>{wait=1000;live.add(name);status();onopen(ws)};
-  ws.onmessage=e=>{try{onmsg(JSON.parse(e.data))}catch(_){}};
-  ws.onclose=()=>{live.delete(name);status();retry()};
+  let ws,tm;
+  try{ws=new WebSocket(url)}catch(e){return retry()}
+  ws.onopen=()=>{wait=1000;live.add(name);status();dbg(name+" open");onopen(ws);if(ka)tm=setInterval(()=>{try{ws.send(typeof ka.msg==="function"?ka.msg():ka.msg)}catch(_){}},ka.every)};
+  ws.onmessage=e=>{let d;try{d=JSON.parse(e.data)}catch(_){return}try{onmsg(d,ws)}catch(_){}};
+  ws.onclose=()=>{clearInterval(tm);live.delete(name);status();dbg(name+" closed");retry()};
   ws.onerror=()=>ws.close();
  }
  go();
@@ -438,11 +486,55 @@ link("Coinbase","wss://ws-feed.exchange.coinbase.com",ws=>{
  if(m.product_id==="ZEC-USD"){zec=+m.price;render()}
 });
 
+link("Gemini","wss://api.gemini.com/v1/marketdata/zecusd?trades=true&heartbeat=false&bids=false&offers=false",()=>{},m=>{
+ if(m.type!=="update"||!m.events)return;
+ m.events.forEach(e=>{if(e.type==="trade"&&e.makerSide==="ask")onBuy("USD",+e.amount,+e.price)}); // maker on the ask = taker bought
+});
+
 link("Binance","wss://stream.binance.com:9443/stream?streams="+
- ["eur","brl","try","gbp","jpy","aud"].map(c=>"zec"+c+"@trade").join("/"),()=>{},m=>{
+ ["eur","brl","try","gbp","jpy","aud","usdt","usdc","btc"].map(c=>"zec"+c+"@trade").join("/"),()=>{},m=>{
  const t=m.data;
  if(t&&t.e==="trade"&&!t.m)onBuy(t.s.slice(3),+t.q,+t.p); // m=false: the buyer took the trade
 });
+
+let bf={};
+link("Bitfinex","wss://api-pub.bitfinex.com/ws/2",ws=>{
+ bf={};
+ ["tZECUSD","tZECBTC"].forEach(sy=>send(ws,{event:"subscribe",channel:"trades",symbol:sy}));
+},m=>{
+ if(m.event==="subscribed"){bf[m.chanId]=m.symbol;return}
+ if(Array.isArray(m)&&m[1]==="te"&&bf[m[0]]&&Array.isArray(m[2])){
+  const t=m[2]; // [id, time, amount, price], amount > 0 is a buy
+  if(t[2]>0)onBuy(bf[m[0]]==="tZECBTC"?"BTC":"USDT",+t[2],+t[3]);
+ }
+});
+
+link("OKX","wss://ws.okx.com:8443/ws/v5/public",ws=>{
+ send(ws,{op:"subscribe",args:[{channel:"trades",instId:"ZEC-USDT"}]});
+},m=>{
+ if(m.arg&&m.arg.channel==="trades"&&Array.isArray(m.data))m.data.forEach(t=>{if(t.side==="buy")onBuy("USDT",+t.sz,+t.px)});
+},{msg:"ping",every:25000});
+
+link("Bybit","wss://stream.bybit.com/v5/public/spot",ws=>{
+ send(ws,{op:"subscribe",args:["publicTrade.ZECUSDT"]});
+},m=>{
+ if(m.topic&&m.topic.indexOf("publicTrade")===0&&Array.isArray(m.data))m.data.forEach(t=>{if(t.S==="Buy")onBuy("USDT",+t.v,+t.p)});
+},{msg:'{"op":"ping"}',every:20000});
+
+link("Gate","wss://api.gateio.ws/ws/v4/",ws=>{
+ send(ws,{time:Math.floor(Date.now()/1000),channel:"spot.trades",event:"subscribe",payload:["ZEC_USDT"]});
+},m=>{
+ if(m.channel==="spot.trades"&&m.event==="update"&&m.result){
+  const r=Array.isArray(m.result)?m.result:[m.result];
+  r.forEach(t=>{if(t.side==="buy")onBuy("USDT",+t.amount,+t.price)});
+ }
+},{msg:()=>JSON.stringify({time:Math.floor(Date.now()/1000),channel:"spot.ping"}),every:20000});
+
+link("Bitget","wss://ws.bitget.com/v2/ws/public",ws=>{
+ send(ws,{op:"subscribe",args:[{instType:"SPOT",channel:"trade",instId:"ZECUSDT"}]});
+},m=>{
+ if(m.action==="update"&&m.arg&&m.arg.channel==="trade"&&Array.isArray(m.data))m.data.forEach(t=>{if(t.side==="buy")onBuy("USDT",+t.size,+t.price)});
+},{msg:"ping",every:25000});
 
 /* Swaps into ZEC via NEAR Intents, from the public ZecBlock API.
    Only chain, token and size are used. Addresses in the response are ignored on purpose. */
@@ -465,15 +557,19 @@ async function fetchSwaps(){
    const j=await r.json();
    const list=(j.data&&j.data.swaps)||j.swaps;
    if(!Array.isArray(list))throw new Error("unexpected response");
+   dbg("swaps OK "+SOURCES[k].split("?")[0]+" ("+list.length+")");
    srcOk=k;return list;
-  }catch(e){err=e}
+  }catch(e){err=e;dbg("swaps FAIL "+SOURCES[k].split("?")[0]+": "+e)}
  }
  throw err;
 }
-function setFeed(ok,e){
- if(!ok)console.warn("ZEC map: swap feed unavailable (usually CORS, see DATA_URL / PROXY):",e);
-}
-const seen=new Set(),queue=[];let primed=false;
+/* Recent real swaps into ZEC (NEAR Intents, via ZecBlock, 7 Oct 2026): chain, token, USD, ZEC.
+   Replayed only while the live feed cannot be reached, and labelled as a replay. */
+const SNAP=[["tron","USDT",999.63,.738],["tron","USDT",899.69,.668],["near","WNEAR",11.05,.0082],["sol","ZEC",67.44,.05],["sui","SUI",41.81,.0304],["sol","SOL",117.05,.0857],["eth","USDT",3861.99,2.877],["sol","SOL",816.06,.6096],["sol","SOL",1749,1.306],["sol","USDC",498.21,.3732],["sol","SOL",11.64,.0084],["btc","BTC(OMNI)",1089.35,.8188],["btc","BTC(OMNI)",96.16,.0714],["sol","USDC",326.93,.2462],["sol","SOL",2318.4,1.746],["tron","TRX",32296.29,24.071],["eth","USDC",3.85,.00255],["sol","SOL",144.73,.1079],["btc","BTC(OMNI)",1660.78,1.2358],["btc","BTC(OMNI)",373.57,.2802],["tron","USDT",1199.71,.896],["tron","USDT",97060.23,72.771],["eth","ETH",231.05,.1723],["eth","USDT",7648.09,5.721],["tron","USDT",999.75,.7474],["btc","BTC(OMNI)",99971.11,74.14],["eth","USDT",18042.52,13.538],["sol","SOL",827.61,.626],["sol","ZEC",3.01,.00198],["eth","USDT",18029.98,13.634],["btc","BTC(OMNI)",2720.9,2.0244],["btc","BTC(OMNI)",13.92,.01017],["eth","USDT",2999.37,2.258],["btc","BTC(OMNI)",287.13,.2161],["tron","USDT",214.96,.1614],["sol","USDC",4999.31,3.764],["eth","USDT",18002.54,13.557],["eth","USDT",18000.62,13.538],["eth","USDC",25,.01848],["arb","ETH",4.999,.00345]].map(a=>({sourceChain:a[0],sourceToken:a[1],amountUsd:a[2],zecAmount:a[3]}));
+for(let i=SNAP.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[SNAP[i],SNAP[j]]=[SNAP[j],SNAP[i]]}
+
+const seen=new Set(),queue=[];let primed=false,liveOk=false,snapPos=0;
+const t0=Date.now();
 async function pollSwaps(){
  try{
   const list=await fetchSwaps();
@@ -481,21 +577,25 @@ async function pollSwaps(){
   fresh.forEach(x=>seen.add(x.id));
   // first load: replay the latest 12 so the zone is alive right away
   (primed?fresh:fresh.slice(0,12)).reverse().forEach(x=>queue.push(x)); // oldest first
-  primed=true;
-  live.add("NEAR Intents");setFeed(true);
- }catch(e){live.delete("NEAR Intents");
-  setFeed(false,e)}
+  primed=true;liveOk=true;
+  live.add("NEAR Intents");
+ }catch(e){
+  liveOk=false;live.delete("NEAR Intents");
+  console.warn("ZEC map: swap feed unavailable (usually CORS, see DATA_URL / PROXY). Add ?debug to the URL for details.",e);
+ }
  status();
 }
 (function drain(){
- const x=queue.shift();
- if(x&&proj){
-  const usd=+x.amountUsd||0;
-  veil(usd,usd>=500?`${x.sourceToken} → ZEC`:"");
-  $("#last").textContent=`${(+x.zecAmount||0).toFixed(2)} ZEC from ${x.sourceToken} on ${String(x.sourceChain||"").toUpperCase()}`;
-  $("#lastrow").style.display="block";
+ let delay=700;
+ if(queue.length&&liveOk){
+  swapFx(queue.shift(),true);
+  delay=clamp(16000/(queue.length+1),900,3500);
+ }else if(!liveOk&&Date.now()-t0>4000){
+  queue.length=0;
+  swapFx(SNAP[snapPos++%SNAP.length],false);
+  delay=2200+Math.random()*2300;
  }
- setTimeout(drain,clamp(20000/(queue.length+1),400,5000));
+ setTimeout(drain,delay);
 })();
 pollSwaps();setInterval(pollSwaps,30000);
 status();
