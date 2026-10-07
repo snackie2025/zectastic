@@ -413,7 +413,24 @@ function swapFx(x,real){
 setInterval(()=>{const c=Date.now()-6e4;while(buysT.length&&buysT[0]<c)buysT.shift();$("#bpm").textContent=buysT.length},1000);
 
 /* Prices */
-let zec=null,btc=null,zecChg=null,btcChg=null,last=null;
+let zec=null,btc=null,zecChg=null,btcChg=null,last=null,yrBase=null;
+/* ZEC/BTC one year ago. Tries Binance, then CoinGecko, then Kraken; the first that answers wins. */
+async function loadYear(){
+ const t=Date.now()-365*864e5;
+ const srcs=[
+  async()=>{const j=await(await fetch("https://api.binance.com/api/v3/klines?symbol=ZECBTC&interval=1d&limit=1&startTime="+Math.floor(t))).json();return +j[0][1]},
+  async()=>{const j=(await(await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=btc&ids=zcash&price_change_percentage=1y")).json())[0];return j.current_price/(1+j.price_change_percentage_1y_in_currency/100)},
+  async()=>{
+   const get=async pr=>{const j=await(await fetch("https://api.kraken.com/0/public/OHLC?interval=1440&pair="+pr+"&since="+Math.floor(t/1000))).json();return +j.result[Object.keys(j.result).find(k=>k!=="last")][0][1]};
+   const [a,b]=await Promise.all([get("ZECUSD"),get("XBTUSD")]);return a/b;
+  }
+ ];
+ for(const f of srcs){
+  try{const v=await f();if(v>0&&isFinite(v)){yrBase=v;render();dbg("1y base OK "+v);setTimeout(loadYear,36e5);return}}catch(e){dbg("1y source failed: "+e)}
+ }
+ setTimeout(loadYear,6e4);
+}
+loadYear();
 const fmt=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"});
 function render(){
  if(zec){
@@ -423,9 +440,9 @@ function render(){
  }
  if(zec&&btc){
   let h=`ZEC/BTC <b>₿${(zec/btc).toFixed(6)}</b>`;
-  if(zecChg!=null&&btcChg!=null){
-   const ch=((1+zecChg/100)/(1+btcChg/100)-1)*100;
-   h+=` &nbsp;<span class="${ch<0?"down":"up"}">${ch<0?"▼":"▲"} ${Math.abs(ch).toFixed(2)}% against BTC in 24h</span>`;
+  if(yrBase){
+   const ch=(zec/btc/yrBase-1)*100;
+   h+=` &nbsp;<span class="${ch<0?"down":"up"}">${ch<0?"▼":"▲"} ${Math.abs(ch).toFixed(1)}% against BTC in 1y</span>`;
   }
   $("#btc").innerHTML=h;
  }
