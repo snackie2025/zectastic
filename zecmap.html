@@ -431,22 +431,41 @@ link("Binance","wss://stream.binance.com:9443/stream?streams="+
    Only chain, token and size are used. Addresses in the response are ignored on purpose. */
 /* If the browser blocks the API (CORS), deploy swaps-proxy.js as a Cloudflare Worker and put its URL here. */
 const PROXY="";
-const SWAPS=(PROXY||"https://api.zecblock.com/v1/crosschain/swaps")+"?direction=inflow&status=SUCCESS&period=24h&limit=50";
+/* Alternative without a proxy: a GitHub Action publishes swaps.json to a "data" branch.
+   Set the raw URL here, for example https://raw.githubusercontent.com/USER/REPO/data/swaps.json */
+const DATA_URL="";
+const QS="?direction=inflow&status=SUCCESS&period=24h&limit=50";
+/* Tried in order until one answers. Both public APIs index the same swaps; the second is the older CipherScan host. */
+const SOURCES=[DATA_URL,PROXY&&PROXY+QS,"https://api.zecblock.com/v1/crosschain/swaps"+QS,"https://api.mainnet.cipherscan.app/api/crosschain/swaps"+QS].filter(Boolean);
+let srcOk=0;
+async function fetchSwaps(){
+ let err;
+ for(let i=0;i<SOURCES.length;i++){
+  const k=(srcOk+i)%SOURCES.length;
+  try{
+   const r=await fetch(SOURCES[k]);
+   if(!r.ok)throw new Error("HTTP "+r.status);
+   const j=await r.json();
+   const list=(j.data&&j.data.swaps)||j.swaps;
+   if(!Array.isArray(list))throw new Error("unexpected response");
+   srcOk=k;return list;
+  }catch(e){err=e}
+ }
+ throw err;
+}
 function swapErr(m){const el=$("#swerr");el.textContent=m;el.style.display=m?"block":"none"}
 const seen=new Set(),queue=[];let primed=false;
 async function pollSwaps(){
  try{
-  const r=await fetch(SWAPS);
-  if(!r.ok)throw new Error("HTTP "+r.status);
-  const j=await r.json();
-  const fresh=((j.data&&j.data.swaps)||[]).filter(x=>x.id&&!seen.has(x.id));
+  const list=await fetchSwaps();
+  const fresh=list.filter(x=>x.id&&!seen.has(x.id));
   fresh.forEach(x=>seen.add(x.id));
   // first load: replay the latest 12 so the zone is alive right away
   (primed?fresh:fresh.slice(0,12)).reverse().forEach(x=>queue.push(x)); // oldest first
   primed=true;
   live.add("NEAR Intents");swapErr("");
  }catch(e){live.delete("NEAR Intents");
-  swapErr(e instanceof TypeError?"Swap feed blocked by the browser (CORS). Use the proxy, see swaps-proxy.js.":"Swap feed error: "+e.message)}
+  swapErr(e instanceof TypeError?"Swap feed blocked by the browser (CORS). Set DATA_URL or PROXY in zecmap.html.":"Swap feed error: "+e.message)}
  status();
 }
 (function drain(){
