@@ -120,6 +120,7 @@
   .t-foot{display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); border-top:1px solid var(--line); padding-top:12px;}
   .t-foot span:last-child{color:var(--text); font-size:13px; letter-spacing:0;}
 
+  .shr{color:var(--muted); font-size:11px; font-weight:400; margin-left:8px;}
   /* PORTFOLIO */
   #port{margin-bottom:20px;}
   #port[hidden]{display:none;}
@@ -173,6 +174,42 @@
     .tiles{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px;}
     .tile{padding:12px;}
     .t-price{font-size:17px;}
+
+    /* PORTFOLIO ON A PHONE: total first, then the holdings as two-line rows, then the tools */
+    body[data-mode="port"] main{display:flex; flex-direction:column;}
+    body[data-mode="port"] .top{order:0; padding:18px 0 14px;}
+    body[data-mode="port"] h1{display:none;}
+    body[data-mode="port"] .eyebrow{margin-bottom:0;}
+    body[data-mode="port"] #port, body[data-mode="port"] .p-card{display:contents;}
+    body[data-mode="port"] .p-card > div:first-child{order:1; border:1px solid var(--line); background:var(--bg-raised); padding:16px 14px; margin-bottom:12px;}
+    body[data-mode="port"] #tablebox{order:2;}
+    body[data-mode="port"] #note{order:3;}
+    body[data-mode="port"] #stale{order:3;}
+    body[data-mode="port"] .p-add{order:4; border:1px solid var(--line); background:var(--bg-raised); padding:14px; margin-top:14px;}
+    body[data-mode="port"] .p-privacy{order:5;}
+    body[data-mode="port"] #pMsg{order:6;}
+    body[data-mode="port"] #tip{order:7;}
+    body[data-mode="port"] footer{order:9;}
+
+    body[data-mode="port"] table, body[data-mode="port"] tbody{display:block; white-space:normal;}
+    body[data-mode="port"] thead{display:none;}
+    body[data-mode="port"] tbody tr{
+      display:grid; grid-template-columns:auto auto 1fr auto auto; column-gap:10px; row-gap:8px; align-items:center;
+      padding:12px; border-bottom:1px solid var(--line);
+      background:linear-gradient(to right, rgba(244,197,66,0.08) var(--shr, 0%), transparent var(--shr, 0%));
+    }
+    body[data-mode="port"] tbody tr:last-child{border-bottom:0;}
+    body[data-mode="port"] tbody td{display:block; padding:0; border:0; text-align:left; background:none !important; min-width:0;}
+    body[data-mode="port"] tbody td:nth-child(2){display:none;}
+    body[data-mode="port"] tbody td:nth-child(3){grid-area:1 / 1 / 2 / 4;}
+    body[data-mode="port"] tbody td:nth-child(7){grid-area:1 / 4 / 2 / 6; text-align:right; font-weight:700; font-size:14px; white-space:nowrap;}
+    body[data-mode="port"] tbody td:nth-child(4){grid-area:2 / 1; color:var(--muted); font-size:12px; white-space:nowrap;}
+    body[data-mode="port"] tbody td:nth-child(5){grid-area:2 / 2; font-size:12px; white-space:nowrap;}
+    body[data-mode="port"] tbody td:nth-child(6){grid-area:2 / 4; text-align:right; white-space:nowrap;}
+    body[data-mode="port"] tbody td:nth-child(1){grid-area:2 / 5;}
+    body[data-mode="port"] .coin .s{display:inline;}
+    body[data-mode="port"] .coin .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    body[data-mode="port"] .amt{width:104px; padding:5px 8px;}
   }
 </style>
 </head>
@@ -704,7 +741,7 @@
     var trs = rowsEl.children;
     view.forEach(function(c, i){
       var td = trs[i].children;
-      rows[c.id] = {c: c, price: td[3], chg: td[4], chart: td[5], cap: td[6], first: null, pv: null, pt: '', ct: '', gt: ''};
+      rows[c.id] = {c: c, tr: trs[i], price: td[3], chg: td[4], chart: td[5], cap: td[6], first: null, pv: null, pt: '', ct: '', gt: ''};
     });
     charts(true);
     update();
@@ -787,6 +824,8 @@
     var st = stale ? 'Ranking last refreshed at ' + new Date(listAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) +
       '. Prices from Binance stay live; dimmed prices date from then.' : '';
     if(st !== staleT){ document.getElementById('stale').textContent = st; staleT = st; }
+    var ptot = 0;     // portfolio total, for each holding's share
+    if(MODE === 'port') view.forEach(function(c){ var q = price(c); if(q != null) ptot += q * (hold[c.id] || 0); });
     for(var i = 0; i < view.length; i++){
       var row = rows[view[i].id];
       if(!row) continue;
@@ -800,8 +839,20 @@
         row.pt = t;
       }
       row.pv = p;
-      t = MODE !== 'port' ? fmtCap(cap(row.c)) : hide ? DOTS : fmtPrice(p == null ? null : p * (hold[row.c.id] || 0));
-      if(t !== row.ct){ row.cap.textContent = t; row.ct = t; }
+      if(MODE === 'port'){
+        var val = p == null ? null : p * (hold[row.c.id] || 0);
+        var sh = !hide && val != null && ptot > 0 ? val / ptot * 100 : null;
+        var shT = sh == null ? '' : (sh >= 10 || sh === 0 ? sh.toFixed(0) : sh.toFixed(1)) + '%';
+        t = hide ? DOTS : fmtPrice(val) + '|' + shT;
+        if(t !== row.ct){
+          row.cap.innerHTML = hide ? DOTS : esc(fmtPrice(val)) + (shT ? '<span class="shr">' + shT + '</span>' : '');
+          if(row.tr) row.tr.style.setProperty('--shr', sh == null ? '0%' : sh.toFixed(1) + '%');
+          row.ct = t;
+        }
+      }else{
+        t = fmtCap(cap(row.c));
+        if(t !== row.ct){ row.cap.textContent = t; row.ct = t; }
+      }
       t = fmtPct(pct(row));
       if(t !== row.gt){ row.chg.innerHTML = t; row.gt = t; }
     }
