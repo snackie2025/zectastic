@@ -9,7 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Portfolio">
+<meta name="apple-mobile-web-app-title" content="Captastic">
+<link rel="manifest" href="captastic.webmanifest">
 <link rel="apple-touch-icon" href="captastic-icon.png">
 <link rel="icon" type="image/png" href="captastic-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -148,8 +149,11 @@
   body{padding-bottom:env(safe-area-inset-bottom);}
   #tip{font-family:var(--mono); font-size:12px; color:var(--muted); padding:10px 2px 0; display:flex; gap:10px; align-items:baseline;}
   #tip[hidden]{display:none;}
+  #tip{flex-wrap:wrap;}
   #tip button{background:none; border:0; color:var(--muted); font:inherit; cursor:pointer; padding:0 4px;}
   #tip button:hover{color:var(--gold);}
+  #tip #tipGo{background:var(--gold); color:#0a0b0d; font-weight:700; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px;}
+  #tip #tipGo[hidden]{display:none;}
   footer{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:28px 0 48px; line-height:1.9;}
   footer a{color:var(--muted);}
   footer a:hover{color:var(--teal);}
@@ -266,7 +270,7 @@
       <span class="p-tools"><button type="button" id="pExp">Save backup file</button> · <button type="button" id="pImp">Restore backup</button><input type="file" id="pFile" accept="application/json,.json" hidden></span>
     </div>
     <div class="p-msg" id="pMsg"></div>
-    <div id="tip" hidden><span id="tipText"></span><button type="button" id="tipX" aria-label="Hide this tip">\u00D7</button></div>
+    <div id="tip" hidden><span id="tipText"></span><button type="button" id="tipGo" hidden>Install app</button><button type="button" id="tipX" aria-label="Hide this tip">\u00D7</button></div>
   </section>
 
   <div class="tablebox" id="tablebox">
@@ -939,18 +943,34 @@
     document.getElementById('thB').textContent = 'Value';
     msgEl.textContent = 'Loading your portfolio...';
 
-    // One-line tip on phones: how to keep this page on the home screen like an app.
+    // Tip: how to put Captastic on the home screen as an app. A website cannot place
+    // the icon itself. On Android the browser can offer an install button; on iPhone
+    // the person adds it from the Share menu.
     (function(){
-      var tip = document.getElementById('tip');
+      var tip = document.getElementById('tip'), text = document.getElementById('tipText'), go = document.getElementById('tipGo');
       var inApp = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
-      var phone = window.matchMedia && matchMedia('(pointer: coarse)').matches;
-      if(inApp || !phone || get('cap_tip', '1') === '0') return;
-      var apple = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      document.getElementById('tipText').textContent = apple
-        ? '\u25C8 Use it like an app: tap the Share button, then "Add to Home Screen".'
-        : '\u25C8 Use it like an app: open the browser menu, then "Add to Home screen".';
-      tip.hidden = false;
+      if(inApp || get('cap_tip', '1') === '0') return;
       document.getElementById('tipX').addEventListener('click', function(){ tip.hidden = true; set('cap_tip', '0'); });
+      var offer = null;
+      window.addEventListener('beforeinstallprompt', function(e){      // Android and desktop Chrome
+        e.preventDefault();
+        offer = e;
+        text.textContent = '◈ Put Captastic on your home screen as an app.';
+        go.hidden = false; tip.hidden = false;
+      });
+      go.addEventListener('click', function(){
+        if(!offer) return;
+        offer.prompt();
+        offer = null; go.hidden = true; tip.hidden = true;
+      });
+      window.addEventListener('appinstalled', function(){ tip.hidden = true; });
+      var phone = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+      if(!phone) return;
+      var apple = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      text.textContent = apple
+        ? '◈ Put Captastic on your home screen: in Safari tap the Share button (the square with the arrow), scroll down, tap "Add to Home Screen", then "Add".'
+        : '◈ Put Captastic on your home screen: open the browser menu (three dots), then tap "Add to Home screen" or "Install app".';
+      tip.hidden = false;
     })();
 
     var pTotal = document.getElementById('pTotal'), pHint = document.getElementById('pHint');
