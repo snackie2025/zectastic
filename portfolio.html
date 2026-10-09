@@ -284,7 +284,7 @@
         <div class="p-sub"><span id="pChg"></span><span class="muted t-rg" id="pRg"></span></div>
       </div>
       <form class="p-add" id="pForm" autocomplete="off">
-        <input id="pCoin" list="pList" placeholder="Project, e.g. Zcash" aria-label="Project">
+        <input id="pCoin" list="pList" placeholder="Project (top 500), e.g. Zcash" aria-label="Project">
         <datalist id="pList"></datalist>
         <input id="pAmt" inputmode="decimal" placeholder="Amount" aria-label="Amount">
         <button type="submit">Add</button>
@@ -513,11 +513,11 @@
   // two different coins sharing the same ticker.
   function mapPairs(){
     pairs = {};
-    coins.forEach(function(c){
+    every.forEach(function(c){
       var s = String(c.symbol || '').toUpperCase() + 'USDT', x = tk[s];
       if(!x) return;
-      // a remembered list carries the pairing that was checked when it was fresh
-      if(savedPairs ? savedPairs[c.id] === s : (c.current_price && Math.abs(x.c / c.current_price - 1) < 0.15)) pairs[c.id] = s;
+      // a remembered top 100 list carries the pairing that was checked when it was fresh
+      if(savedPairs && topIds[c.id] ? savedPairs[c.id] === s : (c.current_price && Math.abs(x.c / c.current_price - 1) < 0.15)) pairs[c.id] = s;
     });
     if(tk.EURUSDT) pairs[EUR.id] = 'EURUSDT';
   }
@@ -597,8 +597,65 @@
     btc = d.filter(function(c){ return c.id === 'bitcoin'; })[0] || null;
     listAt = t;
     savedPairs = p || null;
+    joinLists();
     mapPairs();
     build();
+  }
+
+  // The portfolio can also hold projects ranked 101 to 500. They come from the same kind
+  // of general ranking list, two pages of 250, never from a request that names one project,
+  // so the ranking service still cannot tell which projects someone holds.
+  var more = [], moreAt = 0, moreBusy = null;
+  var every = [];          // top 100 plus, in the portfolio, ranks 101 to 500
+  var topIds = {};
+  var MORE_KEY = 'cap_more', MORE_FRESH = 5 * MIN;
+  function joinLists(){
+    topIds = {};
+    coins.forEach(function(c){ topIds[c.id] = 1; });
+    every = more.length ? coins.concat(more.filter(function(c){ return !topIds[c.id]; })) : coins;
+  }
+  function applyMore(d, t){
+    more = d; moreAt = t;
+    joinLists();
+    mapPairs();
+    if(coins.length) build();
+  }
+  function readMore(){
+    try{
+      var o = JSON.parse(get(MORE_KEY, 'null'));
+      if(o && Array.isArray(o.d) && o.d.length && o.t && Date.now() - o.t < LIST_MAX) return o;
+    }catch(e){}
+    return null;
+  }
+  function needMore(){
+    for(var id in hold) if(!topIds[id]) return true;
+    return false;
+  }
+  // Resolves when the longer list is on hand (fresh, remembered, or not available).
+  function loadMore(){
+    if(MODE !== 'port') return Promise.resolve();
+    if(moreBusy) return moreBusy;
+    var c = readMore();
+    if(c && c.t > moreAt) applyMore(c.d, c.t);
+    if(moreAt && Date.now() - moreAt < MORE_FRESH) return Promise.resolve();
+    var page = function(n){
+      return fetch(CG + '/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=' + n + '&sparkline=false&price_change_percentage=24h,7d,30d,1y')
+        .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
+    };
+    moreBusy = page(1).then(function(a){
+      return wait(1200).then(function(){ return page(2); }).then(function(b){
+        var d = a.concat(b).filter(function(x){ return x && x.id; }).map(function(x){
+          var o = {};
+          KEEP.forEach(function(k){ o[k] = x[k]; });
+          return o;
+        });
+        if(d.length < 200) throw new Error('short');
+        var t = Date.now();
+        set(MORE_KEY, JSON.stringify({t: t, d: d}));
+        applyMore(d, t);
+      });
+    }).catch(function(){}).then(function(){ moreBusy = null; });
+    return moreBusy;
   }
   // Resolves true when the list on screen is fresh.
   function loadList(also){
@@ -637,6 +694,7 @@
   // Refresh every two minutes; after a failure retry sooner, backing off from 15 seconds.
   function cycle(also){
     loadList(also).then(function(ok){
+      if(MODE === 'port' && coins.length && needMore()) loadMore();
       setTimeout(cycle, ok ? 2 * MIN : Math.min(15000 * Math.pow(2, fails - 1), 2 * MIN));
     });
   }
@@ -729,13 +787,13 @@
   function build(){
     var key;
     if(MODE === 'port'){
-      view = coins.filter(function(c){ return hold[c.id] > 0; });
+      view = every.filter(function(c){ return hold[c.id] > 0; });
       // the key ignores order, so rows only move when a holding is added or removed
       key = (hide ? 'PH:' : 'P:') + view.map(function(c){ return c.id; }).sort().join(',');
       if(key !== order) view.sort(function(a, b){ return usd(b) * hold[b.id] - usd(a) * hold[a.id]; });
-      else view = orderView.map(function(c){ return coins.filter(function(x){ return x.id === c.id; })[0]; });
+      else view = orderView.map(function(c){ return every.filter(function(x){ return x.id === c.id; })[0]; });
       orderView = view;
-      document.getElementById('pList').innerHTML = coins.map(function(c){
+      document.getElementById('pList').innerHTML = every.map(function(c){
         return '<option value="' + esc(c.name) + ' (' + esc(String(c.symbol).toUpperCase()) + ')">';
       }).join('');
     }else{
@@ -801,9 +859,10 @@
     if(MODE === 'port'){
       msgEl.textContent = view.length ? '' : 'No holdings yet. Add a project and an amount above.';
       var have = {}, gone = 0;
-      coins.forEach(function(c){ have[c.id] = 1; });
+      every.forEach(function(c){ have[c.id] = 1; });
       for(var id in hold) if(!have[id]) gone++;
-      noteEl.textContent = gone ? gone + (gone === 1 ? ' holding is' : ' holdings are') + ' outside the top 100 right now, so hidden and not counted in the total.' : '';
+      noteEl.textContent = !gone ? '' : !more.length ? 'Looking up ' + (gone === 1 ? 'a holding' : gone + ' holdings') + ' outside the top 100...'
+        : gone + (gone === 1 ? ' holding is' : ' holdings are') + ' outside the top 500 right now, so hidden and not counted in the total.';
       return;
     }
     msgEl.innerHTML = view.length ? '' : 'Your watchlist is empty. Tap <b>+</b> next to a project in the <a href="captastic.html">Top 100</a>.';
@@ -858,7 +917,8 @@
     for(var i = 0; i < view.length; i++){
       var row = rows[view[i].id];
       if(!row) continue;
-      var p = price(row.c), t = fmtPrice(p), old = stale && !liveOf(row.c);
+      var p = price(row.c), t = fmtPrice(p);
+      var old = (topIds[row.c.id] ? stale : Date.now() - moreAt > 12 * MIN) && !liveOf(row.c);
       if(old !== row.old){ row.price.classList.toggle('old', old); row.old = old; }
       if(t !== row.pt){
         row.price.textContent = t;
@@ -1017,18 +1077,31 @@
       v = v.trim().toLowerCase();
       if(!v) return null;
       var hit = null;
-      coins.some(function(c){
+      every.some(function(c){
         var n = String(c.name).toLowerCase(), sy = String(c.symbol).toLowerCase();
         if(v === n || v === sy || v === n + ' (' + sy + ')'){ hit = c; return true; }
       });
-      if(!hit) coins.some(function(c){ if(String(c.name).toLowerCase().indexOf(v) === 0){ hit = c; return true; } });
+      if(!hit) every.some(function(c){ if(String(c.name).toLowerCase().indexOf(v) === 0){ hit = c; return true; } });
       return hit;
     };
+    // fetch the longer list the first time someone starts typing a project name
+    pCoin.addEventListener('focus', function(){ if(coins.length) loadMore(); });
     document.getElementById('pForm').addEventListener('submit', function(e){
       e.preventDefault();
       pMsg.textContent = '';
       var c = findCoin(pCoin.value), n = parseAmt(pAmt.value);
-      if(!c) return bad(pCoin);
+      if(!c && pCoin.value.trim() && coins.length && !(moreAt && Date.now() - moreAt < MORE_FRESH)){
+        // not in the top 100: look in ranks 101 to 500, then try again
+        pMsg.textContent = 'Looking beyond the top 100...';
+        var again = e.target;
+        loadMore().then(function(){
+          pMsg.textContent = '';
+          if(findCoin(pCoin.value)) again.dispatchEvent(new Event('submit', {cancelable: true}));
+          else{ pMsg.textContent = more.length ? 'Not found in the top 500.' : 'Could not reach the ranking service. Try again in a moment.'; bad(pCoin); }
+        });
+        return;
+      }
+      if(!c){ if(more.length) pMsg.textContent = 'Not found in the top 500.'; return bad(pCoin); }
       if(n == null) return bad(pAmt);
       hold[c.id] = (hold[c.id] || 0) + n;
       saveHold();
