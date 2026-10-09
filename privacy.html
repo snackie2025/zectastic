@@ -149,6 +149,11 @@
         <div class="cell"><p><a href="https://www.binance.com" target="_blank" rel="noopener">binance.com</a></p></div>
       </div>
       <div class="service-row">
+        <div class="cell"><div class="name">DexScreener</div><p>Prices for tokens you add to the Captastic portfolio by contract address.</p></div>
+        <div class="cell"><p>Only contacted if you add such a token. The request names the token's address, about once a minute while the portfolio is open.</p></div>
+        <div class="cell"><p><a href="https://dexscreener.com" target="_blank" rel="noopener">dexscreener.com</a></p></div>
+      </div>
+      <div class="service-row">
         <div class="cell"><div class="name">Kraken</div><p>The ZEC price in the header, and buys on the ZEC Map.</p></div>
         <div class="cell"><p>A live public price stream, opened directly from your browser while a page is open.</p></div>
         <div class="cell"><p><a href="https://www.kraken.com" target="_blank" rel="noopener">kraken.com</a></p></div>
@@ -195,9 +200,9 @@
 <section>
   <div class="wrap">
     <h2><span class="icon">◈</span> Captastic: top 100, watchlist and portfolio</h2>
-    <p>Captastic shows the top 100 projects by market cap. The ranking, supply figures and logos come from CoinGecko, and live prices and chart history come from Binance, both fetched directly by your browser.</p>
+    <p>Captastic shows the top 100 projects by market cap, and its portfolio can hold projects ranked up to 500. The ranking, supply figures and logos come from CoinGecko, and live prices and chart history come from Binance, both fetched directly by your browser.</p>
     <p><strong>Your watchlist and portfolio never leave your browser.</strong> The projects you mark and the amounts you type in are saved on your own device only. There is no account, and nothing is uploaded.</p>
-    <p>The portfolio page asks the price services for the same general data whatever you hold, so they can't tell from its requests which projects are in your portfolio or how much you have. The watchlist page loads chart history for the projects on your list, so Binance can see which projects' charts your browser asks for, as it would if you looked them up there.</p>
+    <p>For projects in the top 500, the portfolio page asks the price services for the same general data whatever you hold, so they can't tell from its requests which projects are in your portfolio or how much you have. The one exception is a token you add yourself by its contract address: its price is requested by that address from DexScreener, which can then see which token your browser asks about, though never how much of it you hold. The watchlist page loads chart history for the projects on your list, so Binance can see which projects' charts your browser asks for, as it would if you looked them up there.</p>
     <p>"Save backup file" writes your holdings to a file on your own device, and "Restore backup" reads that file back. The file goes nowhere else. Because nothing is stored online, your watchlist and portfolio don't follow you to another browser or device, and clearing your browser data removes them.</p>
   </div>
 </section>

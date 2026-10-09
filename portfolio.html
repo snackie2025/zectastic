@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.coingecko.com; connect-src 'self' https://api.coingecko.com https://data-api.binance.vision https://api.binance.com wss://stream.binance.com:9443 wss://data-stream.binance.vision; manifest-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.coingecko.com; connect-src 'self' https://api.coingecko.com https://data-api.binance.vision https://api.binance.com wss://stream.binance.com:9443 wss://data-stream.binance.vision https://api.dexscreener.com; manifest-src 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Captastic · Portfolio</title>
 <meta name="description" content="A simple live crypto portfolio. Your holdings stay in your own browser and are never sent anywhere.">
@@ -92,6 +92,7 @@
   .coin{display:flex; align-items:center; gap:10px;}
   .coin img{width:22px; height:22px; border-radius:50%; flex:none;}
   .coin .n{font-family:var(--sans); font-weight:500; font-size:14px;}
+  .badge{width:22px; height:22px; border-radius:50%; flex:none; display:grid; place-items:center; background:var(--line); color:var(--gold); font-family:var(--mono); font-size:11px; font-weight:700;}
   .coin .s{color:var(--muted); font-size:11px; text-transform:uppercase;}
   .muted{color:var(--muted);}
   .up{color:var(--teal);} .down{color:var(--exposed);}
@@ -284,7 +285,7 @@
         <div class="p-sub"><span id="pChg"></span><span class="muted t-rg" id="pRg"></span></div>
       </div>
       <form class="p-add" id="pForm" autocomplete="off">
-        <input id="pCoin" list="pList" placeholder="Project (top 500), e.g. Zcash" aria-label="Project">
+        <input id="pCoin" list="pList" placeholder="Name (top 500) or contract address" aria-label="Project">
         <datalist id="pList"></datalist>
         <input id="pAmt" inputmode="decimal" placeholder="Amount" aria-label="Amount">
         <button type="submit">Add</button>
@@ -514,6 +515,7 @@
   function mapPairs(){
     pairs = {};
     every.forEach(function(c){
+      if(c.custom) return;       // a token added by address never borrows an exchange price by ticker
       var s = String(c.symbol || '').toUpperCase() + 'USDT', x = tk[s];
       if(!x) return;
       // a remembered top 100 list carries the pairing that was checked when it was fresh
@@ -613,6 +615,74 @@
     topIds = {};
     coins.forEach(function(c){ topIds[c.id] = 1; });
     every = more.length ? coins.concat(more.filter(function(c){ return !topIds[c.id]; })) : coins;
+    if(MODE === 'port'){
+      var extra = customCoins();
+      if(extra.length) every = every.concat(extra);
+    }
+  }
+
+  // Tokens added by contract address (portfolio only), for projects outside the top 500.
+  // Their price is asked from DexScreener by address. That request names the token, so
+  // DexScreener can see which token is looked up. It never sees how much is held.
+  var DEX = 'https://api.dexscreener.com/latest/dex/tokens/';
+  function isAddress(v){ return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v) || /^0x[0-9a-fA-F]{40}$/.test(v); }
+  function cleanToken(x){
+    if(!x || typeof x.address !== 'string' || !isAddress(x.address)) return null;
+    return {address: x.address, name: String(x.name || 'Token').slice(0, 40), symbol: String(x.symbol || '').slice(0, 12),
+      price: +x.price > 0 ? +x.price : null, h24: typeof x.h24 === 'number' && isFinite(x.h24) ? x.h24 : null, cap: +x.cap > 0 ? +x.cap : null};
+  }
+  function readCustom(){
+    var out = {};
+    try{
+      var d = JSON.parse(get('cap_custom', '{}'));
+      for(var k in d){ var t = cleanToken(d[k]); if(t && k === 'x:' + t.address) out[k] = t; }
+    }catch(e){}
+    return out;
+  }
+  function saveCustom(){ set('cap_custom', JSON.stringify(custom)); }
+  var custom = readCustom();     // id ("x:" + address) -> token
+  var customAt = 0;              // when their prices were last fetched
+  function customCoins(){
+    return Object.keys(custom).map(function(id){
+      var x = custom[id];
+      return {id: id, custom: true, symbol: x.symbol, name: x.name, image: '', current_price: x.price, market_cap: x.cap,
+        market_cap_rank: null, circulating_supply: null, price_change_percentage_24h_in_currency: x.h24};
+    });
+  }
+  // One request for up to 30 addresses. Each token takes its price from its deepest market.
+  function fetchTokens(addresses){
+    return fetch(DEX + addresses.join(','))
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(j){
+        var best = {};
+        ((j && j.pairs) || []).forEach(function(p){
+          var a = p && p.baseToken && p.baseToken.address, pr = p && +p.priceUsd;
+          if(!a || !(pr > 0)) return;
+          var key = addresses.filter(function(x){ return x.toLowerCase() === String(a).toLowerCase(); })[0];
+          if(!key) return;
+          var liq = (p.liquidity && +p.liquidity.usd) || 0;
+          if(!best[key] || liq > best[key].liq){
+            best[key] = {liq: liq, price: pr, name: p.baseToken.name, symbol: p.baseToken.symbol,
+              h24: p.priceChange && typeof p.priceChange.h24 === 'number' ? p.priceChange.h24 : null, cap: +p.marketCap || +p.fdv || null};
+          }
+        });
+        return best;
+      });
+  }
+  function refreshCustom(){
+    if(MODE !== 'port') return;
+    var ids = Object.keys(custom).filter(function(id){ return hold[id] > 0; }).slice(0, 30);
+    if(!ids.length) return;
+    fetchTokens(ids.map(function(id){ return custom[id].address; })).then(function(best){
+      ids.forEach(function(id){
+        var b = custom[id] && best[custom[id].address];
+        if(b){ custom[id].price = b.price; custom[id].h24 = b.h24; custom[id].cap = b.cap; }
+      });
+      customAt = Date.now();
+      saveCustom();
+      joinLists();
+      if(coins.length) build();
+    }).catch(function(){});
   }
   function applyMore(d, t){
     more = d; moreAt = t;
@@ -628,7 +698,7 @@
     return null;
   }
   function needMore(){
-    for(var id in hold) if(!topIds[id]) return true;
+    for(var id in hold) if(!topIds[id] && id.indexOf('x:') !== 0) return true;
     return false;
   }
   // Resolves when the longer list is on hand (fresh, remembered, or not available).
@@ -816,8 +886,10 @@
     rowsEl.innerHTML = view.map(function(c, i){
       return '<tr>' +
         '<td class="w">' + (MODE === 'port' ? rmHtml(c) : wbHtml(c)) + '</td>' +
-        '<td class="rank">' + (c.market_cap_rank || i + 1) + '</td>' +
-        '<td class="l"><div class="coin"><img src="' + esc(c.image || '') + '" alt="" width="22" height="22" loading="lazy">' +
+        '<td class="rank">' + (c.custom ? '\u2013' : (c.market_cap_rank || i + 1)) + '</td>' +
+        '<td class="l"><div class="coin">' + (c.custom
+          ? '<span class="badge">' + esc(String(c.symbol || c.name || '?').charAt(0).toUpperCase()) + '</span>'
+          : '<img src="' + esc(c.image || '') + '" alt="" width="22" height="22" loading="lazy">') +
           '<span class="n">' + esc(c.name) + '</span><span class="s">' + esc(c.symbol) + '</span></div></td>' +
         '<td></td><td></td><td>' + (MODE === 'port'
           ? (hide ? '<span class="muted">' + DOTS + '</span>'
@@ -918,7 +990,7 @@
       var row = rows[view[i].id];
       if(!row) continue;
       var p = price(row.c), t = fmtPrice(p);
-      var old = (topIds[row.c.id] ? stale : Date.now() - moreAt > 12 * MIN) && !liveOf(row.c);
+      var old = (row.c.custom ? Date.now() - customAt > 5 * MIN : topIds[row.c.id] ? stale : Date.now() - moreAt > 12 * MIN) && !liveOf(row.c);
       if(old !== row.old){ row.price.classList.toggle('old', old); row.old = old; }
       if(t !== row.pt){
         row.price.textContent = t;
@@ -989,7 +1061,13 @@
   document.querySelector('main').addEventListener('click', function(e){
     var b = e.target.closest ? e.target.closest('[data-w]') : null;
     var r = e.target.closest ? e.target.closest('[data-rm]') : null;
-    if(r){ delete hold[r.dataset.rm]; saveHold(); build(); return; }
+    if(r){
+      var gone = r.dataset.rm;
+      delete hold[gone]; saveHold();
+      if(custom[gone]){ delete custom[gone]; saveCustom(); joinLists(); }   // stop asking for a token no longer held
+      build();
+      return;
+    }
     if(!b) return;
     var id = b.dataset.w;
     if(watch.has(id)) watch.delete(id); else watch.add(id);
@@ -1000,9 +1078,10 @@
   });
   // another tab changed the list
   window.addEventListener('storage', function(e){
-    if(e.key !== 'cap_watch' && e.key !== 'cap_hold') return;
+    if(e.key !== 'cap_watch' && e.key !== 'cap_hold' && e.key !== 'cap_custom') return;
     watch = readWatch();
     hold = readHold();
+    custom = readCustom(); joinLists();
     if(coins.length){ order = null; build(); }
   });
 
@@ -1089,6 +1168,30 @@
     document.getElementById('pForm').addEventListener('submit', function(e){
       e.preventDefault();
       pMsg.textContent = '';
+      var typed = pCoin.value.trim();
+      if(isAddress(typed)){
+        // a contract address: look the token up by address
+        var amt = parseAmt(pAmt.value), tid = 'x:' + typed;
+        if(amt == null) return bad(pAmt);
+        var done = function(){
+          hold[tid] = (hold[tid] || 0) + amt;
+          saveHold();
+          pMsg.textContent = ''; pCoin.value = ''; pAmt.value = '';
+          joinLists(); build();
+          var box = rowsEl.querySelector('.amt[data-a="' + tid + '"]');
+          if(box) box.value = fmtAmt(hold[tid]);
+          dirty();
+        };
+        if(custom[tid]) return done();
+        pMsg.textContent = 'Looking up that token...';
+        fetchTokens([typed]).then(function(best){
+          var t = best[typed] && cleanToken({address: typed, name: best[typed].name, symbol: best[typed].symbol, price: best[typed].price, h24: best[typed].h24, cap: best[typed].cap});
+          if(!t){ pMsg.textContent = 'No market found for that address.'; return bad(pCoin); }
+          custom[tid] = t; customAt = Date.now(); saveCustom();
+          done();
+        }).catch(function(){ pMsg.textContent = 'Could not reach the token price service. Try again in a moment.'; bad(pCoin); });
+        return;
+      }
       var c = findCoin(pCoin.value), n = parseAmt(pAmt.value);
       if(!c && pCoin.value.trim() && coins.length && !(moreAt && Date.now() - moreAt < MORE_FRESH)){
         // not in the top 100: look in ranks 101 to 500, then try again
@@ -1126,7 +1229,7 @@
     });
     // backup to a file on the visitor's own device, and back
     document.getElementById('pExp').addEventListener('click', function(){
-      var blob = new Blob([JSON.stringify({app: 'captastic', version: 1, holdings: hold}, null, 2)], {type: 'application/json'});
+      var blob = new Blob([JSON.stringify({app: 'captastic', version: 1, holdings: hold, tokens: custom}, null, 2)], {type: 'application/json'});
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'captastic-portfolio.json';
@@ -1140,14 +1243,16 @@
       if(!f) return;
       var rd = new FileReader();
       rd.onload = function(){
-        var next = {}, n = 0;
+        var next = {}, n = 0, nextTok = {};
         try{
           var d = JSON.parse(rd.result), h = d && d.holdings;
+          nextTok = (d && d.tokens && typeof d.tokens === 'object') ? d.tokens : {};
           for(var k in h) if(typeof h[k] === 'number' && isFinite(h[k]) && h[k] > 0){ next[k] = h[k]; n++; }
         }catch(err){}
         if(!n){ pMsg.textContent = 'That file is not a Captastic backup.'; }
         else{
           hold = next; saveHold();
+          set('cap_custom', JSON.stringify(nextTok)); custom = readCustom(); joinLists();
           pMsg.textContent = 'Restored ' + n + (n === 1 ? ' holding.' : ' holdings.');
           if(coins.length){ order = null; build(); }
         }
@@ -1168,6 +1273,7 @@
   });
   cycle(snap);
   connect();
+  if(MODE === 'port'){ snap.then(refreshCustom); setInterval(refreshCustom, MIN); }
   // keep rows honest if the live feed goes quiet
   setInterval(dirty, 15000);
 })();
