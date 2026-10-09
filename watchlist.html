@@ -90,7 +90,9 @@
   #msg:empty{display:none;}
   #msg a, #note a{color:var(--teal);}
   #msg b{color:var(--gold);}
-  #note{font-family:var(--mono); font-size:12px; color:var(--muted); padding:14px 2px 0;}
+  #note, #stale{font-family:var(--mono); font-size:12px; color:var(--muted); padding:14px 2px 0;}
+  #stale:empty{display:none;}
+  .old{opacity:.5;}
   #note:empty{display:none;}
 
   /* TILES (watchlist) */
@@ -226,6 +228,7 @@
   </div>
   <div class="tiles" id="tiles" style="display:none"></div>
   <div id="note"></div>
+  <div id="stale"></div>
 
   <footer>
     Live prices: <a href="https://www.binance.com" target="_blank" rel="noopener">Binance</a> · Ranking, supply and logos: <a href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko</a><br>
@@ -429,7 +432,9 @@
     pairs = {};
     coins.forEach(function(c){
       var s = String(c.symbol || '').toUpperCase() + 'USDT', x = tk[s];
-      if(x && c.current_price && Math.abs(x.c / c.current_price - 1) < 0.15) pairs[c.id] = s;
+      if(!x) return;
+      // a remembered list carries the pairing that was checked when it was fresh
+      if(savedPairs ? savedPairs[c.id] === s : (c.current_price && Math.abs(x.c / c.current_price - 1) < 0.15)) pairs[c.id] = s;
     });
     if(tk.EURUSDT) pairs[EUR.id] = 'EURUSDT';
   }
@@ -477,19 +482,79 @@
     return p;
   }
 
+  // The top 100 list is remembered in the browser. A visit can then show the page
+  // at once, moving between the pages costs no extra request, and the page keeps
+  // working when the ranking service is rate limiting this visitor.
+  var LIST_KEY = 'cap_list', LIST_FRESH = 2 * MIN - 5000, LIST_MAX = 24 * 60 * MIN;
+  var listAt = 0;          // when the list on screen was fetched
+  var savedPairs = null;   // pairing that came with a remembered list
+  var fails = 0;
+  var KEEP = ['id', 'symbol', 'name', 'image', 'current_price', 'market_cap', 'market_cap_rank', 'circulating_supply',
+    'price_change_percentage_24h_in_currency', 'price_change_percentage_7d_in_currency',
+    'price_change_percentage_30d_in_currency', 'price_change_percentage_1y_in_currency'];
+  function readList(){
+    try{
+      var o = JSON.parse(get(LIST_KEY, 'null'));
+      if(o && Array.isArray(o.d) && o.d.length > 0 && o.t && Date.now() - o.t < LIST_MAX) return o;
+    }catch(e){}
+    return null;
+  }
+  function saveList(){
+    var p = {};
+    for(var id in pairs) if(id !== EUR.id) p[id] = pairs[id];
+    set(LIST_KEY, JSON.stringify({t: listAt, p: p, d: coins.map(function(c){
+      var o = {};
+      KEEP.forEach(function(k){ o[k] = c[k]; });
+      if(!pairs[c.id] && c.sparkline_in_7d) o.sparkline_in_7d = c.sparkline_in_7d;   // only needed without Binance history
+      return o;
+    })}));
+  }
+  function applyList(d, t, p){
+    coins = d;
+    btc = d.filter(function(c){ return c.id === 'bitcoin'; })[0] || null;
+    listAt = t;
+    savedPairs = p || null;
+    mapPairs();
+    build();
+  }
+  // Resolves true when the list on screen is fresh.
   function loadList(also){
+    var c = readList();
+    if(c && Date.now() - c.t < LIST_FRESH){          // another page or tab fetched it moments ago
+      return Promise.resolve(also).then(function(){ if(c.t > listAt) applyList(c.d, c.t, c.p); return true; });
+    }
     var f = fetch(CG + '/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=24h,7d,30d,1y')
       .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
     return Promise.all([f, also]).then(function(res){
       var d = res[0];
       if(!Array.isArray(d) || !d.length) throw new Error('empty');
-      coins = d;
-      btc = d.filter(function(c){ return c.id === 'bitcoin'; })[0] || null;
-      mapPairs();
-      build();
+      fails = 0;
+      applyList(d, Date.now());
+      saveList();
       if(!tk.EURUSDT) loadEur();
+      return true;
     }).catch(function(){
-      if(!coins.length) msgEl.textContent = 'Could not load the list right now. Trying again in a moment.';
+      fails++;
+      // CoinGecko did not answer this visitor: use the copy saved on this site
+      return fetch('top100.json', {cache: 'no-cache'})
+        .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function(o){
+          if(o && Array.isArray(o.d) && o.d.length && o.t > listAt && Date.now() - o.t < LIST_MAX){
+            applyList(o.d, o.t);
+            saveList();
+          }
+        })
+        .catch(function(){})
+        .then(function(){
+          if(!coins.length) msgEl.textContent = 'The ranking service is busy. Trying again in a few seconds.';
+          return false;
+        });
+    });
+  }
+  // Refresh every two minutes; after a failure retry sooner, backing off from 15 seconds.
+  function cycle(also){
+    loadList(also).then(function(ok){
+      setTimeout(cycle, ok ? 2 * MIN : Math.min(15000 * Math.pow(2, fails - 1), 2 * MIN));
     });
   }
 
@@ -697,11 +762,18 @@
   var raf = 0;
   function dirty(){ if(!raf) raf = requestAnimationFrame(function(){ raf = 0; update(); }); }
 
+  var staleT = '';
   function update(){
+    // the list is "stale" when no fresh ranking arrived for ten minutes
+    var stale = coins.length > 0 && Date.now() - listAt > 10 * MIN;
+    var st = stale ? 'Ranking last refreshed at ' + new Date(listAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) +
+      '. Prices from Binance stay live; dimmed prices date from then.' : '';
+    if(st !== staleT){ document.getElementById('stale').textContent = st; staleT = st; }
     for(var i = 0; i < view.length; i++){
       var row = rows[view[i].id];
       if(!row) continue;
-      var p = price(row.c), t = fmtPrice(p);
+      var p = price(row.c), t = fmtPrice(p), old = stale && !liveOf(row.c);
+      if(old !== row.old){ row.price.classList.toggle('old', old); row.old = old; }
       if(t !== row.pt){
         row.price.textContent = t;
         if(!calm && row.pt && row.pv != null && p != null && p !== row.pv && row.price.animate){
@@ -875,9 +947,13 @@
 
   mark('cur', cur); mark('range', range);
   var snap = Promise.race([loadSnapshot(), wait(6000).then(function(){ needMap = true; })]);
-  loadList(snap);
+  // show the remembered list straight away, then fetch a fresh one
+  snap.then(function(){
+    var c = readList();
+    if(c && !coins.length) applyList(c.d, c.t, c.p);
+  });
+  cycle(snap);
   connect();
-  setInterval(function(){ loadList(); }, 2 * MIN);
   // keep rows honest if the live feed goes quiet
   setInterval(dirty, 15000);
 })();
