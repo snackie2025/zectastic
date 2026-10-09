@@ -45,11 +45,11 @@
   .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 24px;}
   .logo{font-family:var(--mono); font-weight:800; letter-spacing:0.04em; font-size:18px; display:flex; align-items:center; gap:8px;}
   .logo .z{color:var(--gold);}
-  .navlinks{display:flex; gap:28px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
+  .navlinks{display:flex; gap:20px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
   .navlinks a{color:var(--muted); text-decoration:none; transition:color .15s;}
   .navlinks a:hover{color:var(--gold);}
   .navlinks{display:none;}
-  @media(min-width:760px){.navlinks{display:flex;}}
+  @media(min-width:940px){.navlinks{display:flex;}}
 
 
   /* HEADER PRICE CHIP */
@@ -86,6 +86,8 @@
   .door p{color:var(--muted); font-size:14.5px; flex:1;}
   .door .go{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; color:var(--gold); margin-top:6px;}
   .door:hover .go{text-decoration:underline;}
+  .door.wide{grid-column:1 / -1;}
+  .door .new{font-size:10px; letter-spacing:0.1em; color:#0a0b0d; background:var(--gold); padding:2px 6px; margin-left:6px; vertical-align:2px;}
   @media (prefers-reduced-motion: reduce){.intro .pulse{animation:none; opacity:.5;}}
 
 
@@ -398,6 +400,7 @@
       <a href="#radio">Radio</a>
       <a href="/zecmap.html" style="color:var(--gold);">Map ◈</a>
       <a href="/flippening.html" style="color:var(--gold);">Party ◈</a>
+      <a href="/captastic.html" style="color:var(--gold);">Captastic ◈</a>
     </nav>
     <a class="tick" href="#tracker" title="ZEC price"><span class="lbl">ZEC</span> <span class="p js-p">$–</span> <span class="d js-d"></span></a>
   </div>
@@ -423,6 +426,7 @@
       <a class="door" href="#tracker"><span class="ic">◈</span><h3>Tracker</h3><p>Live price, chart, supply and the shielded split.</p><span class="go">See the numbers ↓</span></a>
       <a class="door g" href="/zecmap.html"><span class="ic">◈</span><h3>ZEC Map</h3><p>Watch the world buy ZEC in real time, with a hidden zone for shielded swaps.</p><span class="go">Open the map →</span></a>
       <a class="door g" href="/flippening.html"><span class="ic">◈</span><h3>Flippening Party</h3><p>How far is ZEC from passing the coins above it? Party mode included.</p><span class="go">Join the party →</span></a>
+      <a class="door g wide" href="/captastic.html"><span class="ic">◈</span><h3>Captastic <span class="new">New</span></h3><p>The top 100 by market cap, live, in USD, EUR or BTC. A watchlist and a portfolio that stay on your device. No ads, no noise.</p><span class="go">Open Captastic →</span></a>
     </div>
   </div>
 </section>

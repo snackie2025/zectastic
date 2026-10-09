@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Captastic · Watchlist</title>
+<meta name="description" content="Your own watchlist of top 100 crypto projects, live, with no noise and no ads.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b0d;
+    --bg-raised:#111318;
+    --line:#22262e;
+    --text:#e8e6e0;
+    --muted:#8b8f98;
+    --gold:#f4c542;
+    --teal:#00d9c0;
+    --exposed:#ff6b4a;
+    --mono:'JetBrains Mono', monospace;
+    --sans:'IBM Plex Sans', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.5;
+    background-image:
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+  }
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  ::selection{background:var(--gold); color:#0a0b0d;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+
+  /* HEADER (same build as Zectastic) */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,11,13,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 24px;}
+  .logo{font-family:var(--mono); font-weight:800; letter-spacing:0.04em; font-size:18px; display:flex; align-items:center; gap:8px; text-decoration:none;}
+  .logo .z{color:var(--gold);}
+  .nav-right{display:flex; align-items:center; gap:20px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
+  .nav-right a{color:var(--muted); text-decoration:none; transition:color .15s;}
+  .nav-right a:hover{color:var(--gold);}
+  .nav-right a[aria-current]{color:var(--gold); border-bottom:1px solid var(--gold);}
+  .live-tag{display:flex; align-items:center; gap:8px; color:var(--muted);}
+  .live-dot{width:7px; height:7px; border-radius:50%; background:var(--muted);}
+  .live-tag.on{color:var(--teal);}
+  .live-tag.on .live-dot{background:var(--teal); animation:pulse 1.6s infinite;}
+
+  /* TITLE + CONTROLS */
+  .top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px; padding:40px 0 24px;}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;}
+  h1{font-family:var(--mono); font-weight:800; font-size:28px; letter-spacing:-0.01em; line-height:1.2;}
+  .controls{display:flex; flex-wrap:wrap; gap:10px;}
+  .seg{display:flex; border:1px solid var(--line); background:var(--bg-raised);}
+  .seg button{background:none; border:0; color:var(--muted); font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase; padding:9px 12px; cursor:pointer; transition:color .15s;}
+  .seg[hidden]{display:none;}
+  .seg button:hover{color:var(--text);}
+  .seg button.on{color:#0a0b0d; background:var(--gold); font-weight:700;}
+
+  /* TABLE */
+  .tablebox{border:1px solid var(--line); background:var(--bg-raised); overflow-x:auto;}
+  table{width:100%; border-collapse:collapse; white-space:nowrap; font-family:var(--mono); font-size:13px; font-variant-numeric:tabular-nums;}
+  th{color:var(--muted); font-weight:500; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; text-align:right; padding:12px 14px; border-bottom:1px solid var(--line);}
+  td{padding:11px 14px; border-bottom:1px solid var(--line); text-align:right;}
+  tbody tr:last-child td{border-bottom:0;}
+  tbody tr:hover td{background:rgba(255,255,255,0.025);}
+  th.l, td.l{text-align:left;}
+  .rank{color:var(--muted); width:1%;}
+  td.w, th.w{width:1%; padding-right:0;}
+  .wb{width:26px; height:26px; display:block; border:1px solid var(--line); background:none; color:var(--muted); font-family:var(--mono); font-size:15px; line-height:1; cursor:pointer; transition:color .15s, border-color .15s;}
+  .wb:hover{color:var(--gold); border-color:var(--gold);}
+  .wb.on{color:var(--gold); border-color:transparent;}
+  .wb.on:hover{border-color:var(--gold);}
+  .coin{display:flex; align-items:center; gap:10px;}
+  .coin img{width:22px; height:22px; border-radius:50%; flex:none;}
+  .coin .n{font-family:var(--sans); font-weight:500; font-size:14px;}
+  .coin .s{color:var(--muted); font-size:11px; text-transform:uppercase;}
+  .muted{color:var(--muted);}
+  .up{color:var(--teal);} .down{color:var(--exposed);}
+  td svg{display:block; margin-left:auto;}
+  #msg{font-family:var(--mono); font-size:13px; color:var(--muted); padding:28px 14px;}
+  #msg:empty{display:none;}
+  #msg a, #note a{color:var(--teal);}
+  #msg b{color:var(--gold);}
+  #note{font-family:var(--mono); font-size:12px; color:var(--muted); padding:14px 2px 0;}
+  #note:empty{display:none;}
+
+  /* TILES (watchlist) */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:12px;}
+  .tile{border:1px solid var(--line); background:var(--bg-raised); padding:16px; font-family:var(--mono); font-variant-numeric:tabular-nums; min-width:0; transition:border-color .15s;}
+  .tile:hover{border-color:#3a3f4a;}
+  .t-head{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .t-head .coin{min-width:0;}
+  .t-head .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .tile .coin .s{display:inline;}
+  .tile .wb{flex:none;}
+  .t-price{font-size:22px; font-weight:700; letter-spacing:-0.01em; margin-top:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .t-sub{display:flex; align-items:baseline; gap:8px; font-size:12px; margin-top:2px;}
+  .t-rg{font-size:11px; letter-spacing:0.08em; text-transform:uppercase;}
+  .t-rank{margin-left:auto;}
+  .t-chart{height:56px; margin:14px 0; display:flex; align-items:center;}
+  .t-chart svg{display:block; width:100%; height:56px;}
+  .t-foot{display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); border-top:1px solid var(--line); padding-top:12px;}
+  .t-foot span:last-child{color:var(--text); font-size:13px; letter-spacing:0;}
+
+  /* PORTFOLIO */
+  #port{margin-bottom:20px;}
+  #port[hidden]{display:none;}
+  .p-card{border:1px solid var(--line); background:var(--bg-raised); padding:22px 20px; display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px;}
+  .p-label{font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);}
+  .p-value{font-family:var(--mono); font-weight:800; font-size:36px; letter-spacing:-0.02em; line-height:1.25; font-variant-numeric:tabular-nums;}
+  .p-sub{font-family:var(--mono); font-size:13px; display:flex; gap:8px; align-items:baseline; min-height:20px;}
+  .p-add{display:flex; flex-wrap:wrap; gap:8px;}
+  .p-add input, .amt{background:var(--bg); border:1px solid var(--line); color:var(--text); font-family:var(--mono); font-size:13px; padding:9px 10px; outline:none; border-radius:0;}
+  .p-add input:focus, .amt:focus{border-color:var(--gold);}
+  .p-add input.bad{border-color:var(--exposed);}
+  #pCoin{width:210px;}
+  #pAmt{width:120px;}
+  .p-add button{background:var(--gold); color:#0a0b0d; border:0; font-family:var(--mono); font-weight:700; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; padding:9px 18px; cursor:pointer;}
+  .amt{width:130px; text-align:right; padding:6px 8px; background:transparent;}
+  .p-privacy{font-family:var(--mono); font-size:12px; color:var(--muted); padding:12px 2px 0; display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 16px;}
+  .p-privacy .lock{color:var(--teal);}
+  .p-tools button{background:none; border:0; color:var(--muted); font:inherit; cursor:pointer; text-decoration:underline; padding:0;}
+  .p-tools button:hover{color:var(--teal);}
+  .p-msg{font-family:var(--mono); font-size:12px; color:var(--teal); padding:8px 2px 0;}
+  .p-msg:empty{display:none;}
+
+  footer{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:28px 0 48px; line-height:1.9;}
+  footer a{color:var(--muted);}
+  footer a:hover{color:var(--teal);}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px;}
+    .nav{padding:14px;}
+    .nav{flex-wrap:wrap; row-gap:10px;}
+    .nav-right{width:100%; gap:14px; font-size:11px;}
+    #statusText{display:none;}
+    .p-card{padding:16px 14px;}
+    .p-value{font-size:28px;}
+    .p-add{width:100%;}
+    .p-add input, .amt{font-size:16px;}
+    #pCoin{width:auto; flex:1 1 100%;}
+    #pAmt{width:auto; flex:1 1 0; min-width:0;}
+    .amt{width:110px;}
+    .top{padding:28px 0 18px;}
+    h1{font-size:22px;}
+    th, td{padding:10px 9px;}
+    .coin .s{display:none;}
+    .tiles{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px;}
+    .tile{padding:12px;}
+    .t-price{font-size:17px;}
+  }
+</style>
+</head>
+<body data-mode="watch">
+
+<header>
+  <div class="nav wrap">
+    <a class="logo" href="captastic.html"><span class="z">C</span> CAPTASTIC</a>
+    <div class="nav-right">
+      <div class="live-tag" id="status"><span class="live-dot"></span><span id="statusText">Connecting</span></div>
+      <a href="captastic.html" data-nav="top">Top 100</a>
+      <a href="watchlist.html" data-nav="watch">Watchlist</a>
+      <a href="portfolio.html" data-nav="port">Portfolio</a>
+      <a class="home" href="/">Zectastic</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow" id="eyebrow">◈ Top 100 by market cap</div>
+      <h1 id="title">The market. No noise.</h1>
+    </div>
+    <div class="controls">
+      <div class="seg" id="cur">
+        <button data-v="usd">USD</button><button data-v="eur">EUR</button><button data-v="btc">BTC</button>
+      </div>
+      <div class="seg" id="range">
+        <button data-v="24h">24h</button><button data-v="7d">7d</button><button data-v="30d">30d</button><button data-v="1y">1y</button><button data-v="all">All</button>
+      </div>
+      <div class="seg" id="layout" hidden>
+        <button data-v="list">List</button><button data-v="tiles">Tiles</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="port" hidden>
+    <div class="p-card">
+      <div>
+        <div class="p-label">Total value</div>
+        <div class="p-value" id="pTotal">–</div>
+        <div class="p-sub"><span id="pChg"></span><span class="muted t-rg" id="pRg"></span></div>
+      </div>
+      <form class="p-add" id="pForm" autocomplete="off">
+        <input id="pCoin" list="pList" placeholder="Project, e.g. Zcash" aria-label="Project">
+        <datalist id="pList"></datalist>
+        <input id="pAmt" inputmode="decimal" placeholder="Amount" aria-label="Amount">
+        <button type="submit">Add</button>
+      </form>
+    </div>
+    <div class="p-privacy">
+      <span><span class="lock">◈</span> Your holdings are saved only in this browser. They are never sent anywhere.</span>
+      <span class="p-tools"><button type="button" id="pExp">Save backup file</button> · <button type="button" id="pImp">Restore backup</button><input type="file" id="pFile" accept="application/json,.json" hidden></span>
+    </div>
+    <div class="p-msg" id="pMsg"></div>
+  </section>
+
+  <div class="tablebox" id="tablebox">
+    <table>
+      <thead>
+        <tr><th></th><th>#</th><th class="l">Project</th><th>Price</th><th id="chgHead">Change</th><th id="thA">Chart</th><th id="thB">Market cap</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="msg">Loading the top 100...</div>
+  </div>
+  <div class="tiles" id="tiles" style="display:none"></div>
+  <div id="note"></div>
+
+  <footer>
+    Live prices: <a href="https://www.binance.com" target="_blank" rel="noopener">Binance</a> · Ranking, supply and logos: <a href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko</a><br>
+    © 2026 Captastic · <a href="/">Zectastic</a>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var CG = 'https://api.coingecko.com/api/v3';
+  // Binance public market data, no key needed. The second entry is a backup.
+  var REST = ['https://data-api.binance.vision/api/v3', 'https://api.binance.com/api/v3'];
+  var WS = ['wss://stream.binance.com:9443/ws/!miniTicker@arr', 'wss://data-stream.binance.vision/ws/!miniTicker@arr'];
+  var MIN = 60000;
+  var RANGES = {
+    '24h': {iv: '30m', n: 48,   days: 1,     key: 'price_change_percentage_24h_in_currency', ttl: 5 * MIN},
+    '7d':  {iv: '2h',  n: 84,   days: 7,     key: 'price_change_percentage_7d_in_currency',  ttl: 15 * MIN},
+    '30d': {iv: '8h',  n: 90,   days: 30,    key: 'price_change_percentage_30d_in_currency', ttl: 60 * MIN},
+    '1y':  {iv: '1w',  n: 53,   days: 365,   key: 'price_change_percentage_1y_in_currency',  ttl: 360 * MIN},
+    'all': {iv: '1M',  n: 1000, days: 'max', key: null,                                      ttl: 360 * MIN}
+  };
+
+  function get(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : v; }catch(e){ return d; } }
+  function set(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  var MODE = document.body.dataset.mode;
+  if(MODE !== 'watch' && MODE !== 'port') MODE = 'top';
+  var cur = get('cap_cur', 'usd');
+  if(['usd', 'eur', 'btc'].indexOf(cur) < 0) cur = 'usd';
+  var tiles = MODE === 'watch' && get('cap_layout', 'list') === 'tiles';   // watchlist layout
+  var big = false;     // tiles are on screen right now
+  var cgEur = null;    // backup euro rate (USD per EUR)
+  var EUR = {id: '~eur'};
+  var range = get('cap_range', '7d');
+  if(!RANGES[range]) range = '7d';
+  if(MODE === 'port' && range === 'all') range = '1y';   // the portfolio has no all-time view
+
+  var watch = readWatch();
+  function readWatch(){ try{ return new Set(JSON.parse(get('cap_watch', '[]'))); }catch(e){ return new Set(); } }
+
+  // Portfolio: coin id -> amount held. Lives in this browser only; nothing here is ever sent out.
+  var hold = readHold();
+  function readHold(){
+    var out = {};
+    try{
+      var d = JSON.parse(get('cap_hold', '{}'));
+      for(var k in d) if(typeof d[k] === 'number' && isFinite(d[k]) && d[k] > 0) out[k] = d[k];
+    }catch(e){}
+    return out;
+  }
+  function saveHold(){ set('cap_hold', JSON.stringify(hold)); }
+  var eurFirst = null; // euro rate at the start of the chosen range (portfolio only)
+
+  var coins = [];      // top 100 from CoinGecko (rank, supply, logo)
+  var view = [];       // the coins shown on this page
+  var btc = null;      // the bitcoin entry of that list
+  var pairs = {};      // coin id -> Binance symbol, for coins that trade there
+  var tk = {};         // Binance symbol -> {c: last price, o: price 24h ago, t: time received}
+  var rows = {};       // coin id -> row state
+  var order = null;
+  var orderView = [];
+  var cache = {};      // chart history
+  var gen = 0;
+  var needMap = false;
+  var lastStale = false;
+  var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var rowsEl = document.getElementById('rows');
+  var msgEl = document.getElementById('msg');
+  var noteEl = document.getElementById('note');
+  var boxEl = document.getElementById('tablebox');
+  var tilesEl = document.getElementById('tiles');
+  var statusEl = document.getElementById('status');
+  var statusText = document.getElementById('statusText');
+
+  /* ---------- numbers ---------- */
+  function liveOf(c){
+    var s = pairs[c.id], x = s && tk[s];
+    return x && Date.now() - x.t < 3 * MIN ? x : null;
+  }
+  function usd(c){ var x = liveOf(c); return x ? x.c : c.current_price; }
+  function btcUsd(){ return btc ? usd(btc) : null; }
+  function eurUsd(){
+    var x = tk.EURUSDT;
+    if(x && Date.now() - x.t < 3 * MIN) return x.c;
+    return cgEur || (x && x.c) || null;
+  }
+  // how many dollars one unit of the chosen currency is worth
+  function quote(){ return cur === 'usd' ? 1 : cur === 'btc' ? btcUsd() : eurUsd(); }
+  function price(c){
+    var p = usd(c), q = quote();
+    return p == null || !q ? null : p / q;
+  }
+  function cap(c){
+    var supply = c.circulating_supply || (c.market_cap && c.current_price ? c.market_cap / c.current_price : 0);
+    var v = supply ? usd(c) * supply : c.market_cap;
+    var q = quote();
+    return v == null || !q ? null : v / q;
+  }
+  function cgPct(c){
+    var k = RANGES[range].key;
+    if(!k || c[k] == null) return null;
+    if(cur === 'usd') return c[k];
+    if(cur === 'eur'){
+      var q = eurUsd();
+      return eurFirst && q ? ((1 + c[k] / 100) / (q / eurFirst) - 1) * 100 : c[k];
+    }
+    if(!btc || btc[k] == null) return null;
+    return ((1 + c[k] / 100) / (1 + btc[k] / 100) - 1) * 100;
+  }
+  function pct(row){
+    var c = row.c;
+    if(range === '24h'){
+      var x = liveOf(c);
+      if(x && x.o){
+        var r = x.c / x.o;
+        if(cur === 'usd') return (r - 1) * 100;
+        var b = cur === 'btc' ? (btc && liveOf(btc)) : tk.EURUSDT;
+        if(b && b.o) return (r / (b.c / b.o) - 1) * 100;
+      }
+      return cgPct(c);
+    }
+    var p = price(c);
+    if(row.first && p != null) return (p / row.first - 1) * 100;
+    return cgPct(c);
+  }
+
+  /* ---------- formatting ---------- */
+  var compact = new Intl.NumberFormat('en-US', {notation: 'compact', maximumFractionDigits: 2});
+  function sign(){ return cur === 'btc' ? '₿' : cur === 'eur' ? '€' : '$'; }
+  function fmtPrice(v){
+    if(v == null || !isFinite(v)) return '–';
+    if(v <= 0) return sign() + '0';
+    if(cur !== 'btc' && v >= 1) return sign() + v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    if(cur === 'btc' && v >= 1) return '₿' + v.toFixed(4);
+    var d = Math.min(14, Math.max(cur === 'btc' ? 8 : 2, 3 - Math.floor(Math.log10(v))));
+    return sign() + v.toFixed(d);
+  }
+  function fmtCap(v){ return v == null || !isFinite(v) ? '–' : sign() + compact.format(v); }
+  function fmtPct(v){
+    if(v == null || !isFinite(v)) return '<span class="muted">–</span>';
+    return '<span class="' + (v >= 0 ? 'up' : 'down') + '">' + (v >= 0 ? '+' : '') + v.toFixed(Math.abs(v) >= 1000 ? 0 : 1) + '%</span>';
+  }
+  function sample(a, n){
+    if(a.length <= n) return a;
+    var out = [];
+    for(var i = 0; i < n; i++) out.push(a[Math.round(i * (a.length - 1) / (n - 1))]);
+    return out;
+  }
+  function spark(a, wide){
+    a = sample(a, 60);
+    var w = wide ? 240 : 120, h = wide ? 56 : 32, min = Math.min.apply(null, a), max = Math.max.apply(null, a), r = max - min;
+    if(r <= Math.abs(max) * 1e-9){ min -= 1; r = 2; }     // flat line, drawn through the middle
+    var pts = a.map(function(v, i){
+      return (i / (a.length - 1) * w).toFixed(1) + ',' + (h - 2 - (v - min) / r * (h - 4)).toFixed(1);
+    }).join(' ');
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" ' + (wide ? 'preserveAspectRatio="none"' : 'width="' + w + '" height="' + h + '"') + ' class="' +
+      (a[a.length - 1] >= a[0] ? 'up' : 'down') + '" aria-hidden="true"><polyline points="' + pts +
+      '" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+  }
+
+  /* ---------- data: Binance ---------- */
+  var restIdx = 0;
+  function bget(path, i){
+    i = i || 0;
+    var b = (restIdx + i) % REST.length;
+    return fetch(REST[b] + path)
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d){ restIdx = b; return d; }, function(e){
+        if(i + 1 < REST.length) return bget(path, i + 1);
+        throw e;
+      });
+  }
+  // run at most n requests at the same time
+  function pool(n){
+    var active = 0, q = [];
+    function next(){
+      if(active >= n || !q.length) return;
+      active++;
+      var j = q.shift();
+      j[0]().then(j[1], j[2]).then(function(){ active--; next(); });
+    }
+    return function(fn){ return new Promise(function(res, rej){ q.push([fn, res, rej]); next(); }); };
+  }
+  var bpool = pool(6);
+
+  function loadSnapshot(){
+    return bget('/ticker/price').then(function(d){
+      var now = Date.now();
+      d.forEach(function(x){
+        if(x.symbol.slice(-4) === 'USDT' && !tk[x.symbol]) tk[x.symbol] = {c: +x.price, o: 0, t: now};
+      });
+    }).catch(function(){ needMap = true; });
+  }
+
+  // Match each coin to its Binance USDT market. The price check guards against
+  // two different coins sharing the same ticker.
+  function mapPairs(){
+    pairs = {};
+    coins.forEach(function(c){
+      var s = String(c.symbol || '').toUpperCase() + 'USDT', x = tk[s];
+      if(x && c.current_price && Math.abs(x.c / c.current_price - 1) < 0.15) pairs[c.id] = s;
+    });
+    if(tk.EURUSDT) pairs[EUR.id] = 'EURUSDT';
+  }
+
+  var wsI = 0, wsDelay = 2000;
+  function connect(){
+    var ws, opened = false;
+    try{ ws = new WebSocket(WS[wsI % WS.length]); }catch(e){ return retry(); }
+    ws.onopen = function(){ opened = true; wsDelay = 2000; status(true, 'Live'); };
+    ws.onmessage = function(e){
+      var d;
+      try{ d = JSON.parse(e.data); }catch(err){ return; }
+      if(!Array.isArray(d)) return;
+      var now = Date.now();
+      for(var i = 0; i < d.length; i++){
+        var x = d[i];
+        if(x.s && x.s.slice(-4) === 'USDT') tk[x.s] = {c: +x.c, o: +x.o, t: now};
+      }
+      if(needMap && coins.length){ needMap = false; mapPairs(); charts(false); }
+      dirty();
+    };
+    ws.onerror = function(){ try{ ws.close(); }catch(e){} };
+    ws.onclose = function(){
+      if(!opened) wsI++;
+      status(false, wsI >= WS.length && !opened ? 'Delayed' : 'Reconnecting');
+      retry();
+    };
+  }
+  function retry(){ setTimeout(connect, wsDelay); wsDelay = Math.min(wsDelay * 2, 30000); }
+  function status(on, text){ statusEl.classList.toggle('on', on); statusText.textContent = text; }
+
+  /* ---------- data: CoinGecko ---------- */
+  var cgChain = Promise.resolve();
+  // slow lane for the few coins that do not trade on Binance
+  function cgSlow(url){
+    function run(tries){
+      return fetch(url).then(function(r){
+        if(r.status === 429 && tries < 3) return wait(30000).then(function(){ return run(tries + 1); });
+        if(!r.ok) throw new Error(r.status);
+        return r.json();
+      });
+    }
+    var p = cgChain.then(function(){ return run(0); });
+    cgChain = p.catch(function(){}).then(function(){ return wait(2500); });
+    return p;
+  }
+
+  function loadList(also){
+    var f = fetch(CG + '/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=24h,7d,30d,1y')
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
+    return Promise.all([f, also]).then(function(res){
+      var d = res[0];
+      if(!Array.isArray(d) || !d.length) throw new Error('empty');
+      coins = d;
+      btc = d.filter(function(c){ return c.id === 'bitcoin'; })[0] || null;
+      mapPairs();
+      build();
+      if(!tk.EURUSDT) loadEur();
+    }).catch(function(){
+      if(!coins.length) msgEl.textContent = 'Could not load the list right now. Trying again in a moment.';
+    });
+  }
+
+  // only used when the live euro rate is not available
+  function loadEur(){
+    fetch(CG + '/simple/price?ids=bitcoin&vs_currencies=usd,eur')
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d){
+        var b = d && d.bitcoin;
+        if(b && b.usd && b.eur){ cgEur = b.usd / b.eur; if(cur === 'eur'){ charts(false); dirty(); } }
+      }).catch(function(){});
+  }
+
+  /* ---------- chart history ---------- */
+  // Returns a promise of [[time, usd price], ...] or null.
+  function loadSeries(c, rg){
+    // Binance history is cheap to fetch, so those charts refresh every 5 minutes.
+    var k = c.id + ':' + rg, R = RANGES[rg], sym = pairs[c.id], ttl = sym ? 5 * MIN : R.ttl, hit = cache[k];
+    if(hit && Date.now() - hit.t < ttl) return hit.p;
+    var p;
+    if(sym){
+      p = bpool(function(){ return bget('/klines?symbol=' + sym + '&interval=' + R.iv + '&limit=' + R.n); })
+        .then(function(d){ return d.map(function(x){ return [x[6], +x[4]]; }); });
+    }else if(rg === '24h' || rg === '7d'){
+      var s = (c.sparkline_in_7d && c.sparkline_in_7d.price) || [], now = Date.now();
+      var a = s.map(function(v, i){ return [now - (s.length - 1 - i) * 3600000, v]; });
+      p = Promise.resolve(rg === '24h' ? a.slice(-25) : a);
+    }else{
+      p = cgSlow(CG + '/coins/' + encodeURIComponent(c.id) + '/market_chart?vs_currency=usd&days=' + R.days)
+        .then(function(d){ return d.prices; });
+    }
+    var entry = {t: Date.now(), p: null};
+    entry.p = p.then(function(a){
+      if(a && a.length > 1) return a;
+      entry.t = Date.now() - ttl + MIN;     // nothing came back: try again in a minute
+      return null;
+    }, function(){
+      entry.t = Date.now() - ttl + MIN;
+      return null;
+    });
+    cache[k] = entry;
+    return entry.p;
+  }
+  function near(a, t){
+    var lo = 0, hi = a.length - 1;
+    while(hi - lo > 1){ var m = (lo + hi) >> 1; if(a[m][0] <= t) lo = m; else hi = m; }
+    return Math.abs(a[lo][0] - t) <= Math.abs(a[hi][0] - t) ? a[lo][1] : a[hi][1];
+  }
+  // Price history as plain numbers in the chosen currency.
+  function seriesIn(c, rg, cu){
+    if(cu === 'usd') return loadSeries(c, rg).then(function(a){ return a && a.map(function(x){ return x[1]; }); });
+    if(cu === 'eur'){
+      var rates = pairs[EUR.id] ? loadSeries(EUR, rg) : Promise.resolve(null);
+      return Promise.all([loadSeries(c, rg), rates]).then(function(r){
+        var a = r[0], b = r[1], flat = eurUsd();
+        if(!a || (!b && !flat)) return null;
+        return a.map(function(x){ return x[1] / (b ? near(b, x[0]) : flat); });
+      });
+    }
+    if(!btc) return Promise.resolve(null);
+    if(c.id === 'bitcoin') return loadSeries(c, rg).then(function(a){ return a && a.map(function(){ return 1; }); });
+    return Promise.all([loadSeries(c, rg), loadSeries(btc, rg)]).then(function(r){
+      var a = r[0], b = r[1];
+      if(!a || !b) return null;
+      var from = b[0][0] - 31 * 86400000, out = [];
+      a.forEach(function(x){ if(x[0] >= from){ var q = near(b, x[0]); if(q) out.push(x[1] / q); } });
+      return out.length > 1 ? out : null;
+    });
+  }
+
+  /* ---------- page ---------- */
+  function wbHtml(c){
+    var on = watch.has(c.id);
+    return '<button class="wb' + (on ? ' on' : '') + '" data-w="' + esc(c.id) + '" aria-pressed="' + on + '" title="' +
+      (on ? 'Remove from watchlist' : 'Add to watchlist') + '" aria-label="' + (on ? 'Remove ' : 'Add ') + esc(c.name) +
+      (on ? ' from watchlist' : ' to watchlist') + '">' + (on ? '\u25C8' : '+') + '</button>';
+  }
+  function rmHtml(c){
+    return '<button class="wb" data-rm="' + esc(c.id) + '" title="Remove from portfolio" aria-label="Remove ' + esc(c.name) + ' from portfolio">\u00D7</button>';
+  }
+  function fmtAmt(n){ return n.toLocaleString('en-US', {maximumFractionDigits: 8, useGrouping: false}); }
+  // accepts 1234.5, 1,234.5, 1234,5 and 1.234,5
+  function parseAmt(v){
+    var t = String(v).replace(/\s/g, ''), c = t.lastIndexOf(','), d = t.lastIndexOf('.');
+    if(c > d) t = t.replace(/\./g, '').replace(',', '.'); else t = t.replace(/,/g, '');
+    var n = t === '' ? NaN : Number(t);
+    return isFinite(n) && n > 0 ? n : null;
+  }
+  function build(){
+    var key;
+    if(MODE === 'port'){
+      view = coins.filter(function(c){ return hold[c.id] > 0; });
+      // the key ignores order, so rows only move when a holding is added or removed
+      key = 'P:' + view.map(function(c){ return c.id; }).sort().join(',');
+      if(key !== order) view.sort(function(a, b){ return usd(b) * hold[b.id] - usd(a) * hold[a.id]; });
+      else view = orderView.map(function(c){ return coins.filter(function(x){ return x.id === c.id; })[0]; });
+      orderView = view;
+      document.getElementById('pList').innerHTML = coins.map(function(c){
+        return '<option value="' + esc(c.name) + ' (' + esc(String(c.symbol).toUpperCase()) + ')">';
+      }).join('');
+    }else{
+      view = MODE === 'watch' ? coins.filter(function(c){ return watch.has(c.id); }) : coins;
+      key = (tiles ? 'T:' : 'L:') + view.map(function(c){ return c.id; }).join(',');
+    }
+    notes();
+    if(key === order){
+      view.forEach(function(c){ if(rows[c.id]) rows[c.id].c = c; });
+      charts(false);
+      dirty();
+      return;
+    }
+    order = key;
+    big = tiles && view.length > 0;
+    boxEl.style.display = big ? 'none' : '';
+    tilesEl.style.display = big ? '' : 'none';
+    if(big){ buildTiles(); charts(true); update(); return; }
+    tilesEl.innerHTML = '';
+    rowsEl.innerHTML = view.map(function(c, i){
+      return '<tr>' +
+        '<td class="w">' + (MODE === 'port' ? rmHtml(c) : wbHtml(c)) + '</td>' +
+        '<td class="rank">' + (c.market_cap_rank || i + 1) + '</td>' +
+        '<td class="l"><div class="coin"><img src="' + esc(c.image || '') + '" alt="" width="22" height="22" loading="lazy">' +
+          '<span class="n">' + esc(c.name) + '</span><span class="s">' + esc(c.symbol) + '</span></div></td>' +
+        '<td></td><td></td><td>' + (MODE === 'port'
+          ? '<input class="amt" data-a="' + esc(c.id) + '" value="' + fmtAmt(hold[c.id]) + '" inputmode="decimal" aria-label="Amount of ' + esc(c.name) + '">'
+          : '<span class="muted">…</span>') + '</td><td></td></tr>';
+    }).join('');
+    rows = {};
+    var trs = rowsEl.children;
+    view.forEach(function(c, i){
+      var td = trs[i].children;
+      rows[c.id] = {c: c, price: td[3], chg: td[4], chart: td[5], cap: td[6], first: null, pv: null, pt: '', ct: '', gt: ''};
+    });
+    charts(true);
+    update();
+  }
+
+  function buildTiles(){
+    rowsEl.innerHTML = '';
+    tilesEl.innerHTML = view.map(function(c, i){
+      return '<div class="tile">' +
+        '<div class="t-head"><div class="coin"><img src="' + esc(c.image || '') + '" alt="" width="22" height="22" loading="lazy">' +
+          '<span class="n">' + esc(c.name) + '</span><span class="s">' + esc(c.symbol) + '</span></div>' + wbHtml(c) + '</div>' +
+        '<div class="t-price"></div>' +
+        '<div class="t-sub"><span></span><span class="muted t-rg"></span><span class="muted t-rank">#' + (c.market_cap_rank || i + 1) + '</span></div>' +
+        '<div class="t-chart"><span class="muted">…</span></div>' +
+        '<div class="t-foot"><span>Market cap</span><span></span></div>' +
+      '</div>';
+    }).join('');
+    rows = {};
+    view.forEach(function(c, i){
+      var t = tilesEl.children[i].children;
+      rows[c.id] = {c: c, price: t[1], chg: t[2].children[0], chart: t[3], cap: t[4].children[1], first: null, pv: null, pt: '', ct: '', gt: ''};
+    });
+  }
+
+  // Messages under the table: empty watchlist, and watched coins that left the top 100.
+  function notes(){
+    if(MODE === 'top'){ msgEl.textContent = ''; return; }
+    if(MODE === 'port'){
+      msgEl.textContent = view.length ? '' : 'No holdings yet. Add a project and an amount above.';
+      var have = {}, gone = 0;
+      coins.forEach(function(c){ have[c.id] = 1; });
+      for(var id in hold) if(!have[id]) gone++;
+      noteEl.textContent = gone ? gone + (gone === 1 ? ' holding is' : ' holdings are') + ' outside the top 100 right now, so hidden and not counted in the total.' : '';
+      return;
+    }
+    msgEl.innerHTML = view.length ? '' : 'Your watchlist is empty. Tap <b>+</b> next to a project in the <a href="captastic.html">Top 100</a>.';
+    var ids = {}, out = 0;
+    coins.forEach(function(c){ ids[c.id] = 1; });
+    watch.forEach(function(id){ if(!ids[id]) out++; });
+    noteEl.textContent = out && view.length ? out + (out === 1 ? ' project on your list is' : ' projects on your list are') + ' outside the top 100 right now and hidden.' : '';
+  }
+
+  function charts(blank){
+    var g = ++gen, rg = range, cu = cur;
+    var label = rg === 'all' ? 'All time' : rg;
+    document.getElementById('chgHead').textContent = label;
+    Array.prototype.forEach.call(tilesEl.querySelectorAll('.t-rg'), function(el){ el.textContent = label; });
+    if(MODE === 'port'){
+      // No per-coin history is requested here, so the data this page asks for
+      // is the same whatever someone holds.
+      document.getElementById('pRg').textContent = label;
+      eurFirst = null;
+      view.forEach(function(c){ if(rows[c.id]) rows[c.id].first = null; });
+      if(cu === 'eur' && rg !== '24h' && pairs[EUR.id]){
+        loadSeries(EUR, rg).then(function(a){ if(g !== gen) return; eurFirst = a ? a[0][1] : null; dirty(); });
+      }
+      dirty();
+      return;
+    }
+    view.forEach(function(c){
+      var row = rows[c.id];
+      if(!row) return;
+      if(blank){ row.first = null; row.chart.innerHTML = '<span class="muted">…</span>'; }
+      seriesIn(c, rg, cu).then(function(a){
+        if(g !== gen || rows[c.id] !== row) return;
+        if(!a){ row.first = null; row.chart.innerHTML = '<span class="muted">–</span>'; }
+        else{ row.first = a[0]; row.chart.innerHTML = spark(a, big); }
+        dirty();
+      });
+    });
+  }
+
+  var raf = 0;
+  function dirty(){ if(!raf) raf = requestAnimationFrame(function(){ raf = 0; update(); }); }
+
+  function update(){
+    for(var i = 0; i < view.length; i++){
+      var row = rows[view[i].id];
+      if(!row) continue;
+      var p = price(row.c), t = fmtPrice(p);
+      if(t !== row.pt){
+        row.price.textContent = t;
+        if(!calm && row.pt && row.pv != null && p != null && p !== row.pv && row.price.animate){
+          row.price.animate([{color: p > row.pv ? '#00d9c0' : '#ff6b4a'}, {color: '#e8e6e0'}], {duration: 900});
+        }
+        row.pt = t;
+      }
+      row.pv = p;
+      t = MODE === 'port' ? fmtPrice(p == null ? null : p * (hold[row.c.id] || 0)) : fmtCap(cap(row.c));
+      if(t !== row.ct){ row.cap.textContent = t; row.ct = t; }
+      t = fmtPct(pct(row));
+      if(t !== row.gt){ row.chg.innerHTML = t; row.gt = t; }
+    }
+    if(MODE === 'port') totals();
+  }
+
+  var totT = '', totC = '';
+  function totals(){
+    var tot = 0, prev = 0, n = 0;
+    view.forEach(function(c){
+      var row = rows[c.id], p = price(c);
+      if(!row || p == null) return;
+      var v = p * (hold[c.id] || 0), x = pct(row);
+      tot += v; n++;
+      prev += x == null || x <= -100 ? v : v / (1 + x / 100);
+    });
+    var t = !coins.length ? '\u2013' : n ? fmtPrice(tot) : sign() + (cur === 'btc' ? '0' : '0.00'), h = '';
+    if(n && prev > 0 && tot > 0){
+      var d = tot - prev;
+      h = '<span class="' + (d >= 0 ? 'up' : 'down') + '">' + (d >= 0 ? '+' : '-') + fmtPrice(Math.abs(d)) +
+        ' (' + (d >= 0 ? '+' : '') + ((tot / prev - 1) * 100).toFixed(1) + '%)</span>';
+    }
+    if(t !== totT){ document.getElementById('pTotal').textContent = t; totT = t; }
+    if(h !== totC){ document.getElementById('pChg').innerHTML = h; totC = h; }
+  }
+
+  function mark(id, val){
+    Array.prototype.forEach.call(document.querySelectorAll('#' + id + ' button'), function(b){
+      b.classList.toggle('on', b.dataset.v === val);
+    });
+  }
+  function clearFlash(){ for(var id in rows){ rows[id].pt = ''; rows[id].pv = null; } }
+
+  document.getElementById('cur').addEventListener('click', function(e){
+    var v = e.target.dataset.v; if(!v || v === cur) return;
+    cur = v; set('cap_cur', v); mark('cur', v);
+    clearFlash(); charts(true); update();
+  });
+  document.getElementById('range').addEventListener('click', function(e){
+    var v = e.target.dataset.v; if(!v || v === range) return;
+    range = v; set('cap_range', v); mark('range', v);
+    charts(true); update();
+  });
+
+  document.querySelector('main').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-w]') : null;
+    var r = e.target.closest ? e.target.closest('[data-rm]') : null;
+    if(r){ delete hold[r.dataset.rm]; saveHold(); build(); return; }
+    if(!b) return;
+    var id = b.dataset.w;
+    if(watch.has(id)) watch.delete(id); else watch.add(id);
+    set('cap_watch', JSON.stringify(Array.from(watch)));
+    if(MODE === 'watch'){ build(); return; }
+    var c = coins.filter(function(x){ return x.id === id; })[0];
+    if(c) b.outerHTML = wbHtml(c);
+  });
+  // another tab changed the list
+  window.addEventListener('storage', function(e){
+    if(e.key !== 'cap_watch' && e.key !== 'cap_hold') return;
+    watch = readWatch();
+    hold = readHold();
+    if(coins.length){ order = null; build(); }
+  });
+
+  var layoutEl = document.getElementById('layout');
+  layoutEl.addEventListener('click', function(e){
+    var v = e.target.dataset.v; if(!v || (v === 'tiles') === tiles) return;
+    tiles = v === 'tiles'; set('cap_layout', v); mark('layout', v);
+    if(coins.length) build();
+  });
+  if(MODE === 'watch'){
+    layoutEl.hidden = false;
+    mark('layout', tiles ? 'tiles' : 'list');
+    document.getElementById('eyebrow').textContent = '\u25C8 Your watchlist';
+    document.getElementById('title').textContent = 'Your projects. No noise.';
+    msgEl.textContent = 'Loading your watchlist...';
+  }
+  if(MODE === 'port'){
+    document.getElementById('port').hidden = false;
+    document.querySelector('#range [data-v="all"]').hidden = true;
+    document.getElementById('eyebrow').textContent = '\u25C8 Your portfolio';
+    document.getElementById('title').textContent = 'Your holdings. No noise.';
+    document.getElementById('thA').textContent = 'Holdings';
+    document.getElementById('thB').textContent = 'Value';
+    msgEl.textContent = 'Loading your portfolio...';
+
+    var pCoin = document.getElementById('pCoin'), pAmt = document.getElementById('pAmt'), pMsg = document.getElementById('pMsg');
+    var bad = function(el){ el.classList.add('bad'); el.focus(); setTimeout(function(){ el.classList.remove('bad'); }, 1500); };
+    var findCoin = function(v){
+      v = v.trim().toLowerCase();
+      if(!v) return null;
+      var hit = null;
+      coins.some(function(c){
+        var n = String(c.name).toLowerCase(), sy = String(c.symbol).toLowerCase();
+        if(v === n || v === sy || v === n + ' (' + sy + ')'){ hit = c; return true; }
+      });
+      if(!hit) coins.some(function(c){ if(String(c.name).toLowerCase().indexOf(v) === 0){ hit = c; return true; } });
+      return hit;
+    };
+    document.getElementById('pForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      pMsg.textContent = '';
+      var c = findCoin(pCoin.value), n = parseAmt(pAmt.value);
+      if(!c) return bad(pCoin);
+      if(n == null) return bad(pAmt);
+      hold[c.id] = (hold[c.id] || 0) + n;
+      saveHold();
+      pCoin.value = ''; pAmt.value = '';
+      build();
+      var inp = rowsEl.querySelector('.amt[data-a="' + c.id.replace(/"/g, '') + '"]');
+      if(inp) inp.value = fmtAmt(hold[c.id]);
+      dirty();
+      pCoin.focus();
+    });
+    // edit an amount in the table
+    rowsEl.addEventListener('change', function(e){
+      var id = e.target.dataset && e.target.dataset.a;
+      if(!id) return;
+      var n = parseAmt(e.target.value);
+      if(n != null){ hold[id] = n; saveHold(); }
+      e.target.value = fmtAmt(hold[id]);
+      dirty();
+    });
+    rowsEl.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && e.target.dataset && e.target.dataset.a) e.target.blur();
+    });
+    // backup to a file on the visitor's own device, and back
+    document.getElementById('pExp').addEventListener('click', function(){
+      var blob = new Blob([JSON.stringify({app: 'captastic', version: 1, holdings: hold}, null, 2)], {type: 'application/json'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'captastic-portfolio.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    });
+    var pFile = document.getElementById('pFile');
+    document.getElementById('pImp').addEventListener('click', function(){ pFile.click(); });
+    pFile.addEventListener('change', function(){
+      var f = pFile.files && pFile.files[0];
+      if(!f) return;
+      var rd = new FileReader();
+      rd.onload = function(){
+        var next = {}, n = 0;
+        try{
+          var d = JSON.parse(rd.result), h = d && d.holdings;
+          for(var k in h) if(typeof h[k] === 'number' && isFinite(h[k]) && h[k] > 0){ next[k] = h[k]; n++; }
+        }catch(err){}
+        if(!n){ pMsg.textContent = 'That file is not a Captastic backup.'; }
+        else{
+          hold = next; saveHold();
+          pMsg.textContent = 'Restored ' + n + (n === 1 ? ' holding.' : ' holdings.');
+          if(coins.length){ order = null; build(); }
+        }
+        pFile.value = '';
+      };
+      rd.readAsText(f);
+    });
+  }
+  var navOn = document.querySelector('.nav-right a[data-nav="' + MODE + '"]');
+  if(navOn) navOn.setAttribute('aria-current', 'page');
+
+  mark('cur', cur); mark('range', range);
+  var snap = Promise.race([loadSnapshot(), wait(6000).then(function(){ needMap = true; })]);
+  loadList(snap);
+  connect();
+  setInterval(function(){ loadList(); }, 2 * MIN);
+  // keep rows honest if the live feed goes quiet
+  setInterval(dirty, 15000);
+})();
+</script>
+</body>
+</html>
