@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Captastic · Top 100 Live</title>
 <meta name="description" content="The top 100 crypto projects by market cap, live, with no noise and no ads.">
+<meta name="theme-color" content="#0a0b0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Captastic">
+<link rel="apple-touch-icon" href="captastic-icon.png">
+<link rel="icon" type="image/png" href="captastic-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
@@ -137,6 +144,11 @@
   .p-msg{font-family:var(--mono); font-size:12px; color:var(--teal); padding:8px 2px 0;}
   .p-msg:empty{display:none;}
 
+  body{padding-bottom:env(safe-area-inset-bottom);}
+  #tip{font-family:var(--mono); font-size:12px; color:var(--muted); padding:10px 2px 0; display:flex; gap:10px; align-items:baseline;}
+  #tip[hidden]{display:none;}
+  #tip button{background:none; border:0; color:var(--muted); font:inherit; cursor:pointer; padding:0 4px;}
+  #tip button:hover{color:var(--gold);}
   footer{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:28px 0 48px; line-height:1.9;}
   footer a{color:var(--muted);}
   footer a:hover{color:var(--teal);}
@@ -217,6 +229,7 @@
       <span class="p-tools"><button type="button" id="pExp">Save backup file</button> · <button type="button" id="pImp">Restore backup</button><input type="file" id="pFile" accept="application/json,.json" hidden></span>
     </div>
     <div class="p-msg" id="pMsg"></div>
+    <div id="tip" hidden><span id="tipText"></span><button type="button" id="tipX" aria-label="Hide this tip">\u00D7</button></div>
   </section>
 
   <div class="tablebox" id="tablebox">
@@ -874,6 +887,20 @@
     document.getElementById('thA').textContent = 'Holdings';
     document.getElementById('thB').textContent = 'Value';
     msgEl.textContent = 'Loading your portfolio...';
+
+    // One-line tip on phones: how to keep this page on the home screen like an app.
+    (function(){
+      var tip = document.getElementById('tip');
+      var inApp = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+      var phone = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+      if(inApp || !phone || get('cap_tip', '1') === '0') return;
+      var apple = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      document.getElementById('tipText').textContent = apple
+        ? '\u25C8 Use it like an app: tap the Share button, then "Add to Home Screen".'
+        : '\u25C8 Use it like an app: open the browser menu, then "Add to Home screen".';
+      tip.hidden = false;
+      document.getElementById('tipX').addEventListener('click', function(){ tip.hidden = true; set('cap_tip', '0'); });
+    })();
 
     var pTotal = document.getElementById('pTotal'), pHint = document.getElementById('pHint');
     var showHide = function(){
