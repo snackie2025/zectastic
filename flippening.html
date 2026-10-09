@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.coingecko.com; connect-src https://api.coingecko.com; media-src https:">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zcash Flippening Party · Zectastic</title>
 <meta name="description" content="Live Zcash flippening tracker: how far ZEC is from flipping every coin ranked above it, with party mode, confetti, and DANCE.FM playing.">
@@ -303,6 +305,10 @@
   const fmtUSD = (n, opts={}) => n == null ? '—' : n.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits: n < 10 ? 4 : 2, ...opts});
   const fmtCompact = (n) => n == null ? '—' : '$' + Intl.NumberFormat('en-US', {notation:'compact', maximumFractionDigits:2}).format(n);
 
+  // Text from the data feed is shown as plain text, never read as page code.
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const safeImg = u => (typeof u === 'string' && u.indexOf('https://') === 0) ? esc(u) : '';
+
   async function loadFlippeningBoard(){
     try {
       const [zecRes, marketsRes] = await Promise.all([
@@ -337,9 +343,9 @@
         const pct = Math.min(100, (zecPrice / flipPrice) * 100);
         return `
           <div class="ladder-row ${i === 0 ? 'closest' : ''}">
-            <div class="ladder-rank">#${c.market_cap_rank}</div>
+            <div class="ladder-rank">#${Number(c.market_cap_rank) || ''}</div>
             <div>
-              <div class="ladder-name"><img src="${c.image}" alt="" loading="lazy"> ${c.name} <span class="ladder-sym">${c.symbol}</span></div>
+              <div class="ladder-name"><img src="${safeImg(c.image)}" alt="" loading="lazy"> ${esc(c.name)} <span class="ladder-sym">${esc(c.symbol)}</span></div>
               <div class="ladder-meta">Market cap ${fmtCompact(c.market_cap)}</div>
             </div>
             <div class="ladder-target">

@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://api.binance.com https://api.coingecko.com https://api.kraken.com https://api.zecblock.com https://api.mainnet.cipherscan.app wss://ws.kraken.com wss://ws-feed.exchange.coinbase.com wss://api.gemini.com wss://stream.binance.com:9443 wss://api-pub.bitfinex.com wss://ws.okx.com:8443 wss://stream.bybit.com wss://api.gateio.ws wss://ws.bitget.com">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ZEC Map · Zectastic</title>
 <meta name="description" content="Live ZEC buys on a world map, flying into the price, with swaps into ZEC surfacing in a hidden shielded zone.">
@@ -226,8 +228,8 @@
   </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" integrity="sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js" integrity="sha512-4UKI/XKm3xrvJ6pZS5oTRvIQGIzZFoXR71rRBb1y2N+PbwAsKa5tPl2J6WvbEvwN3TxQCm8hMzsl/pO+82iRlg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function(){
 const $=s=>document.querySelector(s);
@@ -292,7 +294,7 @@ function draw(){
 }
 draw();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
-d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(w=>{
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json",{integrity:"sha384-yOCJ+8ShBm8UDqtAVtAvxTDDf4gXo5edxl/YG0FmVC5OTmqVLl7utuVGBDEeZWHf"}).then(w=>{
  land=topojson.feature(w,w.objects.countries).features.filter(f=>String(f.id)!=="010");
  draw();
 }).catch(()=>{});
