@@ -118,6 +118,8 @@
   #port[hidden]{display:none;}
   .p-card{border:1px solid var(--line); background:var(--bg-raised); padding:22px 20px; display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px;}
   .p-label{font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);}
+  button.p-value{display:block; background:none; border:0; padding:0; color:var(--text); cursor:pointer; text-align:left;}
+  #pHint{letter-spacing:0.06em; opacity:.7;}
   .p-value{font-family:var(--mono); font-weight:800; font-size:36px; letter-spacing:-0.02em; line-height:1.25; font-variant-numeric:tabular-nums;}
   .p-sub{font-family:var(--mono); font-size:13px; display:flex; gap:8px; align-items:baseline; min-height:20px;}
   .p-add{display:flex; flex-wrap:wrap; gap:8px;}
@@ -199,8 +201,8 @@
   <section id="port" hidden>
     <div class="p-card">
       <div>
-        <div class="p-label">Total value</div>
-        <div class="p-value" id="pTotal">–</div>
+        <div class="p-label">Total value <span id="pHint">· tap to hide</span></div>
+        <button type="button" class="p-value" id="pTotal" aria-pressed="false" title="Hide or show your amounts">–</button>
         <div class="p-sub"><span id="pChg"></span><span class="muted t-rg" id="pRg"></span></div>
       </div>
       <form class="p-add" id="pForm" autocomplete="off">
@@ -282,6 +284,8 @@
     return out;
   }
   function saveHold(){ set('cap_hold', JSON.stringify(hold)); }
+  var hide = get('cap_hide', '0') === '1';   // amounts masked, for when someone can see the screen
+  var DOTS = '\u2022\u2022\u2022\u2022\u2022\u2022';
   var eurFirst = null; // euro rate at the start of the chosen range (portfolio only)
 
   var coins = [];      // top 100 from CoinGecko (rank, supply, logo)
@@ -648,7 +652,7 @@
     if(MODE === 'port'){
       view = coins.filter(function(c){ return hold[c.id] > 0; });
       // the key ignores order, so rows only move when a holding is added or removed
-      key = 'P:' + view.map(function(c){ return c.id; }).sort().join(',');
+      key = (hide ? 'PH:' : 'P:') + view.map(function(c){ return c.id; }).sort().join(',');
       if(key !== order) view.sort(function(a, b){ return usd(b) * hold[b.id] - usd(a) * hold[a.id]; });
       else view = orderView.map(function(c){ return coins.filter(function(x){ return x.id === c.id; })[0]; });
       orderView = view;
@@ -679,7 +683,8 @@
         '<td class="l"><div class="coin"><img src="' + esc(c.image || '') + '" alt="" width="22" height="22" loading="lazy">' +
           '<span class="n">' + esc(c.name) + '</span><span class="s">' + esc(c.symbol) + '</span></div></td>' +
         '<td></td><td></td><td>' + (MODE === 'port'
-          ? '<input class="amt" data-a="' + esc(c.id) + '" value="' + fmtAmt(hold[c.id]) + '" inputmode="decimal" aria-label="Amount of ' + esc(c.name) + '">'
+          ? (hide ? '<span class="muted">' + DOTS + '</span>'
+            : '<input class="amt" data-a="' + esc(c.id) + '" value="' + fmtAmt(hold[c.id]) + '" inputmode="decimal" aria-label="Amount of ' + esc(c.name) + '">')
           : '<span class="muted">…</span>') + '</td><td></td></tr>';
     }).join('');
     rows = {};
@@ -782,7 +787,7 @@
         row.pt = t;
       }
       row.pv = p;
-      t = MODE === 'port' ? fmtPrice(p == null ? null : p * (hold[row.c.id] || 0)) : fmtCap(cap(row.c));
+      t = MODE !== 'port' ? fmtCap(cap(row.c)) : hide ? DOTS : fmtPrice(p == null ? null : p * (hold[row.c.id] || 0));
       if(t !== row.ct){ row.cap.textContent = t; row.ct = t; }
       t = fmtPct(pct(row));
       if(t !== row.gt){ row.chg.innerHTML = t; row.gt = t; }
@@ -800,11 +805,11 @@
       tot += v; n++;
       prev += x == null || x <= -100 ? v : v / (1 + x / 100);
     });
-    var t = !coins.length ? '\u2013' : n ? fmtPrice(tot) : sign() + (cur === 'btc' ? '0' : '0.00'), h = '';
+    var t = !coins.length ? '\u2013' : hide ? DOTS : n ? fmtPrice(tot) : sign() + (cur === 'btc' ? '0' : '0.00'), h = '';
     if(n && prev > 0 && tot > 0){
-      var d = tot - prev;
-      h = '<span class="' + (d >= 0 ? 'up' : 'down') + '">' + (d >= 0 ? '+' : '-') + fmtPrice(Math.abs(d)) +
-        ' (' + (d >= 0 ? '+' : '') + ((tot / prev - 1) * 100).toFixed(1) + '%)</span>';
+      var d = tot - prev, pc = (d >= 0 ? '+' : '') + ((tot / prev - 1) * 100).toFixed(1) + '%';
+      // hidden: the percentage stays, the money amount does not
+      h = '<span class="' + (d >= 0 ? 'up' : 'down') + '">' + (hide ? pc : (d >= 0 ? '+' : '-') + fmtPrice(Math.abs(d)) + ' (' + pc + ')') + '</span>';
     }
     if(t !== totT){ document.getElementById('pTotal').textContent = t; totT = t; }
     if(h !== totC){ document.getElementById('pChg').innerHTML = h; totC = h; }
@@ -869,6 +874,19 @@
     document.getElementById('thA').textContent = 'Holdings';
     document.getElementById('thB').textContent = 'Value';
     msgEl.textContent = 'Loading your portfolio...';
+
+    var pTotal = document.getElementById('pTotal'), pHint = document.getElementById('pHint');
+    var showHide = function(){
+      pTotal.setAttribute('aria-pressed', hide ? 'true' : 'false');
+      pHint.textContent = hide ? '\u00B7 tap to show' : '\u00B7 tap to hide';
+    };
+    showHide();
+    pTotal.addEventListener('click', function(){
+      hide = !hide;
+      set('cap_hide', hide ? '1' : '0');
+      showHide();
+      if(coins.length) build(); else dirty();
+    });
 
     var pCoin = document.getElementById('pCoin'), pAmt = document.getElementById('pAmt'), pMsg = document.getElementById('pMsg');
     var bad = function(el){ el.classList.add('bad'); el.focus(); setTimeout(function(){ el.classList.remove('bad'); }, 1500); };

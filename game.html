@@ -157,6 +157,7 @@ body::after{
 .lb-name{font-size:9px;color:var(--neon-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lb-row.me .lb-name{color:var(--neon);}
 .lb-score{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;color:var(--gold);text-align:right;white-space:nowrap;}
+#lb-how{font-size:8px;line-height:1.6;color:var(--neon-dim);text-align:center;padding:8px 4px 2px;letter-spacing:.1em;border-top:1px solid rgba(244,183,40,.06);margin-top:4px;}
 #lb-empty{font-size:8.5px;color:var(--neon-dim);text-align:center;padding:8px;letter-spacing:.12em;}
 
 .ms{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(244,183,40,.05);}
@@ -615,8 +616,9 @@ body::after{
         <button id="replay-intro">⟳ replay origin story</button>
       </div>
       <div class="pbox">
-        <div class="ptitle">GLOBAL BOARD</div>
+        <div class="ptitle">HALL OF FAME</div>
         <div id="lb-list"><div id="lb-empty">LOADING…</div></div>
+        <div id="lb-how">POST YOUR SCORE ON X WITH #EncryptTheMoney TO GET ON THE BOARD. YOUR OWN BEST STAYS ON THIS DEVICE.</div>
       </div>
       <div class="pbox">
         <div class="ptitle">MILESTONES</div>
@@ -670,7 +672,7 @@ const TTYPES = [
 const $ = id => document.getElementById(id);
 
 // Sanitize any string before inserting into innerHTML
-// Prevents stored XSS from leaderboard names coming from Supabase
+// Keeps names on the board from being read as HTML
 const esc = s => String(s)
   .replace(/&/g,'&amp;')
   .replace(/</g,'&lt;')
@@ -755,64 +757,37 @@ function savePd() {
 // ─────────────────────────────────────────
 //  LEADERBOARD
 // ─────────────────────────────────────────
-// ── SUPABASE CONFIG ──
-const SB_URL = 'https://svfrxrmofgokzddwcoqv.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZnJ4cm1vZmdva3pkZHdjb3F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3Njc1NjYsImV4cCI6MjA5MzM0MzU2Nn0.AHpGEChN3I7kd2bCp6MFMTpVfm_AqjSht22A316TWfkC';
-const SB_HDR = { 'Content-Type':'application/json', 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY };
-const LB_KEY = 'zcash-lb-local-v4';
+// ── HALL OF FAME ──
+// A hand-kept list. The game sends nothing anywhere: no server, no database.
+// Players post their score on X with #EncryptTheMoney, and the best ones are added here.
+// To add someone, copy the example line, remove the two slashes, and fill in the
+// callsign and the score exactly as shown in their post (the number after the Ƶ sign).
+const HALL_OF_FAME = [
+  // { name: 'CALLSIGN', zec: 0.00012345 },
+];
 
-function lbLocal() { try { return JSON.parse(localStorage.getItem(LB_KEY)) || []; } catch(e) { return []; } }
-function saveLbLocal(d) { try { localStorage.setItem(LB_KEY, JSON.stringify(d)); } catch(e) {} }
+// The old online scoreboard kept a copy in the browser. It is no longer used, so clear it.
+try { localStorage.removeItem('zcash-lb-local-v4'); } catch(e) {}
 
-async function loadLb() {
-  // Show local cache instantly, then refresh from Supabase
-  renderLb(lbLocal());
-  try {
-    const res = await fetch(
-      `${SB_URL}/rest/v1/scores?select=name,raw&order=raw.desc&limit=50`,
-      { headers: SB_HDR, cache:'no-store' }
-    );
-    if (!res.ok) return;
-    const rows = await res.json();
-    // Validate each row: name must be a string, raw must be a positive integer
-    const arr = rows
-      .filter(r => typeof r.name === 'string' && Number.isInteger(r.raw) && r.raw >= 0)
-      .map(r => ({ name: r.name.slice(0, 12), raw: r.raw }));
-    saveLbLocal(arr);
-    renderLb(arr);
-  } catch(e) {}
+// The board shown in the game: the hall of fame plus this player's own best, kept only in this browser.
+function boardData() {
+  const d = HALL_OF_FAME
+    .filter(e => e && typeof e.name === 'string' && typeof e.zec === 'number' && isFinite(e.zec) && e.zec >= 0)
+    .map(e => ({ name: e.name.slice(0, 12).toUpperCase(), raw: Math.round(e.zec * ZEC_UNIT) }));
+  if (pd.bestRaw > 0) {
+    const mine = d.find(e => e.name === pd.name);
+    if (mine) mine.raw = Math.max(mine.raw, pd.bestRaw);
+    else d.push({ name: pd.name, raw: pd.bestRaw });
+  }
+  return d.sort((a, b) => b.raw - a.raw);
 }
-
-async function submitScore(raw) {
-  // Sanity-check the score before sending — reject obviously impossible values
-  if (typeof raw !== 'number' || !isFinite(raw) || raw < 0 || raw > 100000000) return;
-  raw = Math.floor(raw); // ensure integer
-
-  // 1. Update local cache immediately
-  let d = lbLocal().filter(e => e.name !== pd.name);
-  d.push({ name:pd.name, raw });
-  d.sort((a,b) => b.raw - a.raw);
-  d = d.slice(0, 50);
-  saveLbLocal(d); renderLb(d);
-
-  // 2. Upsert to Supabase (insert or update — name is the unique key)
-  if (raw <= 0) { await loadLb(); return; }
-  const cleanName = pd.name.slice(0,12).replace(/[^A-Z0-9_\-\.]/g,'');
-  if (cleanName.length < 2) { await loadLb(); return; }
-  try {
-    await fetch(`${SB_URL}/rest/v1/scores`, {
-      method: 'POST',
-      headers: { ...SB_HDR, 'Prefer': 'resolution=merge-duplicates,return=representation' },
-      body: JSON.stringify({ name: cleanName, raw, updated_at: new Date().toISOString() })
-    });
-    // Reload global board after submit
-    await loadLb();
-  } catch(e) { await loadLb(); }
-}
+function loadLb() { renderLb(boardData()); }
+// Kept under its old name for the places that call it. It only redraws the board now.
+function submitScore() { loadLb(); }
 
 function renderLb(data) {
   lbList.innerHTML = '';
-  if (!data.length) { lbList.innerHTML = '<div id="lb-empty">BE THE FIRST!</div>'; return; }
+  if (!data.length) { lbList.innerHTML = '<div id="lb-empty">NO ENTRIES YET. BE THE FIRST!</div>'; return; }
   data.slice(0,10).forEach((e,i) => {
     const row = document.createElement('div');
     row.className = 'lb-row' + (i===0?' r1':i===1?' r2':i===2?' r3':'');
@@ -1246,6 +1221,7 @@ async function endGame() {
   const tweetText = encodeURIComponent(
     `I just encrypted ${zecShort(gs.raw)} in the ZCash Shield game on zectastic.com!\n` +
     `Wave ${gs.wave} reached. Can you beat me? 🛡️⚡\n` +
+    (pd.name && pd.name !== 'ANON' ? `Callsign: ${pd.name}\n` : '') +
     `Come encrypt the money → zectastic.com\n` +
     `#ZCash #EncryptTheMoney #ZEC #PrivacyCoin`
   );

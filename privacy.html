@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy · Zectastic</title>
-<meta name="description" content="What Zectastic does and doesn't collect, and how the third-party feeds it uses (CoinGecko, zkp.baby, DANCE.FM) handle your data.">
+<meta name="description" content="What Zectastic and Captastic do and don't collect, what stays in your browser, and which third-party feeds your browser talks to.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -90,9 +90,9 @@
 <section class="hero">
   <div class="wrap">
     <div class="eyebrow">◈ Privacy</div>
-    <h1>What Zectastic does and doesn't do with your data</h1>
-    <p class="lede">Short version: there's no account, no wallet connection, and nothing to sell. Most of what you see is fetched live from other people's public feeds, and this page explains exactly which ones, and what they can see.</p>
-    <div class="updated">Last updated August 2026</div>
+    <h1>What Zectastic and Captastic do and don't do with your data</h1>
+    <p class="lede">Short version: there's no account, no wallet connection, and nothing to sell. Anything you save, such as a watchlist or a portfolio, stays in your own browser. Most of what you see is fetched live from other people's public feeds, and this page explains exactly which ones, and what they can see.</p>
+    <div class="updated">Last updated October 2026</div>
   </div>
 </section>
 
@@ -101,8 +101,9 @@
     <h2><span class="icon">◈</span> The short version</h2>
     <ul class="quick-list">
       <li><span class="mark">→</span> Zectastic doesn't have user accounts, doesn't ask for a wallet address, and doesn't run analytics or advertising trackers.</li>
-      <li><span class="mark">→</span> The only thing stored locally is your cookie choice and, if you set one, your radio volume. Nothing here is sold or shared.</li>
-      <li><span class="mark">→</span> Live price, supply, and shielded-pool numbers come from third-party services (CoinGecko and zkp.baby) that your browser talks to directly. Their own privacy practices are outside our control, and linked below.</li>
+      <li><span class="mark">→</span> A few things are stored locally in your browser: your cookie choice, and, if you use them, your Captastic settings, watchlist and portfolio and your game progress. None of it is sent to us or to anyone else, and nothing here is sold or shared.</li>
+      <li><span class="mark">→</span> Live prices, supply, rankings and shielded-pool numbers come from third-party services (mainly CoinGecko, Binance, Kraken and zkp.baby) that your browser talks to directly. Their own privacy practices are outside our control, and linked below.</li>
+      <li><span class="mark">→</span> The ZEC Map connects your browser to several exchanges at once while it is open, to show their public trades.</li>
       <li><span class="mark">→</span> Playing the radio opens a direct audio connection to DANCE.FM, which can see your IP address for the duration of playback, same as any internet radio.</li>
     </ul>
   </div>
@@ -111,11 +112,16 @@
 <section>
   <div class="wrap">
     <h2><span class="icon">◈</span> What we store ourselves</h2>
-    <p>Zectastic stores essential preferences only, using your browser's local storage:</p>
+    <p>The site keeps a small amount of information in your browser's local storage, on your own device. It is never sent to us, because there is no server of ours to send it to.</p>
     <ul>
       <li>Whether you've accepted or dismissed the cookie notice, so it doesn't show up on every visit.</li>
-      <li>Your radio volume, if you change it from the default.</li>
+      <li>Your Captastic settings: the currency, time period and layout you last chose, and whether you hid your portfolio amounts.</li>
+      <li>Your Captastic watchlist: the list of projects you marked.</li>
+      <li>Your Captastic portfolio: the projects and amounts you typed in.</li>
+      <li>A copy of the public top 100 list, so Captastic opens quickly and keeps working when the ranking service is busy.</li>
+      <li>Your game progress: the callsign you chose, your best score and level, and whether you have already seen the intro.</li>
     </ul>
+    <p>You can remove all of it at any time by clearing this site's data in your browser. Doing so also erases your watchlist and portfolio, since no other copy exists.</p>
     <p>That's the entire list. We don't collect names, emails, wallet addresses, transaction history, or device fingerprints, and we don't run Google Analytics, Meta Pixel, or any similar tracker anywhere on the site.</p>
   </div>
 </section>
@@ -123,7 +129,7 @@
 <section>
   <div class="wrap">
     <h2><span class="icon">◈</span> Third-party feeds this site uses</h2>
-    <p>To keep prices, supply figures, and the shielded pool dashboard live, your browser fetches data directly from the services below. That means each one can see technical details like your IP address and request timing when your browser calls them, the same as visiting their site directly. Zectastic itself never sees or stores that data.</p>
+    <p>To keep prices, rankings, supply figures, and the shielded pool dashboard live, your browser fetches data directly from the services below. That means each one can see technical details like your IP address and request timing when your browser calls them, the same as visiting their site directly. Zectastic itself never sees or stores that data. A service is only contacted on the pages that use it.</p>
     <div class="service-table">
       <div class="service-row header">
         <div class="cell">Service</div>
@@ -131,9 +137,29 @@
         <div class="cell">Their policy</div>
       </div>
       <div class="service-row">
-        <div class="cell"><div class="name">CoinGecko</div><p>Live ZEC price, market cap, supply figures, and the flippening leaderboard.</p></div>
-        <div class="cell"><p>Public API, called directly from your browser every 60 seconds while a page is open.</p></div>
+        <div class="cell"><div class="name">CoinGecko</div><p>Live ZEC price, market cap, supply figures, the flippening leaderboard, and Captastic's top 100 ranking and project logos.</p></div>
+        <div class="cell"><p>Public API, called directly from your browser every one to two minutes while a page is open.</p></div>
         <div class="cell"><p><a href="https://www.coingecko.com/en/privacy" target="_blank" rel="noopener">coingecko.com/privacy</a></p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">Binance</div><p>Captastic's live prices and chart history, and buys on the ZEC Map.</p></div>
+        <div class="cell"><p>Public market data and a live price stream, opened directly from your browser while one of those pages is open.</p></div>
+        <div class="cell"><p><a href="https://www.binance.com" target="_blank" rel="noopener">binance.com</a></p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">Kraken</div><p>The ZEC price in the header, and buys on the ZEC Map.</p></div>
+        <div class="cell"><p>A live public price stream, opened directly from your browser while a page is open.</p></div>
+        <div class="cell"><p><a href="https://www.kraken.com" target="_blank" rel="noopener">kraken.com</a></p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">Other exchanges</div><p>Buys shown on the ZEC Map: Coinbase, Gemini, Bitfinex, OKX, Bybit, Gate and Bitget.</p></div>
+        <div class="cell"><p>Public trade streams, opened directly from your browser only while the ZEC Map is open.</p></div>
+        <div class="cell"><p>Each exchange's own policy</p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">ZecBlock</div><p>Swaps into ZEC shown in the shielded zone of the ZEC Map. Its older CipherScan address is used as a backup.</p></div>
+        <div class="cell"><p>Public API, called from your browser every 30 seconds while the map is open. Only chain, token and size are used; addresses in the feed are ignored.</p></div>
+        <div class="cell"><p><a href="https://zecblock.com" target="_blank" rel="noopener">zecblock.com</a></p></div>
       </div>
       <div class="service-row">
         <div class="cell"><div class="name">zkp.baby</div><p>The embedded Ironwood shielded-pool dashboard on the tracker page.</p></div>
@@ -145,7 +171,49 @@
         <div class="cell"><p>Only connects when you press play, streaming directly from their server for as long as it plays.</p></div>
         <div class="cell"><p><a href="https://dance.fm" target="_blank" rel="noopener">dance.fm</a></p></div>
       </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">Google Fonts</div><p>The typefaces used on every page.</p></div>
+        <div class="cell"><p>Font files are loaded from Google when a page opens.</p></div>
+        <div class="cell"><p><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">cdnjs and jsDelivr</div><p>The drawing code and world map outline for the ZEC Map.</p></div>
+        <div class="cell"><p>Loaded once from these public file networks when the map opens.</p></div>
+        <div class="cell"><p><a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a> · <a href="https://www.jsdelivr.com" target="_blank" rel="noopener">jsdelivr.com</a></p></div>
+      </div>
+      <div class="service-row">
+        <div class="cell"><div class="name">GitHub Pages</div><p>Hosting. Every page of this site is delivered by GitHub.</p></div>
+        <div class="cell"><p>Like any web host, GitHub can log technical details such as your IP address when a page loads.</p></div>
+        <div class="cell"><p><a href="https://github.com" target="_blank" rel="noopener">github.com</a></p></div>
+      </div>
     </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> Captastic: top 100, watchlist and portfolio</h2>
+    <p>Captastic shows the top 100 projects by market cap. The ranking, supply figures and logos come from CoinGecko, and live prices and chart history come from Binance, both fetched directly by your browser.</p>
+    <p><strong>Your watchlist and portfolio never leave your browser.</strong> The projects you mark and the amounts you type in are saved on your own device only. There is no account, and nothing is uploaded.</p>
+    <p>The portfolio page asks the price services for the same general data whatever you hold, so they can't tell from its requests which projects are in your portfolio or how much you have. The watchlist page loads chart history for the projects on your list, so Binance can see which projects' charts your browser asks for, as it would if you looked them up there.</p>
+    <p>"Save backup file" writes your holdings to a file on your own device, and "Restore backup" reads that file back. The file goes nowhere else. Because nothing is stored online, your watchlist and portfolio don't follow you to another browser or device, and clearing your browser data removes them.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> The ZEC Map</h2>
+    <p>While the map is open, your browser connects directly to the exchanges listed above to receive their public trade feeds. The map only receives data; it sends nothing about you beyond what any connection reveals, such as your IP address.</p>
+    <p>The places where buys appear are estimates based on the currency of each trade, not the location of any person. Swaps shown in the shielded zone use only the chain, token and size from the public swap feed.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2><span class="icon">◈</span> The game and its hall of fame</h2>
+    <p>"Encrypt the money" runs entirely in your browser. The callsign you choose, your best score and your progress are kept on your own device and are <strong>not sent anywhere</strong>. There is no online scoreboard and no database.</p>
+    <p>The hall of fame shown in the game is a short list we keep by hand. It is filled from scores that players choose to post publicly on X with #EncryptTheMoney. If you never post, you never appear on it.</p>
+    <p>The share button opens a ready-made post on X only when you press it, and the post includes your callsign and score. Nothing is posted for you, and what you publish there is covered by X's own rules.</p>
   </div>
 </section>
 
@@ -159,7 +227,7 @@
 <section>
   <div class="wrap">
     <h2><span class="icon">◈</span> No wallets, no addresses</h2>
-    <p>Zectastic never asks you to connect a wallet, paste an address, or sign anything. Nothing on this site can see your ZEC balance, your transaction history, or which pool your funds sit in. If you're ever asked to connect a wallet on a page claiming to be Zectastic, that page isn't us.</p>
+    <p>Zectastic never asks you to connect a wallet, paste an address, or sign anything. Nothing on this site can see your ZEC balance, your transaction history, or which pool your funds sit in. The Captastic portfolio only knows the amounts you type in by hand, and keeps them in your browser. If you're ever asked to connect a wallet on a page claiming to be Zectastic, that page isn't us.</p>
   </div>
 </section>
 
