@@ -179,6 +179,26 @@
     .tile{padding:12px;}
     .t-price{font-size:17px;}
 
+    /* TOP 100 AND WATCHLIST ON A PHONE: everything in view, no sideways scrolling.
+       Left: add button, rank, name with market cap under it. Right: small chart, price with change under it. */
+    body:not([data-mode="port"]) table, body:not([data-mode="port"]) tbody{display:block;}
+    body:not([data-mode="port"]) thead{display:none;}
+    body:not([data-mode="port"]) tbody tr{
+      display:grid; grid-template-columns:auto 20px minmax(0, 1fr) auto minmax(98px, auto); column-gap:8px; row-gap:1px; align-items:center;
+      padding:10px; border-bottom:1px solid var(--line);
+    }
+    body:not([data-mode="port"]) tbody tr:last-child{border-bottom:0;}
+    body:not([data-mode="port"]) tbody td{display:block; padding:0; border:0; background:none !important; min-width:0; width:auto;}
+    body:not([data-mode="port"]) tbody td:nth-child(1){grid-area:1 / 1 / 3 / 2;}
+    body:not([data-mode="port"]) tbody td:nth-child(2){grid-area:1 / 2 / 3 / 3; text-align:center; font-size:11px;}
+    body:not([data-mode="port"]) tbody td:nth-child(3){grid-area:1 / 3;}
+    body:not([data-mode="port"]) tbody td:nth-child(7){grid-area:2 / 3; text-align:left; color:var(--muted); font-size:11px; padding-left:32px;}
+    body:not([data-mode="port"]) tbody td:nth-child(6){grid-area:1 / 4 / 3 / 5;}
+    body:not([data-mode="port"]) tbody td:nth-child(4){grid-area:1 / 5; text-align:right;}
+    body:not([data-mode="port"]) tbody td:nth-child(5){grid-area:2 / 5; text-align:right; font-size:12px;}
+    body:not([data-mode="port"]) tbody td svg{width:54px; height:24px;}
+    body:not([data-mode="port"]) .coin .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
     /* PORTFOLIO ON A PHONE: total first, then the holdings as two-line rows, then the tools */
     body[data-mode="port"] main{display:flex; flex-direction:column;}
     body[data-mode="port"] .top{order:0; padding:18px 0 14px;}
@@ -214,6 +234,9 @@
     body[data-mode="port"] .coin .s{display:inline;}
     body[data-mode="port"] .coin .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
     body[data-mode="port"] .amt{width:104px; padding:5px 8px;}
+  }
+  @media (max-width:350px){
+    body:not([data-mode="port"]) tbody td:nth-child(6){display:none;}
   }
 </style>
 </head>
