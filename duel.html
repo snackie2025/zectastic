@@ -244,29 +244,30 @@ h1,.tab,.score,.mid,.side,.kind,.name,.art,.stat,.go,.ghost,.over h2,.over texta
 
 <script>
 /* ============ EDIT HERE ============
-   One line per card. Stats run 1 to 10: p = privacy, s = speed, c = security, a = adoption.
-   kind: coin | tool | threat.   starter: 1 = owned from the start.   shield: 1 = wins ties. */
+   One line per coin. Stats run 1 to 10: p = privacy, s = speed, c = security, a = adoption.
+   mark = ticker.   g = symbol drawn on the card (leave out to draw the ticker).
+   starter: 1 = owned from the start.   shield: 1 = wins ties. */
 var CARDS = [
- {id:"btc", name:"Bitcoin",            kind:"coin",  mark:"BTC", p:3, s:3, c:10,a:10,starter:1, text:"The first and the most secured. Every payment is public forever."},
- {id:"zec", name:"Zcash",              kind:"coin",  mark:"ZEC", p:10,s:5, c:8, a:5, starter:1, shield:1, text:"Encrypted money. Shielded payments hide sender, receiver and amount."},
- {id:"eth", name:"Ethereum",           kind:"coin",  mark:"ETH", p:3, s:6, c:8, a:9, starter:1, text:"A world computer. Everything on it is visible to everyone."},
- {id:"sol", name:"Solana",             kind:"coin",  mark:"SOL", p:2, s:10,c:6, a:7, starter:1, text:"Built for speed above all else."},
- {id:"ltc", name:"Litecoin",           kind:"coin",  mark:"LTC", p:3, s:6, c:7, a:6, starter:1, text:"Bitcoin's lighter, quicker sibling."},
- {id:"doge",name:"Dogecoin",           kind:"coin",  mark:"DOGE",p:2, s:5, c:5, a:7, starter:1, text:"Started as a joke. Still here."},
- {id:"usd", name:"Stablecoin",         kind:"coin",  mark:"USD", p:1, s:7, c:5, a:9, starter:1, text:"Dollars on a chain. The issuer can freeze them."},
- {id:"exc", name:"Exchange",           kind:"tool",  mark:"CEX", p:1, s:8, c:4, a:10,starter:1, text:"Easy to use. Not your keys, not your coins."},
- {id:"min", name:"Miner",              kind:"tool",  mark:"POW", p:4, s:4, c:9, a:6, starter:1, text:"Turns electricity into security."},
- {id:"tad", name:"Transparent Address",kind:"tool",  mark:"t-",  p:1, s:6, c:7, a:8, starter:1, text:"Anyone can look up the balance and every payment."},
- {id:"seed",name:"Seed Phrase",        kind:"tool",  mark:"24",  p:8, s:1, c:9, a:6, starter:1, text:"Write it on paper. Never type it into a website."},
- {id:"phi", name:"Phishing Link",      kind:"threat",mark:"!!",  p:2, s:9, c:1, a:6, starter:1, text:"Looks like the real site. Check the address twice."},
- {id:"xmr", name:"Monero",             kind:"coin",  mark:"XMR", p:9, s:5, c:7, a:5, text:"Private by default on every payment."},
- {id:"ln",  name:"Lightning Network",  kind:"tool",  mark:"LN",  p:6, s:10,c:6, a:5, text:"Instant Bitcoin payments off the main chain."},
- {id:"hww", name:"Hardware Wallet",    kind:"tool",  mark:"HW",  p:7, s:2, c:10,a:4, text:"Keys that never touch the internet."},
- {id:"node",name:"Full Node",          kind:"tool",  mark:"NODE",p:8, s:3, c:9, a:3, text:"Don't trust, verify. Runs on a small computer at home."},
- {id:"zad", name:"Shielded Address",   kind:"tool",  mark:"z-",  p:10,s:5, c:9, a:3, shield:1, text:"Nobody can look up what you hold or who paid you."},
- {id:"mix", name:"Mixer",              kind:"tool",  mark:"MIX", p:8, s:3, c:4, a:2, text:"Shuffles coins to break the trail. Legally risky in many places."},
- {id:"pap", name:"Paper Wallet",       kind:"tool",  mark:"PPR", p:7, s:1, c:6, a:2, text:"Offline and old-school. Fire and water are the enemies."},
- {id:"wr",  name:"Wrench Attack",      kind:"threat",mark:"$5",  p:1, s:6, c:1, a:2, text:"Being forced to hand over coins. Never tell people what you hold."}
+ {id:"btc", name:"Bitcoin",     mark:"BTC", g:"₿", p:3, s:3, c:10,a:10,starter:1, text:"The first and the most secured. Every payment is public forever."},
+ {id:"zec", name:"Zcash",       mark:"ZEC", g:"Z", p:10,s:5, c:8, a:5, starter:1, shield:1, text:"Encrypted money. Shielded payments hide sender, receiver and amount."},
+ {id:"eth", name:"Ethereum",    mark:"ETH", g:"Ξ", p:3, s:6, c:8, a:9, starter:1, text:"A world computer. Everything on it is visible to everyone."},
+ {id:"sol", name:"Solana",      mark:"SOL",        p:2, s:10,c:6, a:8, starter:1, text:"Built for speed above all else."},
+ {id:"ltc", name:"Litecoin",    mark:"LTC", g:"Ł", p:4, s:6, c:7, a:6, starter:1, text:"Bitcoin's lighter, quicker sibling."},
+ {id:"doge",name:"Dogecoin",    mark:"DOGE",g:"Ð", p:2, s:5, c:5, a:7, starter:1, text:"Started as a joke. Still here."},
+ {id:"usdt",name:"Tether",      mark:"USDT",g:"₮", p:1, s:7, c:4, a:10,starter:1, text:"Dollars on a chain. The issuer can freeze them."},
+ {id:"xrp", name:"XRP",         mark:"XRP",        p:2, s:9, c:6, a:7, starter:1, text:"Made for fast payments between banks."},
+ {id:"bnb", name:"BNB",         mark:"BNB",        p:2, s:8, c:5, a:8, starter:1, text:"The coin of the biggest exchange."},
+ {id:"ada", name:"Cardano",     mark:"ADA", g:"₳", p:2, s:5, c:7, a:6, starter:1, text:"Slow and careful by design."},
+ {id:"trx", name:"TRON",        mark:"TRX",        p:2, s:9, c:5, a:8, starter:1, text:"Where a large share of Tether moves."},
+ {id:"link",name:"Chainlink",   mark:"LINK",       p:2, s:5, c:7, a:6, starter:1, text:"Feeds real-world prices to other chains."},
+ {id:"xmr", name:"Monero",      mark:"XMR", g:"ɱ", p:9, s:5, c:7, a:5, text:"Private by default on every payment."},
+ {id:"bch", name:"Bitcoin Cash",mark:"BCH",        p:3, s:7, c:6, a:5, text:"The bigger-blocks split from Bitcoin in 2017."},
+ {id:"avax",name:"Avalanche",   mark:"AVAX",       p:2, s:9, c:6, a:5, text:"Quick to settle, with many networks of its own."},
+ {id:"dot", name:"Polkadot",    mark:"DOT",        p:2, s:6, c:7, a:4, text:"Many chains sharing one security hub."},
+ {id:"xlm", name:"Stellar",     mark:"XLM",        p:2, s:9, c:6, a:5, text:"Cheap payments across borders."},
+ {id:"ton", name:"Toncoin",     mark:"TON",        p:2, s:9, c:5, a:6, text:"The chain inside Telegram."},
+ {id:"dash",name:"Dash",        mark:"DASH",       p:6, s:8, c:6, a:3, text:"Instant payments with optional mixing."},
+ {id:"sui", name:"Sui",         mark:"SUI",        p:2, s:10,c:5, a:4, text:"A newer chain built for speed."}
 ];
 var STATS = [["p","Privacy"],["s","Speed"],["c","Security"],["a","Adoption"]];
 var MAX_ROUNDS = 20;
@@ -285,31 +286,17 @@ if(!owned||!owned.length){owned=CARDS.filter(function(c){return c.starter;}).map
 owned=owned.filter(byId);
 var lastPack=load("zd_pack",""), newId=null, G;
 
-/* Icons: every card is drawn in the same line style. Coins sit in a circle, tools in a square, threats in a warning triangle. */
-function T(g){return '<text x="24" y="25" text-anchor="middle" dominant-baseline="central">'+g+'</text>';}
-var FRAME={coin:'<circle class="frame" cx="24" cy="24" r="21"/>',tool:'<rect class="frame" x="4" y="4" width="40" height="40" rx="10"/>',threat:'<path class="frame" d="M24 5 45 42H3z"/>'};
-var ICONS={
- btc:T("₿"), eth:T("Ξ"), sol:T("S"), ltc:T("Ł"), doge:T("Ð"), usd:T("$"), xmr:T("ɱ"),
- zec:T("Z")+'<path d="M24 10v4M24 34v4"/>',
- exc:'<path d="M14 20h19l-5-5M34 28H15l5 5"/>',
- min:'<path d="M12 21c7-8 17-8 24 0M24 15v21"/>',
- tad:'<path d="M10 24c4-7 9-10 14-10s10 3 14 10c-4 7-9 10-14 10s-10-3-14-10z"/><circle cx="24" cy="24" r="4"/>',
- seed:[17,24,31].map(function(y){return [15,21,27,33].map(function(x){return '<circle class="dot" cx="'+x+'" cy="'+y+'" r="1.8"/>';}).join("");}).join(""),
- ln:'<path d="M27 10 15 26h8l-2 12 12-16h-8z"/>',
- hww:'<rect x="17" y="10" width="14" height="28" rx="4"/><rect x="20.5" y="14.5" width="7" height="8" rx="1.5"/><circle class="dot" cx="24" cy="31" r="1.8"/>',
- node:'<path d="M22.4 17.6 15.6 29.6M25.6 17.6l6.8 12M18 33h12"/><circle cx="24" cy="14" r="3.6"/><circle cx="14" cy="33" r="3.6"/><circle cx="34" cy="33" r="3.6"/>',
- zad:'<path d="M24 10l11 4v8c0 8-5 13-11 16-6-3-11-8-11-16v-8z"/><path d="M19 24l4 4 7-8"/>',
- mix:'<path d="M11 17h6c9 0 5 14 14 14h6M11 31h6c9 0 5-14 14-14h6"/>',
- pap:'<path d="M16 10h11l6 6v22H16zM27 10v6h6M20 25h9M20 31h9"/>',
- phi:'<circle cx="25" cy="18" r="1.8"/><path d="M25 20v12a4.5 4.5 0 0 1-9 0v-2"/>',
- wr:'<path d="M20 37l5-9"/><path d="M29.5 21.5a4.6 4.6 0 1 0 .6 6.2"/>'
-};
-function icon(c){return '<svg viewBox="0 0 48 48" role="img" aria-label="'+esc(c.name)+'">'+FRAME[c.kind]+(ICONS[c.id]||T(esc(c.mark)))+'</svg>';}
+/* Icons: every coin sits in the same circle, drawn with its currency symbol or its ticker. */
+function T(g){return '<text x="24" y="25" text-anchor="middle" dominant-baseline="central"'+(g.length>1?' style="font-size:'+(g.length>3?10.5:12.5)+'px"':'')+'>'+g+'</text>';}
+var FRAME={coin:'<circle class="frame" cx="24" cy="24" r="21"/>'};
+function icon(c){
+  return '<svg viewBox="0 0 48 48" role="img" aria-label="'+esc(c.name)+'">'+FRAME.coin+T(esc(c.g||c.mark))+(c.id==="zec"?'<path d="M24 10v4M24 34v4"/>':'')+'</svg>';
+}
 
 function cardHTML(c,o){
   o=o||{};
-  var h='<div class="card '+c.kind+(o.cls?" "+o.cls:"")+'">'+
-    '<div class="kind"><span>'+c.kind+'</span>'+(c.shield?"<i>shielded</i>":"")+'</div>'+
+  var h='<div class="card coin'+(o.cls?" "+o.cls:"")+'">'+
+    '<div class="kind"><span>'+esc(c.mark)+'</span>'+(c.shield?"<i>shielded</i>":"")+'</div>'+
     '<div class="name">'+esc(c.name)+'</div><div class="art">'+icon(c)+'</div><div class="stats">';
   STATS.forEach(function(s){
     var inner='<span>'+s[1]+'</span><b>'+c[s[0]]+'</b><span class="bar"><i style="width:'+c[s[0]]*10+'%"></i></span>';
