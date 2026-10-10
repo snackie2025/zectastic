@@ -149,6 +149,31 @@
   .p-msg{font-family:var(--mono); font-size:12px; color:var(--teal); padding:8px 2px 0;}
   .p-msg:empty{display:none;}
 
+  /* PORTFOLIOS: up to three, each with its own name */
+  .p-bar{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 16px; min-height:38px; margin-bottom:12px; font-family:var(--mono); font-size:12px; color:var(--muted);}
+  .p-tabs{display:flex; flex-wrap:wrap; gap:8px; min-width:0;}
+  .p-tab{max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:var(--bg-raised); border:1px solid var(--line); border-radius:0; color:var(--muted); font-family:var(--mono); font-size:13px; line-height:1.5; padding:8px 14px; cursor:pointer; transition:color .18s, background-color .18s, border-color .18s;}
+  .p-tab:hover{color:var(--text); border-color:#3a3f4a;}
+  .p-tab.on{background:var(--gold); border-color:var(--gold); color:#0a0b0d; font-weight:700;}
+  .p-tab.new{background:none; border-style:dashed;}
+  .p-tab.new:hover{color:var(--gold); border-color:var(--gold);}
+  .p-name{width:200px; max-width:100%; background:var(--bg); border:1px solid var(--gold); border-radius:0; color:var(--text); font-family:var(--mono); font-size:13px; line-height:1.5; padding:8px 12px; outline:none;}
+  .p-tab:focus-visible, .p-tools button:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+  /* TOTAL: the money amount, with the same total in bitcoin small beside it */
+  .p-totrow{display:flex; flex-wrap:wrap; align-items:baseline; gap:0 14px;}
+  .p-btc{font-family:var(--mono); font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .p-btc:empty{display:none;}
+
+  /* SMOOTH: rows ease in when a portfolio opens or a holding is added, and fade when removed */
+  @keyframes rowIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  #rows tr.in{animation:rowIn .3s ease both; animation-delay:calc(var(--i, 0) * 30ms);}
+  #rows tr.out{opacity:0; pointer-events:none; transition:opacity .16s;}
+  @media (prefers-reduced-motion: reduce){
+    #rows tr.in{animation:none;}
+    .p-tab, #rows tr.out{transition:none;}
+  }
+
   body{padding-bottom:env(safe-area-inset-bottom);}
   #tip{font-family:var(--mono); font-size:12px; color:var(--muted); padding:10px 2px 0; display:flex; gap:10px; align-items:baseline;}
   #tip[hidden]{display:none;}
@@ -169,6 +194,9 @@
     #statusText{display:none;}
     .p-card{padding:16px 14px;}
     .p-value{font-size:28px;}
+    .p-btc{font-size:13px;}
+    .p-tab{max-width:150px; padding:8px 12px;}
+    .p-name{width:150px; font-size:16px; padding:6px 10px;}
     .p-add{width:100%;}
     .p-add input, .amt{font-size:16px;}
     #pCoin{width:auto; flex:1 1 100%;}
@@ -208,6 +236,7 @@
     body[data-mode="port"] h1{display:none;}
     body[data-mode="port"] .eyebrow{margin-bottom:0;}
     body[data-mode="port"] #port, body[data-mode="port"] .p-card{display:contents;}
+    body[data-mode="port"] .p-bar{order:1;}
     body[data-mode="port"] .p-card > div:first-child{order:1; border:1px solid var(--line); background:var(--bg-raised); padding:16px 14px; margin-bottom:12px;}
     body[data-mode="port"] #tablebox{order:2;}
     body[data-mode="port"] #note{order:3;}
@@ -278,10 +307,17 @@
   </div>
 
   <section id="port" hidden>
+    <div class="p-bar">
+      <div class="p-tabs" id="pTabs" role="group" aria-label="Your portfolios"></div>
+      <div class="p-tools" id="pEdit"></div>
+    </div>
     <div class="p-card">
       <div>
         <div class="p-label">Total value <span id="pHint">· tap to hide</span></div>
-        <button type="button" class="p-value" id="pTotal" aria-pressed="false" title="Hide or show your amounts">–</button>
+        <div class="p-totrow">
+          <button type="button" class="p-value" id="pTotal" aria-pressed="false" title="Hide or show your amounts">–</button>
+          <span class="p-btc" id="pBtc" title="The same total in bitcoin"></span>
+        </div>
         <div class="p-sub"><span id="pChg"></span><span class="muted t-rg" id="pRg"></span></div>
       </div>
       <form class="p-add" id="pForm" autocomplete="off">
@@ -353,17 +389,47 @@
   var watch = readWatch();
   function readWatch(){ try{ return new Set(JSON.parse(get('cap_watch', '[]'))); }catch(e){ return new Set(); } }
 
-  // Portfolio: coin id -> amount held. Lives in this browser only; nothing here is ever sent out.
-  var hold = readHold();
-  function readHold(){
+  // Portfolios: up to three, each with a name and its holdings (coin id -> amount held).
+  // They live in this browser only; nothing here is ever sent out.
+  var MAXP = 3, NAME_MAX = 24;
+  function cleanHold(d){
     var out = {};
-    try{
-      var d = JSON.parse(get('cap_hold', '{}'));
-      for(var k in d) if(typeof d[k] === 'number' && isFinite(d[k]) && d[k] > 0) out[k] = d[k];
-    }catch(e){}
+    if(d && typeof d === 'object') for(var k in d) if(typeof d[k] === 'number' && isFinite(d[k]) && d[k] > 0) out[k] = d[k];
     return out;
   }
-  function saveHold(){ set('cap_hold', JSON.stringify(hold)); }
+  function cleanName(v, i){
+    v = String(v == null ? '' : v).replace(/\s+/g, ' ').trim().slice(0, NAME_MAX);
+    return v || 'Portfolio ' + (i + 1);
+  }
+  function readPorts(){
+    var list = [], a = 0;
+    try{
+      var d = JSON.parse(get('cap_ports', 'null'));
+      if(d && Array.isArray(d.list)){
+        d.list.slice(0, MAXP).forEach(function(p, i){ list.push({name: cleanName(p && p.name, i), hold: cleanHold(p && p.hold)}); });
+        a = d.a | 0;
+      }
+    }catch(e){}
+    if(!list.length){
+      // first visit since portfolios got names: the single portfolio from before becomes "Portfolio 1"
+      var old = {};
+      try{ old = cleanHold(JSON.parse(get('cap_hold', '{}'))); }catch(e){}
+      list.push({name: 'Portfolio 1', hold: old});
+    }
+    if(a < 0 || a >= list.length) a = 0;
+    return {a: a, list: list};
+  }
+  var ports = readPorts();              // a: the portfolio on screen, list: all of them
+  var hold = ports.list[ports.a].hold;  // holdings of the portfolio on screen
+  function saveHold(){ set('cap_ports', JSON.stringify(ports)); }
+  function heldAny(id){ return ports.list.some(function(p){ return p.hold[id] > 0; }); }
+  if(MODE === 'port' && get('cap_hold', null) !== null){
+    // the old single-portfolio copy is removed once the new one is safely stored
+    saveHold();
+    if(get('cap_ports', null) !== null){ try{ localStorage.removeItem('cap_hold'); }catch(e){} }
+  }
+  var fresh = false;     // ease all rows in on the next rebuild (a portfolio was opened)
+  var freshId = null;    // ease in just this row (a holding was added)
   var hide = get('cap_hide', '0') === '1';   // amounts masked, for when someone can see the screen
   var DOTS = '\u2022\u2022\u2022\u2022\u2022\u2022';
   var eurFirst = null; // euro rate at the start of the chosen range (portfolio only)
@@ -671,7 +737,7 @@
   }
   function refreshCustom(){
     if(MODE !== 'port') return;
-    var ids = Object.keys(custom).filter(function(id){ return hold[id] > 0; }).slice(0, 30);
+    var ids = Object.keys(custom).filter(heldAny).slice(0, 30);
     if(!ids.length) return;
     fetchTokens(ids.map(function(id){ return custom[id].address; })).then(function(best){
       ids.forEach(function(id){
@@ -698,8 +764,10 @@
     return null;
   }
   function needMore(){
-    for(var id in hold) if(!topIds[id] && id.indexOf('x:') !== 0) return true;
-    return false;
+    return ports.list.some(function(p){
+      for(var id in p.hold) if(!topIds[id] && id.indexOf('x:') !== 0) return true;
+      return false;
+    });
   }
   // Resolves when the longer list is on hand (fresh, remembered, or not available).
   function loadMore(){
@@ -872,19 +940,22 @@
     }
     notes();
     if(key === order){
+      fresh = false; freshId = null;
       view.forEach(function(c){ if(rows[c.id]) rows[c.id].c = c; });
       charts(false);
       dirty();
       return;
     }
     order = key;
+    var allIn = fresh, oneIn = freshId;
+    fresh = false; freshId = null;
     big = tiles && view.length > 0;
     boxEl.style.display = big ? 'none' : '';
     tilesEl.style.display = big ? '' : 'none';
     if(big){ buildTiles(); charts(true); update(); return; }
     tilesEl.innerHTML = '';
     rowsEl.innerHTML = view.map(function(c, i){
-      return '<tr>' +
+      return '<tr' + (calm ? '' : allIn ? ' class="in" style="--i:' + Math.min(i, 12) + '"' : c.id === oneIn ? ' class="in"' : '') + '>' +
         '<td class="w">' + (MODE === 'port' ? rmHtml(c) : wbHtml(c)) + '</td>' +
         '<td class="rank">' + (c.custom ? '\u2013' : (c.market_cap_rank || i + 1)) + '</td>' +
         '<td class="l"><div class="coin">' + (c.custom
@@ -1020,14 +1091,36 @@
     if(MODE === 'port') totals();
   }
 
-  var totT = '', totC = '';
+  var totT = '', totC = '', totB = '';
+  var totNum = null;   // the total on screen as a number, null when there is none to show
+  var tw = null;       // the glide in progress, if any
+  var glide = false;   // let the total glide to its next value (after a switch or an edit, not on every price tick)
+  function fmtBtc(v){ return '\u20BF' + (v >= 100 ? v.toFixed(2) : v >= 1 ? v.toFixed(4) : v >= 0.001 ? v.toFixed(5) : v.toFixed(8)); }
+  function setTotal(t, v){
+    var el = document.getElementById('pTotal'), from = totNum;
+    totNum = v;
+    if(tw){
+      // already gliding: aim at the newest value instead of starting over
+      if(v == null){ cancelAnimationFrame(tw.id); tw = null; el.textContent = t; }
+      else{ tw.to = v; tw.text = t; }
+      return;
+    }
+    if(!glide || calm || from == null || v == null || from === v){ el.textContent = t; return; }
+    tw = {from: from, to: v, text: t, t0: performance.now(), id: 0};
+    (function step(now){
+      var k = Math.min(1, Math.max(0, (now - tw.t0) / 450)), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = k < 1 ? fmtPrice(tw.from + (tw.to - tw.from) * e) : tw.text;
+      if(k < 1) tw.id = requestAnimationFrame(step); else tw = null;
+    })(tw.t0);
+  }
   function totals(){
-    var tot = 0, prev = 0, n = 0;
+    var tot = 0, prev = 0, n = 0, dollars = 0;
     view.forEach(function(c){
       var row = rows[c.id], p = price(c);
       if(!row || p == null) return;
       var v = p * (hold[c.id] || 0), x = pct(row);
       tot += v; n++;
+      dollars += usd(c) * (hold[c.id] || 0);
       prev += x == null || x <= -100 ? v : v / (1 + x / 100);
     });
     var t = !coins.length ? '\u2013' : hide ? DOTS : n ? fmtPrice(tot) : sign() + (cur === 'btc' ? '0' : '0.00'), h = '';
@@ -1036,8 +1129,12 @@
       // hidden: the percentage stays, the money amount does not
       h = '<span class="' + (d >= 0 ? 'up' : 'down') + '">' + (hide ? pc : (d >= 0 ? '+' : '-') + fmtPrice(Math.abs(d)) + ' (' + pc + ')') + '</span>';
     }
-    if(t !== totT){ document.getElementById('pTotal').textContent = t; totT = t; }
+    if(t !== totT){ setTotal(t, !coins.length || hide ? null : n ? tot : 0); totT = t; }
     if(h !== totC){ document.getElementById('pChg').innerHTML = h; totC = h; }
+    // the same total in bitcoin, small, beside the dollar or euro amount
+    var q = btcUsd(), b = cur !== 'btc' && !hide && n && q && dollars > 0 ? fmtBtc(dollars / q) : '';
+    if(b !== totB){ document.getElementById('pBtc').textContent = b; totB = b; }
+    glide = false;
   }
 
   function mark(id, val){
@@ -1062,10 +1159,15 @@
     var b = e.target.closest ? e.target.closest('[data-w]') : null;
     var r = e.target.closest ? e.target.closest('[data-rm]') : null;
     if(r){
-      var gone = r.dataset.rm;
-      delete hold[gone]; saveHold();
-      if(custom[gone]){ delete custom[gone]; saveCustom(); joinLists(); }   // stop asking for a token no longer held
-      build();
+      var gone = r.dataset.rm, tr = r.closest('tr'), from = hold;
+      var remove = function(){
+        delete from[gone]; saveHold();
+        if(custom[gone] && !heldAny(gone)){ delete custom[gone]; saveCustom(); joinLists(); }   // stop asking for a token no longer held
+        glide = true;
+        build();
+      };
+      if(calm || !tr) remove();
+      else{ tr.classList.add('out'); setTimeout(remove, 170); }
       return;
     }
     if(!b) return;
@@ -1078,10 +1180,14 @@
   });
   // another tab changed the list
   window.addEventListener('storage', function(e){
-    if(e.key !== 'cap_watch' && e.key !== 'cap_hold' && e.key !== 'cap_custom') return;
+    if(e.key !== 'cap_watch' && e.key !== 'cap_ports' && e.key !== 'cap_custom') return;
     watch = readWatch();
-    hold = readHold();
+    var mine = ports.a;                  // this tab keeps showing the portfolio it was on
+    ports = readPorts();
+    ports.a = Math.min(mine, ports.list.length - 1);
+    hold = ports.list[ports.a].hold;
     custom = readCustom(); joinLists();
+    if(drawTabs && !naming) drawTabs();
     if(coins.length){ order = null; build(); }
   });
 
@@ -1151,6 +1257,103 @@
     });
 
     var pCoin = document.getElementById('pCoin'), pAmt = document.getElementById('pAmt'), pMsg = document.getElementById('pMsg');
+
+    // Portfolios. Switching only changes what is shown; nothing is fetched, so it is instant.
+    var pTabs = document.getElementById('pTabs'), pEdit = document.getElementById('pEdit');
+    var naming = false;    // the name of the portfolio on screen is being typed
+    var asking = false;    // "delete this portfolio?" is on screen
+    var drawEdit = function(){
+      if(naming) pEdit.innerHTML = 'Enter to save \u00B7 Esc to cancel';
+      else if(asking) pEdit.innerHTML = 'Delete \u201C' + esc(ports.list[ports.a].name) + '\u201D and its holdings? ' +
+        '<button type="button" data-e="yes">Yes, delete</button> \u00B7 <button type="button" data-e="no">Keep</button>';
+      else pEdit.innerHTML = '<button type="button" data-e="ren">Rename</button>' +
+        (ports.list.length > 1 ? ' \u00B7 <button type="button" data-e="del">Delete</button>' : '');
+    };
+    var drawTabs = function(){
+      pTabs.innerHTML = ports.list.map(function(p, i){
+        var on = i === ports.a;
+        if(naming && on) return '<input class="p-name" id="pName" maxlength="' + NAME_MAX + '" value="' + esc(p.name) + '" aria-label="Name of this portfolio" autocomplete="off">';
+        return '<button type="button" class="p-tab' + (on ? ' on' : '') + '" data-p="' + i + '" aria-pressed="' + on + '"' +
+          (on ? ' title="Double-click to rename"' : '') + '>' + esc(p.name) + '</button>';
+      }).join('') + (ports.list.length < MAXP
+        ? '<button type="button" class="p-tab new" data-p="new" title="Add a portfolio (up to ' + MAXP + ')">+ New</button>' : '');
+      drawEdit();
+    };
+    var show = function(i){
+      ports.a = i; hold = ports.list[i].hold; saveHold();
+      asking = false; pMsg.textContent = '';
+      order = null; fresh = true; glide = true;
+      drawTabs();
+      if(coins.length){ if(needMore()) loadMore(); build(); } else dirty();
+    };
+    var rename = function(){
+      naming = true; asking = false;
+      drawTabs();
+      var el = document.getElementById('pName');
+      el.focus(); el.select();
+    };
+    var endName = function(keep){
+      if(!naming) return;
+      var el = document.getElementById('pName');
+      naming = false;
+      if(keep && el){ ports.list[ports.a].name = cleanName(el.value, ports.a); saveHold(); }
+      drawTabs();
+    };
+    var freeName = function(){
+      for(var n = 1; n <= MAXP; n++){
+        var name = 'Portfolio ' + n;
+        if(!ports.list.some(function(p){ return p.name === name; })) return name;
+      }
+      return 'Portfolio';
+    };
+    var pick = function(p){
+      if(p === 'new'){
+        if(ports.list.length >= MAXP) return;
+        ports.list.push({name: freeName(), hold: {}});
+        show(ports.list.length - 1);
+        rename();                 // straight into naming the new one
+      }else if(+p !== ports.a) show(+p);
+    };
+    var drop = function(){
+      if(ports.list.length < 2) return;
+      ports.list.splice(ports.a, 1);
+      var changed = false;        // tokens added by address that no portfolio holds any more
+      for(var id in custom) if(!heldAny(id)){ delete custom[id]; changed = true; }
+      if(changed){ saveCustom(); joinLists(); }
+      show(Math.min(ports.a, ports.list.length - 1));
+    };
+    var skipClick = false;
+    pTabs.addEventListener('pointerdown', function(e){
+      // while a name is being typed, a tap on another tab saves the name and goes there in one go
+      var b = naming && e.target.closest ? e.target.closest('[data-p]') : null;
+      if(!b) return;
+      e.preventDefault();
+      var p = b.dataset.p;
+      endName(true);
+      pick(p);
+      skipClick = true; setTimeout(function(){ skipClick = false; }, 400);
+    });
+    pTabs.addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('[data-p]') : null;
+      if(b && !skipClick) pick(b.dataset.p);
+    });
+    pTabs.addEventListener('dblclick', function(e){
+      if(e.target.closest && e.target.closest('.p-tab.on')) rename();
+    });
+    pTabs.addEventListener('keydown', function(e){
+      if(e.target.id !== 'pName') return;
+      if(e.key === 'Enter'){ e.preventDefault(); endName(true); }
+      else if(e.key === 'Escape') endName(false);
+    });
+    pTabs.addEventListener('focusout', function(e){ if(e.target.id === 'pName') endName(true); });
+    pEdit.addEventListener('click', function(e){
+      var k = e.target.dataset && e.target.dataset.e;
+      if(k === 'ren') rename();
+      else if(k === 'del'){ if(Object.keys(hold).length){ asking = true; drawEdit(); } else drop(); }
+      else if(k === 'yes') drop();
+      else if(k === 'no'){ asking = false; drawEdit(); }
+    });
+    drawTabs();
     var bad = function(el){ el.classList.add('bad'); el.focus(); setTimeout(function(){ el.classList.remove('bad'); }, 1500); };
     var findCoin = function(v){
       v = v.trim().toLowerCase();
@@ -1174,9 +1377,11 @@
         var amt = parseAmt(pAmt.value), tid = 'x:' + typed;
         if(amt == null) return bad(pAmt);
         var done = function(){
+          if(!(hold[tid] > 0)) freshId = tid;
           hold[tid] = (hold[tid] || 0) + amt;
           saveHold();
           pMsg.textContent = ''; pCoin.value = ''; pAmt.value = '';
+          glide = true;
           joinLists(); build();
           var box = rowsEl.querySelector('.amt[data-a="' + tid + '"]');
           if(box) box.value = fmtAmt(hold[tid]);
@@ -1206,9 +1411,11 @@
       }
       if(!c){ if(more.length) pMsg.textContent = 'Not found in the top 500.'; return bad(pCoin); }
       if(n == null) return bad(pAmt);
+      if(!(hold[c.id] > 0)) freshId = c.id;
       hold[c.id] = (hold[c.id] || 0) + n;
       saveHold();
       pCoin.value = ''; pAmt.value = '';
+      glide = true;
       build();
       var inp = rowsEl.querySelector('.amt[data-a="' + c.id.replace(/"/g, '') + '"]');
       if(inp) inp.value = fmtAmt(hold[c.id]);
@@ -1220,7 +1427,7 @@
       var id = e.target.dataset && e.target.dataset.a;
       if(!id) return;
       var n = parseAmt(e.target.value);
-      if(n != null){ hold[id] = n; saveHold(); }
+      if(n != null){ hold[id] = n; saveHold(); glide = true; }
       e.target.value = fmtAmt(hold[id]);
       dirty();
     });
@@ -1229,7 +1436,8 @@
     });
     // backup to a file on the visitor's own device, and back
     document.getElementById('pExp').addEventListener('click', function(){
-      var blob = new Blob([JSON.stringify({app: 'captastic', version: 1, holdings: hold, tokens: custom}, null, 2)], {type: 'application/json'});
+      var blob = new Blob([JSON.stringify({app: 'captastic', version: 2, active: ports.a,
+        portfolios: ports.list.map(function(p){ return {name: p.name, holdings: p.hold}; }), tokens: custom}, null, 2)], {type: 'application/json'});
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'captastic-portfolio.json';
@@ -1243,18 +1451,41 @@
       if(!f) return;
       var rd = new FileReader();
       rd.onload = function(){
-        var next = {}, n = 0, nextTok = {};
+        var list = [], one = null, n = 0, nextTok = {}, at = 0;
         try{
-          var d = JSON.parse(rd.result), h = d && d.holdings;
+          var d = JSON.parse(rd.result);
           nextTok = (d && d.tokens && typeof d.tokens === 'object') ? d.tokens : {};
-          for(var k in h) if(typeof h[k] === 'number' && isFinite(h[k]) && h[k] > 0){ next[k] = h[k]; n++; }
+          if(d && Array.isArray(d.portfolios)){
+            // a backup of all portfolios
+            d.portfolios.slice(0, MAXP).forEach(function(p, i){
+              var h = cleanHold(p && p.holdings);
+              n += Object.keys(h).length;
+              list.push({name: cleanName(p && p.name, i), hold: h});
+            });
+            at = d.active | 0;
+          }else if(d && d.holdings){
+            // an older backup, made when there was one portfolio
+            one = cleanHold(d.holdings);
+            n = Object.keys(one).length;
+          }
         }catch(err){}
-        if(!n){ pMsg.textContent = 'That file is not a Captastic backup.'; }
+        if(!list.length && !n){ pMsg.textContent = 'That file is not a Captastic backup.'; }
         else{
-          hold = next; saveHold();
-          set('cap_custom', JSON.stringify(nextTok)); custom = readCustom(); joinLists();
-          pMsg.textContent = 'Restored ' + n + (n === 1 ? ' holding.' : ' holdings.');
-          if(coins.length){ order = null; build(); }
+          var tok = nextTok;
+          if(list.length) ports = {a: at >= 0 && at < list.length ? at : 0, list: list};
+          else{
+            // it replaces the portfolio on screen and leaves the others alone
+            ports.list[ports.a].hold = one;
+            tok = {};
+            for(var k1 in custom) tok[k1] = custom[k1];
+            for(var k2 in nextTok) tok[k2] = nextTok[k2];
+          }
+          hold = ports.list[ports.a].hold; saveHold();
+          set('cap_custom', JSON.stringify(tok)); custom = readCustom(); joinLists();
+          pMsg.textContent = 'Restored ' + n + (n === 1 ? ' holding' : ' holdings') +
+            (list.length ? ' in ' + list.length + (list.length === 1 ? ' portfolio.' : ' portfolios.') : ' into \u201C' + ports.list[ports.a].name + '\u201D.');
+          naming = false; asking = false; drawTabs();
+          if(coins.length){ order = null; fresh = true; glide = true; build(); }
         }
         pFile.value = '';
       };
