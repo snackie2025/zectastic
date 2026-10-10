@@ -113,38 +113,6 @@ body{font-family:var(--sans);background-image:repeating-linear-gradient(180deg, 
 .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
 ::selection{background:var(--gold); color:#0a0b0d;}
 header a, footer a{color:inherit}
-  /* HEADER */
-  header{
-    position:sticky; top:0; z-index:50;
-    background:rgba(10,11,13,0.9);
-    backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--line);
-  }
-  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 24px;}
-  .logo{font-family:var(--mono); font-weight:800; letter-spacing:0.04em; font-size:18px; display:flex; align-items:center; gap:8px;}
-  .logo .z{color:var(--gold);}
-  .navlinks{display:flex; align-items:center; gap:24px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
-  .navlinks a{color:var(--muted); text-decoration:none; transition:color .15s;}
-  .navlinks a:hover{color:var(--gold);}
-  /* menu buckets */
-  .nb{position:relative;}
-  .nb > button{background:none; border:0; padding:6px 0; color:var(--muted); font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; display:flex; align-items:center; gap:6px; transition:color .15s;}
-  .nb > button i{font-style:normal; font-size:9px; transition:transform .15s;}
-  .nb > button:hover, .nb.open > button{color:var(--gold);}
-  .nb.open > button i{transform:rotate(180deg);}
-  .nm{display:none; position:absolute; top:100%; left:-14px; min-width:170px; padding:6px 0; background:var(--bg-raised); border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,0.5); z-index:60;}
-  .nb.open .nm{display:block;}
-  @media(hover:hover){.nb:hover .nm{display:block;} .nb:hover > button{color:var(--gold);}}
-  .nm a{display:block; padding:9px 14px; white-space:nowrap;}
-  .nm a:hover{background:rgba(255,255,255,0.03);}
-  html{scroll-padding-top:76px;}
-  @media(max-width:759px){
-    html{scroll-padding-top:112px;}
-    .nav{flex-wrap:wrap; row-gap:10px;}
-    .navlinks{order:3; width:100%; gap:20px;}
-  }
-
-
   /* FOOTER */
   footer{padding:32px 0; text-align:center;}
   .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em;}
@@ -152,46 +120,136 @@ header a, footer a{color:inherit}
   .foot-links a{color:var(--muted); text-decoration:none;}
   .foot-links a:hover{color:var(--teal); text-decoration:underline;}
 h1,.tab,.score,.mid,.side,.kind,.name,.art,.stat,.go,.ghost,.over h2,.over textarea,.cardback,.locked{font-family:var(--mono)}
+
+  /* ==== SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. ==== */
+  .zh{position:sticky; top:0; z-index:50; flex:0 0 auto; width:100%; background:rgba(10,11,13,0.9); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border-bottom:1px solid #22262e; color:#e8e6e0; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.5; text-align:left;}
+  .zh, .zh *{box-sizing:border-box;}
+  .zh *{margin:0;}
+  .zh .nav{display:flex; align-items:center; justify-content:flex-start; flex-wrap:nowrap; gap:16px; max-width:1080px; margin:0 auto; padding:14px 24px;}
+  .zh .logo{display:flex; align-items:center; gap:8px; height:30px; font-weight:800; font-size:18px; letter-spacing:0.04em; color:#e8e6e0; text-decoration:none; white-space:nowrap;}
+  .zh .logo .z{color:#f4c542;}
+  .zh .navlinks{display:flex; align-items:center; gap:26px; margin:0 auto 0 28px; font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
+  .zh .navlinks a{color:#8b8f98; text-decoration:none; transition:color .15s;}
+  .zh .navlinks a:hover, .zh .navlinks > a, .zh .navlinks a[aria-current]{color:#f4c542;}
+  .zh .nb{position:relative;}
+  .zh .nb > button{display:flex; align-items:center; gap:6px; padding:6px 0; background:none; border:0; border-radius:0; color:#8b8f98; font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; transition:color .15s;}
+  .zh .nb > button i{font-style:normal; font-size:9px; transition:transform .15s;}
+  .zh .nb > button:hover, .zh .nb.open > button{color:#f4c542;}
+  .zh .nb.open > button i{transform:rotate(180deg);}
+  .zh .nm{display:none; position:absolute; top:100%; left:-14px; z-index:60; min-width:180px; padding:6px 0; background:#111318; border:1px solid #22262e; box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+  .zh .nb.open .nm{display:block;}
+  @media(hover:hover){.zh .nb:hover .nm{display:block;} .zh .nb:hover > button{color:#f4c542;}}
+  .zh .nm a{display:block; padding:9px 14px; white-space:nowrap;}
+  .zh .nm a:hover{background:rgba(255,255,255,0.03);}
+  /* Right side: the live extras (radio, ZEC price). Used on the homepage only. */
+  .zh .nav-right{display:flex; align-items:center; gap:10px;}
+  .zh .radio-btn{display:inline-flex; align-items:center; gap:7px; padding:5px 10px; font-family:inherit; font-size:11px; line-height:1.5; letter-spacing:0.08em; text-transform:uppercase; color:#00d9c0; background:rgba(0,217,192,0.08); border:1px solid rgba(0,217,192,0.4); border-radius:2px; cursor:pointer; white-space:nowrap;}
+  .zh .radio-btn:hover{background:rgba(0,217,192,0.16);}
+  .zh .radio-btn .icon{font-size:9px;}
+  .zh .tick{display:inline-flex; align-items:center; gap:8px; padding:5px 10px; font-size:12px; font-weight:700; color:#e8e6e0; text-decoration:none; white-space:nowrap; background:rgba(17,19,24,0.6); border:1px solid #22262e; border-radius:2px;}
+  .zh .tick:hover{border-color:#f4c542;}
+  .zh .tick .lbl{color:#8b8f98; font-weight:400; letter-spacing:0.08em;}
+  .zh .tick .p{color:#f4c542;}
+  .zh .tick .d{font-size:11px; font-weight:600;}
+  @media(max-width:520px){.zh .tick .d, .zh .tick .lbl{display:none;}}
+  @media(max-width:799px){
+    .zh .nav{flex-wrap:wrap; row-gap:10px;}
+    .zh .navlinks{order:3; width:100%; margin:0; gap:22px;}
+    .zh .nav-right{margin-left:auto;}
+  }
+  html{scroll-padding-top:76px;}
+  @media(max-width:799px){html{scroll-padding-top:112px;}}
+  /* ==== END SITE HEADER ==== */
 </style>
 </head>
 <body>
 
-<header>
-  <div class="nav wrap">
-    <a class="logo" href="/" style="text-decoration:none;"><span class="z">Z</span> ZECTASTIC</a>
+<!-- SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. -->
+<header class="zh">
+  <div class="nav">
+    <a class="logo" href="/"><span class="z">Z</span> ZECTASTIC</a>
     <nav class="navlinks" aria-label="Main">
       <div class="nb">
         <button type="button" aria-expanded="false">Live <i>▾</i></button>
         <div class="nm">
           <a href="/#tracker">Tracker</a>
           <a href="/#supply">Supply</a>
-          <a href="/zecmap.html" style="color:var(--gold);">ZEC Map ◈</a>
-          <a href="/flippening.html" style="color:var(--gold);">Flippening Party ◈</a>
-          <a href="/events.html" style="color:var(--gold);">Events ◈</a>
+          <a href="/zecmap.html">ZEC Map</a>
+          <a href="/flippening.html">Flippening Party</a>
+          <a href="/events.html">Events</a>
         </div>
       </div>
       <div class="nb">
         <button type="button" aria-expanded="false">Learn <i>▾</i></button>
         <div class="nm">
           <a href="/#arc">The Redemption Arc</a>
-          <a href="/#why">Why Zcash</a>
-          <a href="/#how">How it works</a>
-          <a href="/#ux">UX on Zcash</a>
+          <a href="/learn.html#why">Why Zcash</a>
+          <a href="/learn.html#how">How it works</a>
+          <a href="/learn.html#ux">Using Zcash</a>
+          <a href="/learn.html#ironwood">Shielded dashboard</a>
         </div>
       </div>
       <div class="nb">
         <button type="button" aria-expanded="false">Play <i>▾</i></button>
         <div class="nm">
-          <a href="/#game">Mini game</a>
-          <a href="/backwards.html" style="color:var(--gold);">Backwards ◈</a>
-          <a href="/duel.html" style="color:var(--gold);">Card Duel ◈</a>
-          <a href="/#radio">Radio</a>
+          <a href="/game.html">Encrypt the money</a>
+          <a href="/backwards.html">Backwards</a>
+          <a href="/duel.html">Card Duel</a>
         </div>
       </div>
-      <a href="/captastic.html" style="color:var(--gold);">Captastic ◈</a>
+      <a href="/captastic.html">Captastic</a>
     </nav>
   </div>
 </header>
+<script>
+// SITE HEADER script: identical on every Zectastic page.
+(function(){
+  var h = document.querySelector('.zh');
+  if(!h) return;
+
+  // Menu buckets: tap to open, tap elsewhere or press Escape to close.
+  var nbs = [].slice.call(h.querySelectorAll('.nb'));
+  function closeAll(except){
+    nbs.forEach(function(n){
+      if(n !== except){ n.classList.remove('open'); n.firstElementChild.setAttribute('aria-expanded', 'false'); }
+    });
+  }
+  nbs.forEach(function(n){
+    var b = n.firstElementChild;
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var open = !n.classList.contains('open');
+      closeAll(n);
+      n.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  document.addEventListener('click', function(){ closeAll(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeAll(); });
+
+  // Highlight the page you are on.
+  function norm(p){ return p.replace(/index\.html$/, '').replace(/\.html$/, '').replace(/\/+$/, ''); }
+  var here = norm(location.pathname);
+  [].forEach.call(h.querySelectorAll('.navlinks a'), function(a){
+    var href = a.getAttribute('href');
+    if(href.indexOf('#') < 0 && norm(href) === here) a.setAttribute('aria-current', 'page');
+  });
+
+  // A link to a section of the page you are already on scrolls there instead of reloading.
+  h.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a[href*="#"]') : null;
+    if(!a) return;
+    var href = a.getAttribute('href'), i = href.indexOf('#');
+    var target = document.getElementById(href.slice(i + 1));
+    if(target && norm(href.slice(0, i)) === here){
+      e.preventDefault();
+      closeAll();
+      target.scrollIntoView();
+      try { history.pushState(null, '', href.slice(i)); } catch (err) {}
+    }
+  });
+})();
+</script>
 
 <div class="page">
   <h1>Zectastic <span>Duel</span></h1>
@@ -401,27 +459,6 @@ $("tabPlay").onclick=function(){tab(true);};
 $("tabCol").onclick=function(){tab(false);};
 newGame();
 
-// Header menu buckets: tap to open, tap elsewhere or press Escape to close.
-(function(){
-  var nbs = [].slice.call(document.querySelectorAll('.nb'));
-  function closeAll(except){
-    nbs.forEach(function(n){
-      if(n !== except){ n.classList.remove('open'); n.firstElementChild.setAttribute('aria-expanded', 'false'); }
-    });
-  }
-  nbs.forEach(function(n){
-    var b = n.firstElementChild;
-    b.addEventListener('click', function(e){
-      e.stopPropagation();
-      var open = !n.classList.contains('open');
-      closeAll(n);
-      n.classList.toggle('open', open);
-      b.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-  });
-  document.addEventListener('click', function(){ closeAll(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeAll(); });
-})();
 </script>
 </body>
 </html>
