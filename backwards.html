@@ -105,7 +105,7 @@
 
   .bw-grid{
     display:grid; grid-template-columns:minmax(0, 1fr);
-    gap:14px; max-width:420px; margin:0 auto;
+    gap:14px; max-width:460px; margin:0 auto;
   }
   .bw-card{
     background:var(--bg-raised); border:1px solid var(--line); padding:22px;
@@ -213,6 +213,13 @@
   .cmp-intro{font-size:14px; color:var(--muted); text-align:center; margin:0 auto 12px; max-width:460px;}
   .cmp-head{color:var(--muted); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; padding-bottom:6px;}
 
+  .how-block{margin-top:40px;}
+  .mini{border-top:1px solid var(--line); padding-top:12px; margin-top:4px;}
+  .mini-t{font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:8px;}
+  .mini-g{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:5px 14px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+  .mini-g b{color:var(--text); font-weight:500; text-align:right; font-variant-numeric:tabular-nums;}
+  .result .mini{max-width:400px; margin:0 auto 22px; text-align:left;}
+
   /* COMPARE */
   .cmp{max-width:600px; margin:28px auto 0; text-align:left;}
   .result .cmp{margin:0 auto 22px;}
@@ -283,15 +290,6 @@
 
 <section class="calc-section">
   <div class="wrap">
-    <div class="section-label">How to read this</div>
-    <div class="how">
-      <div class="how-step"><b>1</b><span>You spent money on something. Say <em>$5 on a coffee run</em> on 1 Nov 2020.</span></div>
-      <div class="how-step"><b>2</b><span id="howBuy">Put into Zcash that day, the same $5 would have bought a small amount of ZEC.</span></div>
-      <div class="how-step"><b>3</b><span id="howNow">Each card shows what that ZEC would be worth today.</span></div>
-    </div>
-
-    <div class="section-label">Click to look backwards</div>
-
     <div class="run-btn-wrap">
       <button type="button" class="run-btn" id="runBtn">▶ Run the numbers</button>
       <div class="run-progress" id="runProgress"></div>
@@ -301,7 +299,14 @@
       <div class="empty-hint" id="emptyHint">Nothing rewound yet. Click above to start.</div>
     </div>
 
-    <div class="cmp" id="cmpPreset" hidden></div>
+    <div class="how-block">
+    <div class="section-label">How to read this</div>
+    <div class="how">
+      <div class="how-step"><b>1</b><span>You spent money on something. Say <em>$5 on a coffee run</em> on 1 Nov 2020.</span></div>
+      <div class="how-step"><b>2</b><span id="howBuy">Put into Zcash that day, the same $5 would have bought a small amount of ZEC.</span></div>
+      <div class="how-step"><b>3</b><span id="howNow">Each card shows what that ZEC would be worth today.</span></div>
+    </div>
+    </div>
 
     <div class="custom-toggle-wrap">
       <button type="button" class="custom-toggle-btn" id="customToggleBtn">+ Calculate your own purchase</button>
@@ -334,7 +339,7 @@
         <div class="result-multiplier mono" id="resultMultiplier"></div>
         <div class="result-sub mono" id="resultSub"></div>
         <p class="result-privacy" id="resultPrivacy">And no bank, no chain-analysis firm, no ex. Nobody would've ever seen you buy it.</p>
-        <div class="cmp" id="cmpCustom" hidden></div>
+        <div id="cmpCustom" hidden></div>
         <div class="result-actions">
           <button type="button" class="btn-ghost post" id="postBtn">Post my result on X →</button>
           <button type="button" class="btn-ghost" id="copyBtn">Copy result</button>
@@ -473,26 +478,17 @@
     return out;
   }
 
-  // ---- compare: the same money on the same day in another coin ----
-  function renderCompare(el, amount, hist, live, dayLabel){
-    const all = COINS.filter(c => hist[c.s] && live[c.s]).map(c => {
-      const mult = live[c.s] / hist[c.s];
-      return {c, mult, value: amount * mult};
-    }).sort((a, b) => b.mult - a.mult);
-    // Only Zcash and the coins it outgrew are shown. Coins that grew more are left out.
-    const zi = all.findIndex(r => r.c.s === 'ZEC');
-    const rows = zi < 0 ? [] : all.slice(zi);
-    if (rows.length < 2) { el.hidden = true; return; }
-    el.innerHTML = `<div class="cmp-title">Coins Zcash outgrew</div>
-      <p class="cmp-intro">The same ${fmtUsd(amount)} put into each of these on ${niceDate(dayLabel)}, and what it would be worth today.</p>
-      <div class="cmp-row cmp-head"><span>#</span><span>Coin</span><span>Growth</span><span class="cmp-val">Worth today</span></div>` +
-      rows.map((r, i) => `<div class="cmp-row${r.c.s === 'ZEC' ? ' zec' : ''}">
-        <span class="cmp-rank">${i + 1}</span>
-        <span class="cmp-name">${r.c.n}<small>${r.c.s}</small></span>
-        <span class="cmp-mult ${r.mult >= 1 ? 'up' : 'down'}">${r.mult >= 1 ? '▲' : '▼'} ${multText(r.mult)}</span>
-        <span class="cmp-val">${fmtUsd(r.value)}</span>
-      </div>`).join('');
-    el.hidden = false;
+  // ---- compare: the same money on the same day in the coins Zcash outgrew, shown inside the card ----
+  function cmpInline(amount, hist, live){
+    if (!hist || !live || !hist.ZEC || !live.ZEC) return '';
+    const zecMult = live.ZEC / hist.ZEC;
+    const rows = COINS.filter(c => c.s !== 'ZEC' && hist[c.s] && live[c.s])
+      .map(c => ({c, mult: live[c.s] / hist[c.s]}))
+      .filter(r => r.mult < zecMult)
+      .sort((x, y) => y.mult - x.mult);
+    if (!rows.length) return '';
+    return `<div class="mini"><div class="mini-t">The same ${fmtUsd(amount)} in coins Zcash outgrew</div><div class="mini-g">` +
+      rows.map(r => `<span>${r.c.n}</span><b>${fmtUsd(amount * r.mult)}</b>`).join('') + `</div></div>`;
   }
 
   // ---- sharing ----
@@ -536,6 +532,7 @@
   let livePriceUsd = null;
   let anchorPriceUsd = null;
   let dataLoaded = false;
+  let anchorHist = null, liveAll = null;
   let revealIndex = 0;
   // Random order, one card at a time. Every card is shown once before any repeats.
   let order = [], lastShown = -1;
@@ -575,6 +572,7 @@
       <p class="bw-card-line">Today that ZEC would be worth</p>
       <div class="bw-card-value">${fmtUsd(valueNow)}</div>
       <div class="bw-card-mult ${up ? 'up' : 'down'}">${up ? '▲' : '▼'} ${multText(multiplier)} your money</div>
+      ${cmpInline(preset.amount, anchorHist, liveAll)}
       <a class="share-link" target="_blank" rel="noopener" href="${xIntent(`Nov 2020: ${fmtUsd(preset.amount)} on ${preset.item}. In ZEC that would be ${fmtUsd(valueNow)} today, ${multText(multiplier)}. What's yours?`)}">Post this on X →</a>
     `;
     bwGrid.appendChild(card);
@@ -589,7 +587,7 @@
       anchorPriceUsd = hist.ZEC; livePriceUsd = live.ZEC;
       dataLoaded = !!(anchorPriceUsd && livePriceUsd);
       if (dataLoaded) {
-        renderCompare(document.getElementById('cmpPreset'), 100, hist, live, BUY_DATE);
+        anchorHist = hist; liveAll = live;
         document.getElementById('anchorNote').textContent =
           `On 1 Nov 2020 one ZEC cost ${fmtUsd(anchorPriceUsd)}. Today one ZEC costs ${fmtUsd(livePriceUsd)}.`;
         const exZec = 5 / anchorPriceUsd;
@@ -612,8 +610,9 @@
       : '';
   }
 
-  async function handleRunClick(){
+  async function handleRunClick(quiet){
     const ok = await ensureAnchorData();
+    if (!ok && quiet){ runBtn.textContent = '▶ Run the numbers'; return; }
     if (!ok){
       runBtn.textContent = 'Couldn\'t fetch price, try again';
       runBtn.classList.remove('secondary');
@@ -628,10 +627,10 @@
     revealIndex++;
     updateProgress();
     runBtn.textContent = '▶ Show another';
-    runBtn.classList.add('secondary');
   }
 
-  runBtn.addEventListener('click', handleRunClick);
+  runBtn.addEventListener('click', () => handleRunClick(false));
+  handleRunClick(true); // show a first card as soon as prices arrive
 
   // ---- custom calculator (revealed with one click) ----
   const customToggleBtn = document.getElementById('customToggleBtn');
@@ -722,7 +721,9 @@
       const usdSpent = amount.toLocaleString('en-US', {style:'currency', currency:'USD'});
       lastShareText = `${dateVal}: ${usdSpent} on ${item}. In ZEC that would be ${fmtUsd(valueNow)} today, ${multText(multiplier)}. What's yours?`;
 
-      renderCompare(document.getElementById('cmpCustom'), amount, histAll, live, dateVal);
+      const cmpEl = document.getElementById('cmpCustom');
+      cmpEl.innerHTML = cmpInline(amount, histAll, live);
+      cmpEl.hidden = !cmpEl.innerHTML;
       resultBlock.classList.add('show');
       resultBlock.scrollIntoView({behavior:'smooth', block:'nearest'});
     } catch (e) {
