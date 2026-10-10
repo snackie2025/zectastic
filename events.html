@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events · Zectastic</title>
+<meta name="description" content="Zcash, privacy and Bitcoin gatherings by month. Filter by region and focus. Every date links to the official event page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow column, a sticky filter bar, then month buckets with a date rail on the left. */
+:root{
+  color-scheme:dark;
+  --bg:#0a0b0d; --bg-raised:#111318; --ink:#0a0b0d; --panel:#111318; --line:#22262e;
+  --text:#e8e6e0; --muted:#8b8f98; --gold:#f4c542; --teal:#00d9c0; --red:#ff6b4a; --exposed:#ff6b4a;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--text);font:15px/1.55 var(--mono)}
+.page{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+a{color:var(--teal)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.back{font-size:13px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--teal)}
+h1{font-size:clamp(26px,6vw,38px);line-height:1.1;margin:14px 0 8px;letter-spacing:-.02em;text-wrap:balance}
+h1 span{color:var(--gold)}
+.lede{color:var(--muted);margin:0 0 22px;max-width:60ch}
+
+.filters{position:sticky;top:0;z-index:2;background:var(--ink);padding-block:12px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+#q{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);font:inherit;padding:10px 12px;border-radius:6px}
+#q::placeholder{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.row b{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);width:58px}
+.chip{background:none;border:1px solid var(--line);color:var(--muted);font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;cursor:pointer}
+.chip:hover{color:var(--text);border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:700}
+
+.count{color:var(--muted);font-size:13px;margin:16px 0 0}
+.month{margin-top:30px}
+.month h2{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.ev{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.when{font-weight:700;font-variant-numeric:tabular-nums}
+.when small{display:block;font-weight:400;font-size:12px;color:var(--gold)}
+.ev h3{margin:0;font-size:16px}
+.ev h3 a{color:var(--text);text-decoration:none}
+.ev h3 a:hover{color:var(--teal);text-decoration:underline}
+.where{color:var(--muted);font-size:13px}
+.ev p{margin:6px 0 8px;color:var(--text);opacity:.86;max-width:62ch}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.tag.zcash{border-color:var(--gold);color:var(--gold)}
+.tag.bitcoin{border-color:#c9822b;color:#e6a35a}
+.empty{padding:36px 0;color:var(--muted)}
+.safe{margin-top:40px;border:1px solid var(--line);border-radius:6px;padding:16px 18px;background:var(--panel)}
+.safe h2{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 8px}
+.safe ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.safe p{margin:10px 0 0;color:var(--muted);font-size:13px}
+@media (max-width:520px){
+  .ev{grid-template-columns:minmax(0,1fr)}
+  .when small{display:inline;margin-left:8px}
+  .row b{width:100%}
+}
+
+/* ---- shared with the rest of zectastic.com ---- */
+body{font-family:var(--sans);background-image:repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px)}
+.wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+::selection{background:var(--gold); color:#0a0b0d;}
+header a, footer a{color:inherit}
+  /* HEADER */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,11,13,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 24px;}
+  .logo{font-family:var(--mono); font-weight:800; letter-spacing:0.04em; font-size:18px; display:flex; align-items:center; gap:8px;}
+  .logo .z{color:var(--gold);}
+  .navlinks{display:flex; align-items:center; gap:24px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
+  .navlinks a{color:var(--muted); text-decoration:none; transition:color .15s;}
+  .navlinks a:hover{color:var(--gold);}
+  /* menu buckets */
+  .nb{position:relative;}
+  .nb > button{background:none; border:0; padding:6px 0; color:var(--muted); font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; display:flex; align-items:center; gap:6px; transition:color .15s;}
+  .nb > button i{font-style:normal; font-size:9px; transition:transform .15s;}
+  .nb > button:hover, .nb.open > button{color:var(--gold);}
+  .nb.open > button i{transform:rotate(180deg);}
+  .nm{display:none; position:absolute; top:100%; left:-14px; min-width:170px; padding:6px 0; background:var(--bg-raised); border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,0.5); z-index:60;}
+  .nb.open .nm{display:block;}
+  @media(hover:hover){.nb:hover .nm{display:block;} .nb:hover > button{color:var(--gold);}}
+  .nm a{display:block; padding:9px 14px; white-space:nowrap;}
+  .nm a:hover{background:rgba(255,255,255,0.03);}
+  html{scroll-padding-top:76px;}
+  @media(max-width:759px){
+    html{scroll-padding-top:112px;}
+    .nav{flex-wrap:wrap; row-gap:10px;}
+    .navlinks{order:3; width:100%; gap:20px;}
+  }
+
+
+  /* FOOTER */
+  footer{padding:32px 0; text-align:center;}
+  .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em;}
+  .foot-links{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em; margin-top:10px;}
+  .foot-links a{color:var(--muted); text-decoration:none;}
+  .foot-links a:hover{color:var(--teal); text-decoration:underline;}
+h1,.month h2,.when,.chip,.tag,.count,.row b,#q,.safe h2,.ev h3{font-family:var(--mono)}
+.filters{position:static}
+.notes{margin-top:28px;color:var(--muted);font-size:13px;display:grid;gap:8px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav wrap">
+    <a class="logo" href="/" style="text-decoration:none;"><span class="z">Z</span> ZECTASTIC</a>
+    <nav class="navlinks" aria-label="Main">
+      <div class="nb">
+        <button type="button" aria-expanded="false">Live <i>▾</i></button>
+        <div class="nm">
+          <a href="/#tracker">Tracker</a>
+          <a href="/#supply">Supply</a>
+          <a href="/zecmap.html" style="color:var(--gold);">ZEC Map ◈</a>
+          <a href="/flippening.html" style="color:var(--gold);">Flippening Party ◈</a>
+          <a href="/events.html" style="color:var(--gold);">Events ◈</a>
+        </div>
+      </div>
+      <div class="nb">
+        <button type="button" aria-expanded="false">Learn <i>▾</i></button>
+        <div class="nm">
+          <a href="/#arc">The Redemption Arc</a>
+          <a href="/#why">Why Zcash</a>
+          <a href="/#how">How it works</a>
+          <a href="/#ux">UX on Zcash</a>
+        </div>
+      </div>
+      <div class="nb">
+        <button type="button" aria-expanded="false">Play <i>▾</i></button>
+        <div class="nm">
+          <a href="/#game">Mini game</a>
+          <a href="/backwards.html" style="color:var(--gold);">Backwards ◈</a>
+          <a href="/duel.html" style="color:var(--gold);">Card Duel ◈</a>
+          <a href="/#radio">Radio</a>
+        </div>
+      </div>
+      <a href="/captastic.html" style="color:var(--gold);">Captastic ◈</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <h1>Where the <span>Zcash</span>, privacy and Bitcoin crowd meets</h1>
+  <p class="lede">Upcoming gatherings by month. Each one links to the organiser's own page, because listing sites often disagree on dates. <a href="#safe">Read the safety notes</a> before you go.</p>
+
+  <div class="filters">
+    <input id="q" type="search" placeholder="Search event, city or country" aria-label="Search events">
+    <div class="row" id="regions"><b>Region</b></div>
+    <div class="row" id="focuses"><b>Focus</b></div>
+  </div>
+
+  <p class="count" id="count" aria-live="polite"></p>
+  <div id="list"></div>
+
+  <section class="safe" id="safe">
+    <h2>Before you go</h2>
+    <ul>
+      <li>Don't talk about what you hold. Take your badge and merch off when you leave the venue.</li>
+      <li>Leave hardware wallets and seed phrases at home. Carry a small spending wallet only.</li>
+      <li>Don't scan unknown QR codes, plug in free USB gadgets, or sign anything on the spot.</li>
+      <li>Post photos and your location after you have left, not while you are there.</li>
+      <li>Check your government's travel advice for the country you are visiting.</li>
+    </ul>
+    <p>We list the city only, never a venue or address, and only events the organiser promotes publicly. Private and invite-only meetups are not listed.</p>
+  </section>
+
+  <div class="notes">
+    <span id="checked"></span>
+    <span>Dates and venues change. Confirm on the official page before you book.</span>
+    <span>Monthly Zcash community calls are listed in the <a href="https://zechub.substack.com/" target="_blank" rel="noopener">ZecHub newsletter</a>.</span>
+    <span>Missing an event? Tell us on X.</span>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-note">ZECTASTIC · not affiliated with the Electric Coin Company or the Zcash Foundation.</div>
+    <div class="foot-links"><a href="/index.html">← Back to the live tracker</a> · <a href="/privacy.html">Privacy</a></div>
+  </div>
+</footer>
+
+<script>
+/* ============ EDIT HERE ============
+   One line per event. Past events hide themselves automatically.
+   start/end: YYYY-MM-DD.   tbc: true = month known, exact days not confirmed.
+   check: true = sources disagree, shows a "verify dates" note.
+   region: Europe | Americas | Asia | Middle East | Online
+   focus:  Zcash | Privacy | Bitcoin | Ethereum | Solana | General            */
+var CHECKED = "2026-10-10";
+var EVENTS = [
+ {name:"Plan ₿ Forum", start:"2026-10-23", end:"2026-10-24", city:"Lugano", country:"Switzerland", region:"Europe", focus:"Bitcoin",
+  desc:"Two days on Bitcoin adoption by cities and states, financial freedom and free speech, hosted by the city of Lugano.", url:"https://planb.lugano.ch/"},
+ {name:"Zcon7", start:"2026-10-27", end:"2026-10-29", city:"Cancún", country:"Mexico", region:"Americas", focus:"Zcash",
+  desc:"The Zcash Foundation's annual conference, held over Zcash's tenth birthday on 28 October. Consensus, shielded assets, governance and the dev fund.", url:"https://zfnd.org/"},
+ {name:"Zcash World: Mumbai Edition", start:"2026-11-01", end:"2026-11-01", city:"Mumbai", country:"India", region:"Asia", focus:"Zcash",
+  desc:"One-day community meetup before Devcon week. Talks on privacy and zero-knowledge proofs, and every attendee makes a real shielded transaction.", url:"https://luma.com/83ujl6ms"},
+ {name:"Devcon 8", start:"2026-11-03", end:"2026-11-06", city:"Mumbai", country:"India", region:"Asia", focus:"Ethereum",
+  desc:"The Ethereum Foundation's flagship conference for developers and researchers. Past editions carried a cypherpunk and privacy track.", url:"https://devcon.org/"},
+ {name:"Bitcoin Amsterdam", start:"2026-11-05", end:"2026-11-06", city:"Amsterdam", country:"Netherlands", region:"Europe", focus:"Bitcoin",
+  desc:"Bitcoin-only conference. Talks, expo hall and art gallery for builders, investors and newcomers.", url:"https://amsterdam.b.tc/"},
+ {name:"Bitcoin Histórico", start:"2026-11-11", end:"2026-11-12", city:"San Salvador", country:"El Salvador", region:"Americas", focus:"Bitcoin",
+  desc:"Talks and workshops in the historic centre on national adoption, education, mining and self-custody.", url:"https://bitcoinhistorico.com/"},
+ {name:"Solana Breakpoint", start:"2026-11-15", end:"2026-11-17", city:"London", country:"United Kingdom", region:"Europe", focus:"Solana",
+  desc:"Solana's yearly conference, in London for the first time. Stablecoins, payments and tokenised assets.", url:"https://solana.com/breakpoint"},
+ {name:"Bitcoin MENA", start:"2026-12-07", end:"2026-12-08", check:true, city:"Abu Dhabi", country:"UAE", region:"Middle East", focus:"Bitcoin",
+  desc:"The largest Bitcoin conference in the Middle East. Some listings show 8–9 December.", url:"https://mena.b.tc/"},
+ {name:"Consensus Hong Kong", start:"2027-02-01", end:"2027-02-28", tbc:true, city:"Hong Kong", country:"China", region:"Asia", focus:"General",
+  desc:"CoinDesk's Asian edition, announced for early February with a focus on institutions and AI.", url:"https://consensus-hongkong.coindesk.com/"},
+ {name:"EthCC 10", start:"2027-04-12", end:"2027-04-15", city:"Cannes", country:"France", region:"Europe", focus:"Ethereum",
+  desc:"Europe's longest-running Ethereum community conference. Four days of talks and workshops.", url:"https://ethcc.io/"},
+ {name:"TOKEN2049 Dubai", start:"2027-04-21", end:"2027-04-22", city:"Dubai", country:"UAE", region:"Middle East", focus:"General",
+  desc:"The big all-of-crypto gathering, moved from 2026. Tickets from the postponed edition stay valid.", url:"https://www.token2049.com/dubai/announcement"},
+ {name:"BTC Prague", start:"2027-05-06", end:"2027-05-08", city:"Prague", country:"Czech Republic", region:"Europe", focus:"Bitcoin",
+  desc:"Europe's largest Bitcoin-only event. Three days of talks plus an expo with more than 100 companies.", url:"https://btcprague.com/"},
+ {name:"Bitcoin 2027", start:"2027-07-15", end:"2027-07-17", check:true, city:"Nashville", country:"USA", region:"Americas", focus:"Bitcoin",
+  desc:"The world's largest Bitcoin conference returns to Nashville. Dates seen on one listing only so far.", url:"https://b.tc/conference"}
+];
+/* ============ END EDIT ============ */
+
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+var state={region:"All",focus:"All",q:""};
+function d(s){var p=s.split("-");return new Date(+p[0],p[1]-1,+p[2]);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function when(e){
+  var a=d(e.start),b=d(e.end);
+  if(e.tbc) return MON[a.getMonth()]+"<small>days to be confirmed</small>";
+  var t=a.getDate()+(e.start===e.end?"":"–"+(a.getMonth()===b.getMonth()?"":MON[b.getMonth()]+" ")+b.getDate())+" "+MON[a.getMonth()];
+  return t+(e.check?"<small>verify dates</small>":"");
+}
+function chips(id,key,values){
+  var box=document.getElementById(id);
+  ["All"].concat(values).forEach(function(v){
+    var b=document.createElement("button");
+    b.type="button";b.className="chip";b.textContent=v;
+    b.setAttribute("aria-pressed",v==="All");
+    b.onclick=function(){
+      state[key]=v;
+      box.querySelectorAll(".chip").forEach(function(c){c.setAttribute("aria-pressed",c===b);});
+      render();
+    };
+    box.appendChild(b);
+  });
+}
+function uniq(key,order){
+  var have={};EVENTS.forEach(function(e){have[e[key]]=1;});
+  return order.filter(function(v){return have[v];});
+}
+function render(){
+  var today=new Date();today.setHours(0,0,0,0);
+  var q=state.q.trim().toLowerCase();
+  var rows=EVENTS.filter(function(e){
+    if(d(e.end)<today) return false;
+    if(state.region!=="All"&&e.region!==state.region) return false;
+    if(state.focus!=="All"&&e.focus!==state.focus) return false;
+    if(q&&(e.name+" "+e.city+" "+e.country+" "+e.region+" "+e.focus+" "+e.desc).toLowerCase().indexOf(q)<0) return false;
+    return true;
+  }).sort(function(a,b){return d(a.start)-d(b.start);});
+  var html="",cur="";
+  rows.forEach(function(e){
+    var a=d(e.start),key=MONTHS[a.getMonth()]+" "+a.getFullYear();
+    if(key!==cur){ if(cur) html+="</section>"; html+='<section class="month"><h2>'+key+"</h2>"; cur=key; }
+    html+='<article class="ev"><div class="when">'+when(e)+'</div><div>'+
+      '<h3><a href="'+esc(e.url)+'" target="_blank" rel="noopener">'+esc(e.name)+' &#8599;</a></h3>'+
+      '<div class="where">'+esc(e.city)+", "+esc(e.country)+'</div>'+
+      '<p>'+esc(e.desc)+'</p>'+
+      '<div class="tags"><span class="tag '+e.focus.toLowerCase()+'">'+esc(e.focus)+'</span><span class="tag">'+esc(e.region)+'</span></div>'+
+      '</div></article>';
+  });
+  if(cur) html+="</section>";
+  document.getElementById("list").innerHTML=html||'<p class="empty">No upcoming events match. Clear the search or pick another region.</p>';
+  document.getElementById("count").textContent=rows.length+(rows.length===1?" upcoming event":" upcoming events");
+}
+chips("regions","region",uniq("region",["Europe","Americas","Asia","Middle East","Online"]));
+chips("focuses","focus",uniq("focus",["Zcash","Privacy","Bitcoin","Ethereum","Solana","General"]));
+document.getElementById("q").addEventListener("input",function(){state.q=this.value;render();});
+var c=d(CHECKED);
+document.getElementById("checked").textContent="Dates last checked "+c.getDate()+" "+MONTHS[c.getMonth()]+" "+c.getFullYear()+".";
+render();
+
+// Header menu buckets: tap to open, tap elsewhere or press Escape to close.
+(function(){
+  var nbs = [].slice.call(document.querySelectorAll('.nb'));
+  function closeAll(except){
+    nbs.forEach(function(n){
+      if(n !== except){ n.classList.remove('open'); n.firstElementChild.setAttribute('aria-expanded', 'false'); }
+    });
+  }
+  nbs.forEach(function(n){
+    var b = n.firstElementChild;
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var open = !n.classList.contains('open');
+      closeAll(n);
+      n.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  document.addEventListener('click', function(){ closeAll(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeAll(); });
+})();
+</script>
+</body>
+</html>

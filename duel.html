@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Card Duel · Zectastic</title>
+<meta name="description" content="A three-minute crypto card duel. Pick your best stat, take the computer's card. Nothing stored online.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: score strip on top, two cards face to face, one action line underneath. */
+:root{
+  color-scheme:dark;
+  --bg:#0a0b0d; --bg-raised:#111318; --ink:#0a0b0d; --panel:#111318; --line:#22262e;
+  --text:#e8e6e0; --muted:#8b8f98; --gold:#f4c542; --teal:#00d9c0; --red:#ff6b4a; --exposed:#ff6b4a;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--ink);color:var(--text);font:15px/1.5 var(--mono)}
+.page{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:24px 56px}
+a{color:var(--teal)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.back{font-size:13px;color:var(--muted);text-decoration:none}
+h1{font-size:clamp(24px,6vw,34px);margin:10px 0 4px;letter-spacing:-.02em}
+h1 span{color:var(--gold)}
+.lede{color:var(--muted);margin:0 0 18px}
+.tabs{display:flex;gap:6px;margin-bottom:18px}
+.tab{background:none;border:1px solid var(--line);color:var(--muted);padding:6px 14px;border-radius:999px;font-size:13px}
+.tab[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:700}
+
+.score{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;border-block:1px solid var(--line);padding-block:10px;font-variant-numeric:tabular-nums}
+.score div:last-child{text-align:right}
+.score b{font-size:22px}
+.score small{display:block;color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.mid{text-align:center;color:var(--muted);font-size:12px}
+
+.table{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:16px}
+.side{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:10px;min-height:330px;align-content:start}
+.card.win{border-color:var(--teal)}
+.card.lose{opacity:.6}
+.kind{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+.kind i{font-style:normal;color:var(--gold)}
+.name{font-weight:700;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+.art{height:64px;border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:22px;letter-spacing:.06em;border:1px solid var(--line)}
+.coin .art{color:var(--gold)} .tool .art{color:var(--teal)} .threat .art{color:var(--red)}
+.stats{display:grid;gap:5px}
+.stat{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;width:100%;text-align:left;background:none;border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:13px}
+.stat b{font-variant-numeric:tabular-nums}
+button.stat:hover{border-color:var(--gold);color:var(--gold)}
+.stat.hi{border-color:var(--gold);color:var(--gold)}
+.flavor{font-size:12px;color:var(--muted);margin:0}
+.cardback{place-items:center;align-content:center;color:var(--muted);text-align:center;background:repeating-linear-gradient(135deg,var(--panel) 0 10px,var(--ink) 10px 20px)}
+.cardback b{font-size:34px;color:var(--gold)}
+
+.msg{min-height:52px;margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.msg p{margin:0;flex:1 1 220px}
+.go{background:var(--gold);border:0;color:var(--ink);font-weight:700;padding:10px 18px;border-radius:6px}
+.ghost{background:none;border:1px solid var(--line);padding:10px 18px;border-radius:6px}
+.over{margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:12px;background:var(--panel)}
+.over h2{margin:0;font-size:22px}
+.over textarea{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--text);font:inherit;font-size:13px;padding:10px;border-radius:6px;resize:none}
+.rules{margin-top:26px;color:var(--muted);font-size:13px}
+.rules summary{cursor:pointer;color:var(--text)}
+
+.pack{border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--panel)}
+.pack p{margin:0;flex:1 1 220px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px}
+.grid .card{min-height:0}
+.locked{border-style:dashed;color:var(--muted);place-items:center;align-content:center;min-height:150px!important;text-align:center}
+.new{border-color:var(--gold)}
+.note{margin-top:22px;color:var(--muted);font-size:13px}
+@media (max-width:460px){
+  .card{padding:9px;min-height:300px}.name{font-size:14px}.stat{font-size:12px;padding:6px 7px}.art{height:48px;font-size:18px}
+}
+@media (prefers-reduced-motion:no-preference){.card{transition:opacity .2s,border-color .2s}}
+
+/* ---- card look v2: one icon set, shape shows the kind, meters under each stat ---- */
+.card{border-radius:14px;padding:14px;gap:12px}
+.kind{align-items:center}
+.kind span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:7px}
+.coin .kind span{color:var(--gold)} .tool .kind span{color:var(--teal)} .threat .kind span{color:var(--red)}
+.kind i{border:1px solid var(--gold);border-radius:999px;padding:1px 7px}
+.art{height:92px;border:0;border-radius:10px;background-color:var(--ink);background-image:radial-gradient(var(--line) 1px,transparent 1.2px);background-size:12px 12px}
+.art svg{width:68px;height:68px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.art svg text{fill:currentColor;stroke:none;font:700 21px var(--mono)}
+.art svg .dot{fill:currentColor;stroke:none}
+.art svg .frame{fill:var(--panel)}
+.stat{grid-template-columns:1fr auto;row-gap:5px;border-color:transparent;padding:5px 2px;border-radius:6px}
+button.stat{border-color:var(--line);padding:7px 9px}
+.stat.hi{border-color:transparent}
+.bar{grid-column:1/-1;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:2px;background:currentColor;opacity:.75}
+.flavor{border-top:1px solid var(--line);padding-top:10px}
+.cardback{background:var(--panel);background-image:radial-gradient(var(--line) 1px,transparent 1.2px);background-size:12px 12px;gap:14px}
+.cardback svg{width:84px;height:84px;fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round}
+.cardback svg text{fill:var(--gold);stroke:none;font:700 21px var(--mono)}
+.cardback svg .frame{fill:var(--panel)}
+@media (max-width:460px){.card{padding:10px;gap:9px}.art{height:70px}.art svg{width:54px;height:54px}button.stat{padding:6px 7px}}
+@media (prefers-reduced-motion:no-preference){
+  .flip{animation:flip .38s ease-out}
+  @keyframes flip{from{transform:perspective(600px) rotateY(75deg);opacity:.2}to{transform:none;opacity:1}}
+}
+
+/* ---- shared with the rest of zectastic.com ---- */
+body{font-family:var(--sans);background-image:repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px)}
+.wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+::selection{background:var(--gold); color:#0a0b0d;}
+header a, footer a{color:inherit}
+  /* HEADER */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,11,13,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 24px;}
+  .logo{font-family:var(--mono); font-weight:800; letter-spacing:0.04em; font-size:18px; display:flex; align-items:center; gap:8px;}
+  .logo .z{color:var(--gold);}
+  .navlinks{display:flex; align-items:center; gap:24px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
+  .navlinks a{color:var(--muted); text-decoration:none; transition:color .15s;}
+  .navlinks a:hover{color:var(--gold);}
+  /* menu buckets */
+  .nb{position:relative;}
+  .nb > button{background:none; border:0; padding:6px 0; color:var(--muted); font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; display:flex; align-items:center; gap:6px; transition:color .15s;}
+  .nb > button i{font-style:normal; font-size:9px; transition:transform .15s;}
+  .nb > button:hover, .nb.open > button{color:var(--gold);}
+  .nb.open > button i{transform:rotate(180deg);}
+  .nm{display:none; position:absolute; top:100%; left:-14px; min-width:170px; padding:6px 0; background:var(--bg-raised); border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,0.5); z-index:60;}
+  .nb.open .nm{display:block;}
+  @media(hover:hover){.nb:hover .nm{display:block;} .nb:hover > button{color:var(--gold);}}
+  .nm a{display:block; padding:9px 14px; white-space:nowrap;}
+  .nm a:hover{background:rgba(255,255,255,0.03);}
+  html{scroll-padding-top:76px;}
+  @media(max-width:759px){
+    html{scroll-padding-top:112px;}
+    .nav{flex-wrap:wrap; row-gap:10px;}
+    .navlinks{order:3; width:100%; gap:20px;}
+  }
+
+
+  /* FOOTER */
+  footer{padding:32px 0; text-align:center;}
+  .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em;}
+  .foot-links{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.04em; margin-top:10px;}
+  .foot-links a{color:var(--muted); text-decoration:none;}
+  .foot-links a:hover{color:var(--teal); text-decoration:underline;}
+h1,.tab,.score,.mid,.side,.kind,.name,.art,.stat,.go,.ghost,.over h2,.over textarea,.cardback,.locked{font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav wrap">
+    <a class="logo" href="/" style="text-decoration:none;"><span class="z">Z</span> ZECTASTIC</a>
+    <nav class="navlinks" aria-label="Main">
+      <div class="nb">
+        <button type="button" aria-expanded="false">Live <i>▾</i></button>
+        <div class="nm">
+          <a href="/#tracker">Tracker</a>
+          <a href="/#supply">Supply</a>
+          <a href="/zecmap.html" style="color:var(--gold);">ZEC Map ◈</a>
+          <a href="/flippening.html" style="color:var(--gold);">Flippening Party ◈</a>
+          <a href="/events.html" style="color:var(--gold);">Events ◈</a>
+        </div>
+      </div>
+      <div class="nb">
+        <button type="button" aria-expanded="false">Learn <i>▾</i></button>
+        <div class="nm">
+          <a href="/#arc">The Redemption Arc</a>
+          <a href="/#why">Why Zcash</a>
+          <a href="/#how">How it works</a>
+          <a href="/#ux">UX on Zcash</a>
+        </div>
+      </div>
+      <div class="nb">
+        <button type="button" aria-expanded="false">Play <i>▾</i></button>
+        <div class="nm">
+          <a href="/#game">Mini game</a>
+          <a href="/backwards.html" style="color:var(--gold);">Backwards ◈</a>
+          <a href="/duel.html" style="color:var(--gold);">Card Duel ◈</a>
+          <a href="/#radio">Radio</a>
+        </div>
+      </div>
+      <a href="/captastic.html" style="color:var(--gold);">Captastic ◈</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <h1>Zectastic <span>Duel</span></h1>
+  <p class="lede">Pick the stat your card wins on. Higher number takes both cards.</p>
+
+  <div class="tabs">
+    <button class="tab" id="tabPlay" type="button" aria-pressed="true">Play</button>
+    <button class="tab" id="tabCol" type="button" aria-pressed="false">Collection</button>
+  </div>
+
+  <section id="play">
+    <div class="score">
+      <div><small>You</small><b id="sYou">0</b></div>
+      <div class="mid"><span id="sRound"></span><br><span id="sPot"></span></div>
+      <div><small>Computer</small><b id="sCpu">0</b></div>
+    </div>
+    <div class="table">
+      <div><div class="side">Your card</div><div id="cYou"></div></div>
+      <div><div class="side">Computer's card</div><div id="cCpu"></div></div>
+    </div>
+    <div class="msg"><p id="msg" aria-live="polite"></p><button class="go" id="next" type="button" hidden>Next round</button></div>
+    <div class="over" id="over" hidden>
+      <h2 id="overTitle"></h2>
+      <textarea id="share" rows="2" readonly aria-label="Result to share"></textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="go" id="again" type="button">Play again</button>
+        <button class="ghost" id="copy" type="button">Copy result</button>
+      </div>
+    </div>
+    <details class="rules">
+      <summary>Rules</summary>
+      <p>Your unlocked cards are shuffled and dealt between you and the computer. Each round both top cards meet. Whoever won the last round picks the stat. Higher number takes both cards. On a tie, a shielded card wins; otherwise both cards go to the pot and the next winner takes it. Hold every card to win, or hold the most after 20 rounds.</p>
+    </details>
+  </section>
+
+  <section id="col" hidden>
+    <div class="pack"><p id="packMsg"></p><button class="go" id="packBtn" type="button">Open today's card</button></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <p class="note">Your collection is saved in this browser only. Nothing is sent or stored online. The ratings are opinions; argue with them on X.</p>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-note">ZECTASTIC · not affiliated with the Electric Coin Company or the Zcash Foundation.</div>
+    <div class="foot-links"><a href="/index.html">← Back to the live tracker</a> · <a href="/privacy.html">Privacy</a></div>
+  </div>
+</footer>
+
+<script>
+/* ============ EDIT HERE ============
+   One line per card. Stats run 1 to 10: p = privacy, s = speed, c = security, a = adoption.
+   kind: coin | tool | threat.   starter: 1 = owned from the start.   shield: 1 = wins ties. */
+var CARDS = [
+ {id:"btc", name:"Bitcoin",            kind:"coin",  mark:"BTC", p:3, s:3, c:10,a:10,starter:1, text:"The first and the most secured. Every payment is public forever."},
+ {id:"zec", name:"Zcash",              kind:"coin",  mark:"ZEC", p:10,s:5, c:8, a:5, starter:1, shield:1, text:"Encrypted money. Shielded payments hide sender, receiver and amount."},
+ {id:"eth", name:"Ethereum",           kind:"coin",  mark:"ETH", p:3, s:6, c:8, a:9, starter:1, text:"A world computer. Everything on it is visible to everyone."},
+ {id:"sol", name:"Solana",             kind:"coin",  mark:"SOL", p:2, s:10,c:6, a:7, starter:1, text:"Built for speed above all else."},
+ {id:"ltc", name:"Litecoin",           kind:"coin",  mark:"LTC", p:3, s:6, c:7, a:6, starter:1, text:"Bitcoin's lighter, quicker sibling."},
+ {id:"doge",name:"Dogecoin",           kind:"coin",  mark:"DOGE",p:2, s:5, c:5, a:7, starter:1, text:"Started as a joke. Still here."},
+ {id:"usd", name:"Stablecoin",         kind:"coin",  mark:"USD", p:1, s:7, c:5, a:9, starter:1, text:"Dollars on a chain. The issuer can freeze them."},
+ {id:"exc", name:"Exchange",           kind:"tool",  mark:"CEX", p:1, s:8, c:4, a:10,starter:1, text:"Easy to use. Not your keys, not your coins."},
+ {id:"min", name:"Miner",              kind:"tool",  mark:"POW", p:4, s:4, c:9, a:6, starter:1, text:"Turns electricity into security."},
+ {id:"tad", name:"Transparent Address",kind:"tool",  mark:"t-",  p:1, s:6, c:7, a:8, starter:1, text:"Anyone can look up the balance and every payment."},
+ {id:"seed",name:"Seed Phrase",        kind:"tool",  mark:"24",  p:8, s:1, c:9, a:6, starter:1, text:"Write it on paper. Never type it into a website."},
+ {id:"phi", name:"Phishing Link",      kind:"threat",mark:"!!",  p:2, s:9, c:1, a:6, starter:1, text:"Looks like the real site. Check the address twice."},
+ {id:"xmr", name:"Monero",             kind:"coin",  mark:"XMR", p:9, s:5, c:7, a:5, text:"Private by default on every payment."},
+ {id:"ln",  name:"Lightning Network",  kind:"tool",  mark:"LN",  p:6, s:10,c:6, a:5, text:"Instant Bitcoin payments off the main chain."},
+ {id:"hww", name:"Hardware Wallet",    kind:"tool",  mark:"HW",  p:7, s:2, c:10,a:4, text:"Keys that never touch the internet."},
+ {id:"node",name:"Full Node",          kind:"tool",  mark:"NODE",p:8, s:3, c:9, a:3, text:"Don't trust, verify. Runs on a small computer at home."},
+ {id:"zad", name:"Shielded Address",   kind:"tool",  mark:"z-",  p:10,s:5, c:9, a:3, shield:1, text:"Nobody can look up what you hold or who paid you."},
+ {id:"mix", name:"Mixer",              kind:"tool",  mark:"MIX", p:8, s:3, c:4, a:2, text:"Shuffles coins to break the trail. Legally risky in many places."},
+ {id:"pap", name:"Paper Wallet",       kind:"tool",  mark:"PPR", p:7, s:1, c:6, a:2, text:"Offline and old-school. Fire and water are the enemies."},
+ {id:"wr",  name:"Wrench Attack",      kind:"threat",mark:"$5",  p:1, s:6, c:1, a:2, text:"Being forced to hand over coins. Never tell people what you hold."}
+];
+var STATS = [["p","Privacy"],["s","Speed"],["c","Security"],["a","Adoption"]];
+var MAX_ROUNDS = 20;
+/* ============ END EDIT ============ */
+
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function load(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(e){return d;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function today(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+function byId(id){for(var i=0;i<CARDS.length;i++)if(CARDS[i].id===id)return CARDS[i];}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+var owned=load("zd_owned",null);
+if(!owned||!owned.length){owned=CARDS.filter(function(c){return c.starter;}).map(function(c){return c.id;});}
+owned=owned.filter(byId);
+var lastPack=load("zd_pack",""), newId=null, G;
+
+/* Icons: every card is drawn in the same line style. Coins sit in a circle, tools in a square, threats in a warning triangle. */
+function T(g){return '<text x="24" y="25" text-anchor="middle" dominant-baseline="central">'+g+'</text>';}
+var FRAME={coin:'<circle class="frame" cx="24" cy="24" r="21"/>',tool:'<rect class="frame" x="4" y="4" width="40" height="40" rx="10"/>',threat:'<path class="frame" d="M24 5 45 42H3z"/>'};
+var ICONS={
+ btc:T("₿"), eth:T("Ξ"), sol:T("S"), ltc:T("Ł"), doge:T("Ð"), usd:T("$"), xmr:T("ɱ"),
+ zec:T("Z")+'<path d="M24 10v4M24 34v4"/>',
+ exc:'<path d="M14 20h19l-5-5M34 28H15l5 5"/>',
+ min:'<path d="M12 21c7-8 17-8 24 0M24 15v21"/>',
+ tad:'<path d="M10 24c4-7 9-10 14-10s10 3 14 10c-4 7-9 10-14 10s-10-3-14-10z"/><circle cx="24" cy="24" r="4"/>',
+ seed:[17,24,31].map(function(y){return [15,21,27,33].map(function(x){return '<circle class="dot" cx="'+x+'" cy="'+y+'" r="1.8"/>';}).join("");}).join(""),
+ ln:'<path d="M27 10 15 26h8l-2 12 12-16h-8z"/>',
+ hww:'<rect x="17" y="10" width="14" height="28" rx="4"/><rect x="20.5" y="14.5" width="7" height="8" rx="1.5"/><circle class="dot" cx="24" cy="31" r="1.8"/>',
+ node:'<path d="M22.4 17.6 15.6 29.6M25.6 17.6l6.8 12M18 33h12"/><circle cx="24" cy="14" r="3.6"/><circle cx="14" cy="33" r="3.6"/><circle cx="34" cy="33" r="3.6"/>',
+ zad:'<path d="M24 10l11 4v8c0 8-5 13-11 16-6-3-11-8-11-16v-8z"/><path d="M19 24l4 4 7-8"/>',
+ mix:'<path d="M11 17h6c9 0 5 14 14 14h6M11 31h6c9 0 5-14 14-14h6"/>',
+ pap:'<path d="M16 10h11l6 6v22H16zM27 10v6h6M20 25h9M20 31h9"/>',
+ phi:'<circle cx="25" cy="18" r="1.8"/><path d="M25 20v12a4.5 4.5 0 0 1-9 0v-2"/>',
+ wr:'<path d="M20 37l5-9"/><path d="M29.5 21.5a4.6 4.6 0 1 0 .6 6.2"/>'
+};
+function icon(c){return '<svg viewBox="0 0 48 48" role="img" aria-label="'+esc(c.name)+'">'+FRAME[c.kind]+(ICONS[c.id]||T(esc(c.mark)))+'</svg>';}
+
+function cardHTML(c,o){
+  o=o||{};
+  var h='<div class="card '+c.kind+(o.cls?" "+o.cls:"")+'">'+
+    '<div class="kind"><span>'+c.kind+'</span>'+(c.shield?"<i>shielded</i>":"")+'</div>'+
+    '<div class="name">'+esc(c.name)+'</div><div class="art">'+icon(c)+'</div><div class="stats">';
+  STATS.forEach(function(s){
+    var inner='<span>'+s[1]+'</span><b>'+c[s[0]]+'</b><span class="bar"><i style="width:'+c[s[0]]*10+'%"></i></span>';
+    h+=o.pick?'<button type="button" class="stat" data-stat="'+s[0]+'">'+inner+'</button>'
+             :'<div class="stat'+(o.hi===s[0]?" hi":"")+'">'+inner+'</div>';
+  });
+  return h+'</div><p class="flavor">'+esc(c.text)+'</p></div>';
+}
+function backHTML(n){return '<div class="card cardback"><svg viewBox="0 0 48 48" aria-hidden="true">'+FRAME.coin+T("Z")+'<path d="M24 10v4M24 34v4"/></svg><span>'+n+' card'+(n===1?"":"s")+' left</span></div>';}
+
+function newGame(){
+  var deck=shuffle(owned.map(byId));
+  G={you:[],cpu:[],pot:[],round:1,turn:"you",phase:"pick",stat:null,res:null};
+  deck.forEach(function(c,i){(i%2?G.cpu:G.you).push(c);});
+  if(G.you.length>G.cpu.length)G.pot.push(G.you.pop());
+  $("over").hidden=true;
+  draw();
+}
+function draw(){
+  $("sYou").textContent=G.you.length; $("sCpu").textContent=G.cpu.length;
+  $("sRound").textContent="Round "+G.round+" of "+MAX_ROUNDS;
+  $("sPot").textContent=G.pot.length?"Pot: "+G.pot.length:"";
+  var a=G.show?G.show[0]:G.you[0], b=G.show?G.show[1]:G.cpu[0];
+  if(G.phase==="pick"){
+    $("cYou").innerHTML=cardHTML(a,{pick:G.turn==="you"});
+    $("cCpu").innerHTML=backHTML(G.cpu.length);
+    $("next").hidden=true;
+    if(G.turn==="you"){$("msg").textContent="Your pick. Choose the stat you think you win on.";}
+    else{$("msg").textContent="The computer is choosing a stat…";setTimeout(cpuPick,900);}
+  }else{
+    $("cYou").innerHTML=cardHTML(a,{hi:G.stat,cls:G.res==="you"?"win":G.res==="cpu"?"lose":""});
+    $("cCpu").innerHTML=cardHTML(b,{hi:G.stat,cls:"flip "+(G.res==="cpu"?"win":G.res==="you"?"lose":"")});
+    $("next").hidden=G.phase==="over";
+  }
+}
+function cpuPick(){
+  if(G.phase!=="pick"||G.turn!=="cpu")return;
+  var c=G.cpu[0],best=STATS[0][0];
+  STATS.forEach(function(s){if(c[s[0]]>c[best])best=s[0];});
+  if(Math.random()<.25)best=STATS[Math.floor(Math.random()*4)][0];
+  play(best);
+}
+function play(stat){
+  var a=G.you.shift(),b=G.cpu.shift(),label=STATS.filter(function(s){return s[0]===stat;})[0][1];
+  var res=a[stat]>b[stat]?"you":a[stat]<b[stat]?"cpu":(a.shield&&!b.shield)?"you":(b.shield&&!a.shield)?"cpu":"tie";
+  var shieldWin=a[stat]===b[stat]&&res!=="tie", n=2+G.pot.length;
+  if(res==="tie"){G.pot.push(a,b);}
+  else{var w=res==="you"?G.you:G.cpu;w.push.apply(w,shuffle([a,b].concat(G.pot)));G.pot=[];G.turn=res;}
+  G.stat=stat;G.res=res;G.show=[a,b];G.phase="reveal";
+  var who=(G.show&&res==="you")?"You win":"The computer wins";
+  $("msg").textContent=res==="tie"?label+": "+a[stat]+" against "+b[stat]+". A tie. Both cards go to the pot."
+    :label+": "+a[stat]+" against "+b[stat]+". "+who+(shieldWin?" the tie with a shielded card":"")+" and take"+(res==="you"?"":"s")+" "+n+" cards.";
+  if(!G.you.length||!G.cpu.length||G.round>=MAX_ROUNDS)finish();
+  draw();
+}
+function finish(){
+  G.phase="over";
+  var y=G.you.length,c=G.cpu.length;
+  $("overTitle").textContent=y>c?"You win, "+y+" cards to "+c+".":y<c?"The computer wins, "+c+" cards to "+y+".":"A draw, "+y+" cards each.";
+  $("share").value=(y>c?"I beat the computer "+y+"–"+c:y<c?"The computer beat me "+c+"–"+y:"I drew "+y+"–"+c)+" at Zectastic Duel in "+G.round+" rounds. zectastic.com";
+  $("over").hidden=false;
+}
+$("cYou").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-stat]");
+  if(b&&G.phase==="pick"&&G.turn==="you")play(b.getAttribute("data-stat"));
+});
+$("next").onclick=function(){G.round++;G.phase="pick";G.show=null;draw();};
+$("again").onclick=newGame;
+$("copy").onclick=function(){
+  var t=$("share"),btn=this;
+  function done(){btn.textContent="Copied";setTimeout(function(){btn.textContent="Copy result";},1500);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t.value).then(done,function(){t.select();});}
+  else{t.select();}
+};
+
+function drawCol(){
+  var locked=CARDS.filter(function(c){return owned.indexOf(c.id)<0;});
+  var can=locked.length&&lastPack!==today();
+  $("packBtn").hidden=!can;
+  $("packMsg").textContent=!locked.length?"Collection complete. All "+CARDS.length+" cards are yours."
+    :can?"You have "+owned.length+" of "+CARDS.length+" cards. One new card is waiting."
+    :"You have "+owned.length+" of "+CARDS.length+" cards. Come back tomorrow for the next one.";
+  $("grid").innerHTML=CARDS.map(function(c){
+    return owned.indexOf(c.id)<0?'<div class="card locked"><b>?</b><span>locked</span></div>':cardHTML(c,{cls:c.id===newId?"new":""});
+  }).join("");
+}
+$("packBtn").onclick=function(){
+  var locked=CARDS.filter(function(c){return owned.indexOf(c.id)<0;});
+  if(!locked.length||lastPack===today())return;
+  var c=locked[Math.floor(Math.random()*locked.length)];
+  owned.push(c.id);newId=c.id;lastPack=today();
+  save("zd_owned",owned);save("zd_pack",lastPack);
+  drawCol();
+  $("packMsg").textContent="New card: "+c.name+". It joins your deck in the next game.";
+};
+function tab(play){
+  $("play").hidden=!play;$("col").hidden=play;
+  $("tabPlay").setAttribute("aria-pressed",play);$("tabCol").setAttribute("aria-pressed",!play);
+  if(!play)drawCol();
+}
+$("tabPlay").onclick=function(){tab(true);};
+$("tabCol").onclick=function(){tab(false);};
+newGame();
+
+// Header menu buckets: tap to open, tap elsewhere or press Escape to close.
+(function(){
+  var nbs = [].slice.call(document.querySelectorAll('.nb'));
+  function closeAll(except){
+    nbs.forEach(function(n){
+      if(n !== except){ n.classList.remove('open'); n.firstElementChild.setAttribute('aria-expanded', 'false'); }
+    });
+  }
+  nbs.forEach(function(n){
+    var b = n.firstElementChild;
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var open = !n.classList.contains('open');
+      closeAll(n);
+      n.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  document.addEventListener('click', function(){ closeAll(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeAll(); });
+})();
+</script>
+</body>
+</html>
