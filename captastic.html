@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Captastic · Top 100 Live</title>
 <meta name="description" content="The top 100 crypto projects by market cap, live, with no noise and no ads.">
-<meta name="theme-color" content="#0a0b0d">
+<meta name="theme-color" content="#050608">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -17,19 +17,19 @@
 <link rel="icon" type="image/png" href="captastic-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0b0d;
-    --bg-raised:#111318;
-    --line:#22262e;
-    --text:#e8e6e0;
-    --muted:#8b8f98;
-    --gold:#f4c542;
-    --teal:#00d9c0;
-    --exposed:#ff6b4a;
-    --mono:'JetBrains Mono', monospace;
-    --sans:'IBM Plex Sans', sans-serif;
+    --bg:#050608;
+    --bg-raised:#0D0E11;
+    --line:#1E2024;
+    --text:#F2F2EF;
+    --muted:#9C9EA3;
+    --gold:#FF5A1F;
+    --teal:#3DDC97;
+    --exposed:#FF4D6D;
+    --mono:'DM Mono', monospace;
+    --sans:'Hanken Grotesk', sans-serif;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -37,18 +37,16 @@
     color:var(--text);
     font-family:var(--sans);
     line-height:1.5;
-    background-image:
-      repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
   }
   a{color:inherit;}
   .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
-  ::selection{background:var(--gold); color:#0a0b0d;}
+  ::selection{background:var(--gold); color:#050608;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 
   /* HEADER (same build as Zectastic) */
   header{
     position:sticky; top:0; z-index:50;
-    background:rgba(10,11,13,0.9);
+    background:rgba(5,6,8,0.9);
     backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line);
   }
@@ -73,7 +71,7 @@
   .seg button{background:none; border:0; color:var(--muted); font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase; padding:9px 12px; cursor:pointer; transition:color .15s;}
   .seg[hidden]{display:none;}
   .seg button:hover{color:var(--text);}
-  .seg button.on{color:#0a0b0d; background:var(--gold); font-weight:700;}
+  .seg button.on{color:#050608; background:var(--gold); font-weight:700;}
 
   /* TABLE */
   .tablebox{border:1px solid var(--line); background:var(--bg-raised); overflow-x:auto;}
@@ -109,7 +107,7 @@
   /* TILES (watchlist) */
   .tiles{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:12px;}
   .tile{border:1px solid var(--line); background:var(--bg-raised); padding:16px; font-family:var(--mono); font-variant-numeric:tabular-nums; min-width:0; transition:border-color .15s;}
-  .tile:hover{border-color:#3a3f4a;}
+  .tile:hover{border-color:#34363C;}
   .t-head{display:flex; align-items:center; justify-content:space-between; gap:10px;}
   .t-head .coin{min-width:0;}
   .t-head .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -140,7 +138,7 @@
   .p-add input.bad{border-color:var(--exposed);}
   #pCoin{width:210px;}
   #pAmt{width:120px;}
-  .p-add button{background:var(--gold); color:#0a0b0d; border:0; font-family:var(--mono); font-weight:700; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; padding:9px 18px; cursor:pointer;}
+  .p-add button{background:var(--gold); color:#050608; border:0; font-family:var(--mono); font-weight:700; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; padding:9px 18px; cursor:pointer;}
   .amt{width:130px; text-align:right; padding:6px 8px; background:transparent;}
   .p-privacy{font-family:var(--mono); font-size:12px; color:var(--muted); padding:12px 2px 0; display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 16px;}
   .p-privacy .lock{color:var(--teal);}
@@ -155,7 +153,7 @@
   #tip{flex-wrap:wrap;}
   #tip button{background:none; border:0; color:var(--muted); font:inherit; cursor:pointer; padding:0 4px;}
   #tip button:hover{color:var(--gold);}
-  #tip #tipGo{background:var(--gold); color:#0a0b0d; font-weight:700; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px;}
+  #tip #tipGo{background:var(--gold); color:#050608; font-weight:700; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px;}
   #tip #tipGo[hidden]{display:none;}
   footer{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:28px 0 48px; line-height:1.9;}
   footer a{color:var(--muted);}
@@ -223,7 +221,7 @@
     body[data-mode="port"] tbody tr{
       display:grid; grid-template-columns:auto auto 1fr auto auto; column-gap:10px; row-gap:8px; align-items:center;
       padding:12px; border-bottom:1px solid var(--line);
-      background:linear-gradient(to right, rgba(244,197,66,0.08) var(--shr, 0%), transparent var(--shr, 0%));
+      background:linear-gradient(to right, rgba(255,90,31,0.08) var(--shr, 0%), transparent var(--shr, 0%));
     }
     body[data-mode="port"] tbody tr:last-child{border-bottom:0;}
     body[data-mode="port"] tbody td{display:block; padding:0; border:0; text-align:left; background:none !important; min-width:0;}
@@ -241,6 +239,18 @@
   @media (max-width:350px){
     body:not([data-mode="port"]) tbody td:nth-child(6){display:none;}
   }
+
+  /* ==== SWARM STYLE ==== */
+  body{background-image:none;}
+  h1{font-family:'Archivo','Arial Black',sans-serif !important; font-weight:900 !important; font-stretch:112%; text-transform:uppercase; letter-spacing:-0.025em !important; line-height:0.95 !important; font-size:clamp(32px,4.4vw,56px) !important; text-wrap:balance;}
+  @media(max-width:600px){h1{font-stretch:100%; letter-spacing:-0.02em !important;}}
+  ::selection{background:#FF5A1F; color:#050608;}
+  .logo{font-family:'Archivo','Arial Black',sans-serif !important; font-weight:900 !important; font-stretch:125%; font-size:22px !important; letter-spacing:-0.01em !important; text-transform:uppercase;}
+  .logo .z{color:#FF5A1F;}
+  .seg{border-radius:999px; overflow:hidden;}
+  .tablebox, .tile, .p-card{border-radius:18px;}
+  .eyebrow{font-family:'DM Mono',monospace;}
+  /* ==== END SWARM STYLE ==== */
 </style>
 </head>
 <body data-mode="top">
@@ -995,7 +1005,7 @@
       if(t !== row.pt){
         row.price.textContent = t;
         if(!calm && row.pt && row.pv != null && p != null && p !== row.pv && row.price.animate){
-          row.price.animate([{color: p > row.pv ? '#00d9c0' : '#ff6b4a'}, {color: '#e8e6e0'}], {duration: 900});
+          row.price.animate([{color: p > row.pv ? '#3DDC97' : '#FF4D6D'}, {color: '#F2F2EF'}], {duration: 900});
         }
         row.pt = t;
       }

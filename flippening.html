@@ -9,19 +9,19 @@
 <meta name="description" content="Live Zcash flippening tracker: how far ZEC is from flipping every coin ranked above it, with party mode, confetti, and DANCE.FM playing.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0b0d;
-    --bg-raised:#111318;
-    --line:#22262e;
-    --text:#e8e6e0;
-    --muted:#8b8f98;
-    --gold:#f4c542;
-    --teal:#00d9c0;
-    --exposed:#ff6b4a;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'IBM Plex Sans', sans-serif;
+    --bg:#050608;
+    --bg-raised:#0D0E11;
+    --line:#1E2024;
+    --text:#F2F2EF;
+    --muted:#9C9EA3;
+    --gold:#FF5A1F;
+    --teal:#3DDC97;
+    --exposed:#FF4D6D;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Hanken Grotesk', sans-serif;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html, body{height:100%;}
@@ -30,20 +30,19 @@
     position:relative; overflow:hidden;
     height:100vh; height:100dvh;
     display:flex; flex-direction:column;
-    background-image: repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
   }
   a{color:inherit;}
   .mono{font-family:var(--mono);}
-  ::selection{background:var(--gold); color:#0a0b0d;}
+  ::selection{background:var(--gold); color:#050608;}
 
   #confettiCanvas{position:fixed; inset:0; pointer-events:none; z-index:5;}
 
   /* PARTY GLOW BACKDROP */
   .party-glow{
     position:fixed; inset:0; z-index:0; opacity:0; pointer-events:none;
-    background: radial-gradient(circle at 50% 20%, rgba(244,197,66,0.16), transparent 55%),
-                radial-gradient(circle at 15% 80%, rgba(0,217,192,0.14), transparent 50%),
-                radial-gradient(circle at 85% 75%, rgba(255,107,74,0.12), transparent 50%);
+    background: radial-gradient(circle at 50% 20%, rgba(255,90,31,0.16), transparent 55%),
+                radial-gradient(circle at 15% 80%, rgba(61,220,151,0.14), transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(255,77,109,0.12), transparent 50%);
     transition:opacity .6s ease;
   }
   body.party-on .party-glow{opacity:1; animation:partyPulse 0.94s ease-in-out infinite alternate;}
@@ -88,13 +87,13 @@
 
   .party-btn{
     font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:800;
-    background:var(--gold); color:#0a0b0d; border:none; padding:10px 22px; cursor:pointer;
+    background:var(--gold); color:#050608; border:none; padding:10px 22px; cursor:pointer;
     display:inline-flex; align-items:center; gap:8px; transition:transform .15s, background .15s;
     margin-top:12px;
   }
-  .party-btn:hover{background:#ffd766; transform:translateY(-1px);}
+  .party-btn:hover{background:#FF8352; transform:translateY(-1px);}
   body.party-on .party-btn{background:var(--teal);}
-  body.party-on .party-btn:hover{background:#3ffce0;}
+  body.party-on .party-btn:hover{background:#6BE8B2;}
 
   /* LADDER */
   .board-head{flex:0 0 auto; width:100%; display:flex; align-items:baseline; justify-content:space-between; margin:16px 0 8px; gap:10px;}
@@ -107,7 +106,7 @@
     padding:10px 14px; border-bottom:1px solid var(--line);
   }
   .ladder-row:last-child{border-bottom:none;}
-  .ladder-row.closest{background:rgba(244,197,66,0.06);}
+  .ladder-row.closest{background:rgba(255,90,31,0.06);}
   .ladder-rank{font-family:var(--mono); font-size:12px; color:var(--muted); text-align:center;}
   .ladder-name{font-family:var(--mono); font-size:13.5px; font-weight:700; display:flex; align-items:center; gap:8px;}
   .ladder-name img{width:18px; height:18px; border-radius:50%;}
@@ -123,7 +122,7 @@
     flex:0 0 auto; width:100%; display:flex; align-items:center; gap:14px;
     background:var(--bg-raised); border:1px solid var(--line); padding:10px 16px; margin-top:10px;
   }
-  .play-btn{width:36px; height:36px; border-radius:50%; background:var(--teal); color:#0a0b0d; border:none; font-size:14px; cursor:pointer; flex-shrink:0;}
+  .play-btn{width:36px; height:36px; border-radius:50%; background:var(--teal); color:#050608; border:none; font-size:14px; cursor:pointer; flex-shrink:0;}
   .radio-meta{font-family:var(--mono); font-size:10.5px; color:var(--muted);}
   .radio-meta b{color:var(--text); display:block; font-size:12px; margin-bottom:1px;}
 
@@ -154,44 +153,56 @@
   }
 
   /* ==== SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. ==== */
-  .zh{position:sticky; top:0; z-index:50; flex:0 0 auto; width:100%; background:rgba(10,11,13,0.9); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border-bottom:1px solid #22262e; color:#e8e6e0; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.5; text-align:left;}
+  .zh{position:sticky; top:0; z-index:50; flex:0 0 auto; width:100%; background:rgba(5,6,8,0.86); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border-bottom:1px solid #1E2024; color:#F2F2EF; font-family:'Hanken Grotesk',system-ui,sans-serif; font-size:15px; line-height:1.5; text-align:left;}
   .zh, .zh *{box-sizing:border-box;}
   .zh *{margin:0;}
-  .zh .nav{display:flex; align-items:center; justify-content:flex-start; flex-wrap:nowrap; gap:16px; max-width:1080px; margin:0 auto; padding:14px 24px;}
-  .zh .logo{display:flex; align-items:center; gap:8px; height:30px; font-weight:800; font-size:18px; letter-spacing:0.04em; color:#e8e6e0; text-decoration:none; white-space:nowrap;}
-  .zh .logo .z{color:#f4c542;}
-  .zh .navlinks{display:flex; align-items:center; gap:26px; margin:0 auto 0 28px; font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
-  .zh .navlinks a{color:#8b8f98; text-decoration:none; transition:color .15s;}
-  .zh .navlinks a:hover, .zh .navlinks > a, .zh .navlinks a[aria-current]{color:#f4c542;}
+  .zh .nav{display:flex; align-items:center; justify-content:flex-start; flex-wrap:nowrap; gap:16px; max-width:1240px; margin:0 auto; padding:14px 24px;}
+  .zh .logo{display:flex; align-items:center; height:34px; font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:125%; font-size:22px; letter-spacing:-0.01em; text-transform:uppercase; color:#F2F2EF; text-decoration:none; white-space:nowrap;}
+  .zh .logo i{font-style:normal; color:#FF5A1F;}
+  .zh .navlinks{display:flex; align-items:center; gap:28px; margin:0 auto 0 40px; font-size:15px; font-weight:500;}
+  .zh .navlinks a{color:#9C9EA3; text-decoration:none; transition:color .15s;}
+  .zh .navlinks a:hover, .zh .navlinks a[aria-current]{color:#F2F2EF;}
+  .zh .navlinks > a{color:#FF5A1F;}
+  .zh .navlinks > a:hover{color:#FF8352;}
   .zh .nb{position:relative;}
-  .zh .nb > button{display:flex; align-items:center; gap:6px; padding:6px 0; background:none; border:0; border-radius:0; color:#8b8f98; font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; transition:color .15s;}
-  .zh .nb > button i{font-style:normal; font-size:9px; transition:transform .15s;}
-  .zh .nb > button:hover, .zh .nb.open > button{color:#f4c542;}
+  .zh .nb > button{display:flex; align-items:center; gap:6px; padding:8px 0; background:none; border:0; border-radius:0; color:#9C9EA3; font:inherit; cursor:pointer; transition:color .15s;}
+  .zh .nb > button i{font-style:normal; font-size:10px; transition:transform .15s;}
+  .zh .nb > button:hover, .zh .nb.open > button{color:#F2F2EF;}
   .zh .nb.open > button i{transform:rotate(180deg);}
-  .zh .nm{display:none; position:absolute; top:100%; left:-14px; z-index:60; min-width:180px; padding:6px 0; background:#111318; border:1px solid #22262e; box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+  .zh .nm{display:none; position:absolute; top:100%; left:-18px; z-index:60; min-width:220px; padding:8px; background:#0D0E11; border:1px solid #1E2024; border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,0.6);}
   .zh .nb.open .nm{display:block;}
-  @media(hover:hover){.zh .nb:hover .nm{display:block;} .zh .nb:hover > button{color:#f4c542;}}
-  .zh .nm a{display:block; padding:9px 14px; white-space:nowrap;}
-  .zh .nm a:hover{background:rgba(255,255,255,0.03);}
+  @media(hover:hover){.zh .nb:hover .nm{display:block;} .zh .nb:hover > button{color:#F2F2EF;}}
+  .zh .nm a{display:block; padding:10px 12px; border-radius:10px; white-space:nowrap; color:#C8C9C4;}
+  .zh .nm a:hover{background:#18191D; color:#F2F2EF;}
+  .zh .nm a[aria-current]{color:#FF5A1F;}
   /* Right side: the live extras (radio, ZEC price). Used on the homepage only. */
   .zh .nav-right{display:flex; align-items:center; gap:10px;}
-  .zh .radio-btn{display:inline-flex; align-items:center; gap:7px; padding:5px 10px; font-family:inherit; font-size:11px; line-height:1.5; letter-spacing:0.08em; text-transform:uppercase; color:#00d9c0; background:rgba(0,217,192,0.08); border:1px solid rgba(0,217,192,0.4); border-radius:2px; cursor:pointer; white-space:nowrap;}
-  .zh .radio-btn:hover{background:rgba(0,217,192,0.16);}
-  .zh .radio-btn .icon{font-size:9px;}
-  .zh .tick{display:inline-flex; align-items:center; gap:8px; padding:5px 10px; font-size:12px; font-weight:700; color:#e8e6e0; text-decoration:none; white-space:nowrap; background:rgba(17,19,24,0.6); border:1px solid #22262e; border-radius:2px;}
-  .zh .tick:hover{border-color:#f4c542;}
-  .zh .tick .lbl{color:#8b8f98; font-weight:400; letter-spacing:0.08em;}
-  .zh .tick .p{color:#f4c542;}
-  .zh .tick .d{font-size:11px; font-weight:600;}
+  .zh .radio-btn{display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:0 14px; font-family:'DM Mono',monospace; font-size:12px; line-height:1.5; letter-spacing:0.06em; text-transform:uppercase; color:#F2F2EF; background:transparent; border:1px solid #34363C; border-radius:999px; cursor:pointer; white-space:nowrap;}
+  .zh .radio-btn:hover{border-color:#FF5A1F;}
+  .zh .radio-btn .icon{font-size:9px; color:#FF5A1F;}
+  .zh .tick{display:inline-flex; align-items:center; gap:8px; min-height:38px; padding:0 14px; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; color:#F2F2EF; text-decoration:none; white-space:nowrap; background:#0D0E11; border:1px solid #1E2024; border-radius:999px;}
+  .zh .tick:hover{border-color:#FF5A1F;}
+  .zh .tick .lbl{color:#9C9EA3;}
+  .zh .tick .p{color:#F2F2EF;}
+  .zh .tick .d{font-size:12px;}
+  .zh .up{color:#3DDC97;} .zh .down{color:#FF4D6D;}
   @media(max-width:520px){.zh .tick .d, .zh .tick .lbl{display:none;}}
   @media(max-width:799px){
-    .zh .nav{flex-wrap:wrap; row-gap:10px;}
+    .zh .nav{flex-wrap:wrap; row-gap:6px;}
     .zh .navlinks{order:3; width:100%; margin:0; gap:22px;}
     .zh .nav-right{margin-left:auto;}
   }
   html{scroll-padding-top:76px;}
   @media(max-width:799px){html{scroll-padding-top:112px;}}
   /* ==== END SITE HEADER ==== */
+
+  /* ==== SWARM STYLE ==== */
+  body{background-image:none;}
+  h1{font-family:'Archivo','Arial Black',sans-serif !important; font-weight:900 !important; font-stretch:112%; text-transform:uppercase; letter-spacing:-0.025em !important; line-height:0.95 !important; font-size:40px !important; text-wrap:balance;}
+  @media(max-width:600px){h1{font-stretch:100%; letter-spacing:-0.02em !important;}}
+  ::selection{background:#FF5A1F; color:#050608;}
+  .ladder-wrap,.radio-panel{border-radius:18px;} .party-btn{border-radius:999px;}
+  /* ==== END SWARM STYLE ==== */
 </style>
 </head>
 <body>
@@ -202,7 +213,7 @@
 <!-- SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. -->
 <header class="zh">
   <div class="nav">
-    <a class="logo" href="/"><span class="z">Z</span> ZECTASTIC</a>
+    <a class="logo" href="/">Zec<i>tastic</i></a>
     <nav class="navlinks" aria-label="Main">
       <div class="nb">
         <button type="button" aria-expanded="false">Live <i>▾</i></button>
@@ -359,7 +370,7 @@
   /* ---------------- Confetti (vanilla canvas, no dependencies) ---------------- */
   const canvas = document.getElementById('confettiCanvas');
   const ctx = canvas.getContext('2d');
-  const colors = ['#f4c542', '#00d9c0', '#ff6b4a', '#e8e6e0'];
+  const colors = ['#FF5A1F', '#3DDC97', '#FF4D6D', '#F2F2EF'];
   let particles = [];
   let sprinkleInterval = null;
 

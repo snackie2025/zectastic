@@ -15,19 +15,19 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0b0d;
-    --bg-raised:#111318;
-    --line:#22262e;
-    --text:#e8e6e0;
-    --muted:#8b8f98;
-    --gold:#f4c542;
-    --teal:#00d9c0;
-    --exposed:#ff6b4a;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'IBM Plex Sans', sans-serif;
+    --bg:#050608;
+    --bg-raised:#0D0E11;
+    --line:#1E2024;
+    --text:#F2F2EF;
+    --muted:#9C9EA3;
+    --gold:#FF5A1F;
+    --teal:#3DDC97;
+    --exposed:#FF4D6D;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Hanken Grotesk', sans-serif;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth; scroll-padding-top:76px;}
@@ -36,13 +36,11 @@
     color:var(--text);
     font-family:var(--sans);
     line-height:1.5;
-    background-image:
-      repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
   }
   a{color:inherit;}
   .mono{font-family:var(--mono);}
   .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
-  ::selection{background:var(--gold); color:#0a0b0d;}
+  ::selection{background:var(--gold); color:#050608;}
   .up{color:var(--teal);} .down{color:var(--exposed);}
   .hidden{display:none !important;}
 
@@ -60,7 +58,7 @@
   .live-tag{
     display:inline-flex; align-items:center; gap:6px;
     font-family:var(--mono); font-size:11px; letter-spacing:0.12em;
-    color:var(--exposed); border:1px solid rgba(255,107,74,0.4);
+    color:var(--exposed); border:1px solid rgba(255,77,109,0.4);
     padding:3px 9px; border-radius:2px;
   }
   .live-dot{width:6px; height:6px; border-radius:50%; background:var(--exposed); animation:pulse 1.6s infinite;}
@@ -83,7 +81,7 @@
   .mcap-range-toggle{display:flex; gap:4px;}
   .mcap-range-btn{font-family:var(--mono); font-size:10px; letter-spacing:0.05em; text-transform:uppercase; background:transparent; border:1px solid var(--line); color:var(--muted); padding:4px 9px; cursor:pointer; border-radius:2px; transition:all .15s;}
   .mcap-range-btn:hover{color:var(--text); border-color:var(--muted);}
-  .mcap-range-btn.active{color:var(--gold); border-color:var(--gold); background:rgba(244,197,66,0.1);}
+  .mcap-range-btn.active{color:var(--gold); border-color:var(--gold); background:rgba(255,90,31,0.1);}
   .mcap-chart{width:100%; height:72px; display:block; overflow:visible;}
   .mcap-chart-range-caption{display:flex; justify-content:space-between; font-family:var(--mono); font-size:10px; color:var(--muted); opacity:0.7; margin-top:4px;}
   .mcap-chart-foot{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:6px;}
@@ -102,13 +100,13 @@
   .door{background:var(--bg); padding:24px; text-decoration:none; display:flex; flex-direction:column; gap:8px; transition:background .15s;}
   .door:hover{background:var(--bg-raised);}
   .door .tag{font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--teal);}
-  .door .tag.new{align-self:flex-start; color:#0a0b0d; background:var(--gold); padding:2px 6px; font-weight:700;}
+  .door .tag.new{align-self:flex-start; color:#050608; background:var(--gold); padding:2px 6px; font-weight:700;}
   .door h3{font-family:var(--mono); font-size:16px; text-transform:uppercase; letter-spacing:0.03em;}
   .door p{color:var(--muted); font-size:14.5px; flex:1;}
   .door .go{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; color:var(--gold); margin-top:6px;}
   .door:hover .go{text-decoration:underline;}
   .door.wide{background:var(--bg-raised);}
-  .door.wide:hover{background:#161920;}
+  .door.wide:hover{background:#141519;}
   .door.feature{box-shadow:inset 3px 0 0 var(--gold);}
   @media(min-width:560px){
     .doors{grid-template-columns:repeat(2,1fr);}
@@ -128,10 +126,10 @@
   .arc-play:hover{color:var(--gold); border-color:var(--gold);}
   .arc-chart{padding:8px 8px 0;}
   .arc-chart svg{display:block; width:100%; height:auto; overflow:visible;}
-  .arc-chart .grid{stroke:#1c2027; stroke-width:1;}
-  .arc-chart .ylab,.arc-chart .xlab{fill:#5d626c; font-family:var(--mono); font-size:11px;}
+  .arc-chart .grid{stroke:#18191D; stroke-width:1;}
+  .arc-chart .ylab,.arc-chart .xlab{fill:#76787E; font-family:var(--mono); font-size:11px;}
   .arc-chart .line{fill:none; stroke:url(#arcg); stroke-width:2.4; stroke-linejoin:round; stroke-linecap:round;}
-  .arc-chart .stop{fill:var(--bg-raised); stroke:#3a404b; stroke-width:1.5; transition:fill .4s, stroke .4s;}
+  .arc-chart .stop{fill:var(--bg-raised); stroke:#34363C; stroke-width:1.5; transition:fill .4s, stroke .4s;}
   .arc-chart .stop.on{fill:var(--gold); stroke:var(--gold);}
   .arc-chart .you{fill:var(--gold);}
   .arc-chart .ring{fill:none; stroke:var(--gold); stroke-width:1.5; transform-box:fill-box; transform-origin:center; animation:arcring 2.2s ease-out infinite;}
@@ -149,20 +147,20 @@
   .arc-btn:hover{border-color:var(--gold); color:var(--gold);}
   .arc-btn[disabled]{opacity:.35; cursor:default; border-color:var(--line); color:var(--muted);}
   .arc-dots{display:flex; gap:8px;}
-  .arc-dots button{width:9px; height:9px; border-radius:50%; border:1px solid #4a505b; background:none; padding:0; cursor:pointer;}
+  .arc-dots button{width:9px; height:9px; border-radius:50%; border:1px solid #45474D; background:none; padding:0; cursor:pointer;}
   .arc-dots button.on{background:var(--gold); border-color:var(--gold);}
-  .arc-dots button.cur{box-shadow:0 0 0 3px rgba(244,197,66,.25);}
+  .arc-dots button.cur{box-shadow:0 0 0 3px rgba(255,90,31,.25);}
   .arc-list{list-style:none; font-family:var(--mono); font-size:13px;}
-  .arc-list li{display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); color:#5d626c; transition:color .5s;}
+  .arc-list li{display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); color:#76787E; transition:color .5s;}
   .arc-list li:last-child{border-bottom:none;}
-  .arc-list .bx{width:16px; flex-shrink:0; color:#3a404b; transition:color .5s;}
+  .arc-list .bx{width:16px; flex-shrink:0; color:#34363C; transition:color .5s;}
   .arc-list li.on{color:var(--text);}
   .arc-list li.on .bx{color:var(--gold);}
   .arc-list li span em{display:block; font-style:normal; color:var(--muted); font-size:11.5px; margin-top:2px;}
   .arc-end{display:none; gap:12px; flex-wrap:wrap; margin-top:20px;}
   .arc-end.show{display:flex;}
   .arc-end a{font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-decoration:none; padding:9px 14px; border:1px solid var(--gold); color:var(--gold);}
-  .arc-end a.solid{background:var(--gold); color:#0a0b0d; font-weight:700;}
+  .arc-end a.solid{background:var(--gold); color:#050608; font-weight:700;}
   .arc-end a:hover{filter:brightness(1.15);}
   @media (prefers-reduced-motion: reduce){.arc-chart .ring{animation:none; opacity:.5;} .live-dot,.live-dot-sm{animation:none;}}
 
@@ -172,8 +170,8 @@
   .ledger-num{font-family:var(--mono);}
   .ledger-num .k{font-size:10px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase;}
   .ledger-num .v{font-size:26px; font-weight:800;}
-  .bar-track{position:relative; height:34px; background:#161920; border:1px solid var(--line); overflow:hidden; display:flex;}
-  .bar-fill{height:100%; background:linear-gradient(90deg, var(--gold), #d99f1f);}
+  .bar-track{position:relative; height:34px; background:#141519; border:1px solid var(--line); overflow:hidden; display:flex;}
+  .bar-fill{height:100%; background:linear-gradient(90deg, var(--gold), #D9461A);}
   .bar-ticks{position:absolute; inset:0; display:flex; justify-content:space-between; pointer-events:none;}
   .bar-ticks span{width:1px; background:rgba(0,0,0,0.35); height:100%;}
   .bar-caption{display:flex; justify-content:space-between; gap:12px; font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:8px;}
@@ -208,10 +206,10 @@
   #consent .actions{display:flex; gap:10px; margin-left:auto;}
   .btn{
     font-family:var(--mono); font-size:13px; letter-spacing:0.06em; text-transform:uppercase;
-    background:var(--gold); color:#0a0b0d; border:none; padding:12px 22px; font-weight:800;
+    background:var(--gold); color:#050608; border:none; padding:12px 22px; font-weight:800;
     text-decoration:none; display:inline-block; cursor:pointer;
   }
-  .btn:hover{background:#ffd766;}
+  .btn:hover{background:#FF8352;}
   .btn-ghost{
     font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em;
     background:transparent; border:1px solid var(--line); color:var(--text);
@@ -219,44 +217,118 @@
   }
 
   /* ==== SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. ==== */
-  .zh{position:sticky; top:0; z-index:50; flex:0 0 auto; width:100%; background:rgba(10,11,13,0.9); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border-bottom:1px solid #22262e; color:#e8e6e0; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.5; text-align:left;}
+  .zh{position:sticky; top:0; z-index:50; flex:0 0 auto; width:100%; background:rgba(5,6,8,0.86); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border-bottom:1px solid #1E2024; color:#F2F2EF; font-family:'Hanken Grotesk',system-ui,sans-serif; font-size:15px; line-height:1.5; text-align:left;}
   .zh, .zh *{box-sizing:border-box;}
   .zh *{margin:0;}
-  .zh .nav{display:flex; align-items:center; justify-content:flex-start; flex-wrap:nowrap; gap:16px; max-width:1080px; margin:0 auto; padding:14px 24px;}
-  .zh .logo{display:flex; align-items:center; gap:8px; height:30px; font-weight:800; font-size:18px; letter-spacing:0.04em; color:#e8e6e0; text-decoration:none; white-space:nowrap;}
-  .zh .logo .z{color:#f4c542;}
-  .zh .navlinks{display:flex; align-items:center; gap:26px; margin:0 auto 0 28px; font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
-  .zh .navlinks a{color:#8b8f98; text-decoration:none; transition:color .15s;}
-  .zh .navlinks a:hover, .zh .navlinks > a, .zh .navlinks a[aria-current]{color:#f4c542;}
+  .zh .nav{display:flex; align-items:center; justify-content:flex-start; flex-wrap:nowrap; gap:16px; max-width:1240px; margin:0 auto; padding:14px 24px;}
+  .zh .logo{display:flex; align-items:center; height:34px; font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:125%; font-size:22px; letter-spacing:-0.01em; text-transform:uppercase; color:#F2F2EF; text-decoration:none; white-space:nowrap;}
+  .zh .logo i{font-style:normal; color:#FF5A1F;}
+  .zh .navlinks{display:flex; align-items:center; gap:28px; margin:0 auto 0 40px; font-size:15px; font-weight:500;}
+  .zh .navlinks a{color:#9C9EA3; text-decoration:none; transition:color .15s;}
+  .zh .navlinks a:hover, .zh .navlinks a[aria-current]{color:#F2F2EF;}
+  .zh .navlinks > a{color:#FF5A1F;}
+  .zh .navlinks > a:hover{color:#FF8352;}
   .zh .nb{position:relative;}
-  .zh .nb > button{display:flex; align-items:center; gap:6px; padding:6px 0; background:none; border:0; border-radius:0; color:#8b8f98; font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; transition:color .15s;}
-  .zh .nb > button i{font-style:normal; font-size:9px; transition:transform .15s;}
-  .zh .nb > button:hover, .zh .nb.open > button{color:#f4c542;}
+  .zh .nb > button{display:flex; align-items:center; gap:6px; padding:8px 0; background:none; border:0; border-radius:0; color:#9C9EA3; font:inherit; cursor:pointer; transition:color .15s;}
+  .zh .nb > button i{font-style:normal; font-size:10px; transition:transform .15s;}
+  .zh .nb > button:hover, .zh .nb.open > button{color:#F2F2EF;}
   .zh .nb.open > button i{transform:rotate(180deg);}
-  .zh .nm{display:none; position:absolute; top:100%; left:-14px; z-index:60; min-width:180px; padding:6px 0; background:#111318; border:1px solid #22262e; box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+  .zh .nm{display:none; position:absolute; top:100%; left:-18px; z-index:60; min-width:220px; padding:8px; background:#0D0E11; border:1px solid #1E2024; border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,0.6);}
   .zh .nb.open .nm{display:block;}
-  @media(hover:hover){.zh .nb:hover .nm{display:block;} .zh .nb:hover > button{color:#f4c542;}}
-  .zh .nm a{display:block; padding:9px 14px; white-space:nowrap;}
-  .zh .nm a:hover{background:rgba(255,255,255,0.03);}
+  @media(hover:hover){.zh .nb:hover .nm{display:block;} .zh .nb:hover > button{color:#F2F2EF;}}
+  .zh .nm a{display:block; padding:10px 12px; border-radius:10px; white-space:nowrap; color:#C8C9C4;}
+  .zh .nm a:hover{background:#18191D; color:#F2F2EF;}
+  .zh .nm a[aria-current]{color:#FF5A1F;}
   /* Right side: the live extras (radio, ZEC price). Used on the homepage only. */
   .zh .nav-right{display:flex; align-items:center; gap:10px;}
-  .zh .radio-btn{display:inline-flex; align-items:center; gap:7px; padding:5px 10px; font-family:inherit; font-size:11px; line-height:1.5; letter-spacing:0.08em; text-transform:uppercase; color:#00d9c0; background:rgba(0,217,192,0.08); border:1px solid rgba(0,217,192,0.4); border-radius:2px; cursor:pointer; white-space:nowrap;}
-  .zh .radio-btn:hover{background:rgba(0,217,192,0.16);}
-  .zh .radio-btn .icon{font-size:9px;}
-  .zh .tick{display:inline-flex; align-items:center; gap:8px; padding:5px 10px; font-size:12px; font-weight:700; color:#e8e6e0; text-decoration:none; white-space:nowrap; background:rgba(17,19,24,0.6); border:1px solid #22262e; border-radius:2px;}
-  .zh .tick:hover{border-color:#f4c542;}
-  .zh .tick .lbl{color:#8b8f98; font-weight:400; letter-spacing:0.08em;}
-  .zh .tick .p{color:#f4c542;}
-  .zh .tick .d{font-size:11px; font-weight:600;}
+  .zh .radio-btn{display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:0 14px; font-family:'DM Mono',monospace; font-size:12px; line-height:1.5; letter-spacing:0.06em; text-transform:uppercase; color:#F2F2EF; background:transparent; border:1px solid #34363C; border-radius:999px; cursor:pointer; white-space:nowrap;}
+  .zh .radio-btn:hover{border-color:#FF5A1F;}
+  .zh .radio-btn .icon{font-size:9px; color:#FF5A1F;}
+  .zh .tick{display:inline-flex; align-items:center; gap:8px; min-height:38px; padding:0 14px; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; color:#F2F2EF; text-decoration:none; white-space:nowrap; background:#0D0E11; border:1px solid #1E2024; border-radius:999px;}
+  .zh .tick:hover{border-color:#FF5A1F;}
+  .zh .tick .lbl{color:#9C9EA3;}
+  .zh .tick .p{color:#F2F2EF;}
+  .zh .tick .d{font-size:12px;}
+  .zh .up{color:#3DDC97;} .zh .down{color:#FF4D6D;}
   @media(max-width:520px){.zh .tick .d, .zh .tick .lbl{display:none;}}
   @media(max-width:799px){
-    .zh .nav{flex-wrap:wrap; row-gap:10px;}
+    .zh .nav{flex-wrap:wrap; row-gap:6px;}
     .zh .navlinks{order:3; width:100%; margin:0; gap:22px;}
     .zh .nav-right{margin-left:auto;}
   }
   html{scroll-padding-top:76px;}
   @media(max-width:799px){html{scroll-padding-top:112px;}}
   /* ==== END SITE HEADER ==== */
+
+  /* ==== SITE FOOTER (Swarm) ==== */
+  .zf{border-top:1px solid #1E2024; margin-top:24px; padding:56px 0 36px; text-align:left; font-family:'Hanken Grotesk',system-ui,sans-serif;}
+  .zf-quote{max-width:1240px; margin:0 auto 48px; padding:0 24px; display:flex; flex-wrap:wrap; gap:24px 48px; align-items:flex-end; justify-content:space-between;}
+  .zf-quote p{margin:0; font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:120%; font-size:clamp(34px,5vw,68px); line-height:.92; letter-spacing:-0.03em; text-transform:uppercase; color:#F2F2EF; max-width:14ch;}
+  .zf-quote p i{font-style:normal; color:#FF5A1F;}
+  .zf-quote small{max-width:40ch; font-size:16px; line-height:1.6; color:#9C9EA3;}
+  .zf-in{max-width:1240px; margin:0 auto; padding:32px 24px 0; border-top:1px solid #1E2024; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:32px;}
+  .zf-logo{font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:125%; font-size:24px; text-transform:uppercase; color:#F2F2EF; text-decoration:none;}
+  .zf-logo i{font-style:normal; color:#FF5A1F;}
+  .zf p.zf-tag{margin:10px 0 0; font-size:15px; line-height:1.6; color:#9C9EA3; max-width:30ch;}
+  .zf h4{font-family:'DM Mono',monospace; font-weight:500; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#9C9EA3; margin:0 0 12px;}
+  .zf-col{display:flex; flex-direction:column; gap:8px; font-size:15px;}
+  .zf-col a{color:#F2F2EF; text-decoration:none;}
+  .zf-col a:hover{color:#FF5A1F;}
+  .zf-col p{margin:0 0 6px; font-size:14px; line-height:1.6; color:#9C9EA3;}
+  .zf-credits{max-width:1240px; margin:32px auto 0; padding:0 24px; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.04em; line-height:1.8; color:#76787E;}
+  .zf-credits a{color:#9C9EA3;}
+  .zf-credits a:hover{color:#FF5A1F;}
+  /* ==== END SITE FOOTER ==== */
+
+  /* ==== SWARM STYLE ==== */
+  body{background-image:none;}
+  h1{font-family:'Archivo','Arial Black',sans-serif !important; font-weight:900 !important; font-stretch:112%; text-transform:uppercase; letter-spacing:-0.025em !important; line-height:0.95 !important; font-size:clamp(44px,6.2vw,96px) !important; text-wrap:balance;}
+  @media(max-width:600px){h1{font-stretch:100%; letter-spacing:-0.02em !important;}}
+  ::selection{background:#FF5A1F; color:#050608;}
+  section > .wrap > h2{font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:110%; text-transform:uppercase; letter-spacing:-0.02em; line-height:0.96; font-size:clamp(30px,3.8vw,52px); max-width:22ch; text-wrap:balance;}
+  @media(max-width:600px){section > .wrap > h2{font-stretch:100%;}}
+  .eyebrow{font-family:'DM Mono',monospace; letter-spacing:0.08em;}
+  .lede{font-size:18px; line-height:1.6;}
+  .wrap{max-width:1240px;}
+  .card-grid, .doors, .link-grid{gap:14px !important; background:none !important; border:0 !important;}
+  .why-card, .link-card, .door{background:#0D0E11 !important; border:1px solid #1E2024; border-radius:18px;}
+  .ledger-card, .arc, .embed-frame, .mv-box, .story-card, .concept-box, .grid-stats{border-radius:18px; overflow:hidden;}
+  .btn{border-radius:999px;} .btn-ghost{border-radius:999px;}
+  /* ==== END SWARM STYLE ==== */
+
+  /* ==== SWARM HOMEPAGE ==== */
+  .sw-hero{position:relative; overflow:hidden; border-bottom:1px solid #1E2024; padding:72px 0 72px; display:flex; flex-direction:column;}
+  .sw-hero canvas{position:absolute; top:0; right:-6%; width:62%; height:100%; display:block;}
+  @media(max-width:900px){.sw-hero{padding:0 0 56px;} .sw-hero canvas{position:relative; right:auto; order:-1; width:100%; height:300px; margin-bottom:-12px;}}
+  .sw-copy{position:relative; z-index:2; width:100%;}
+  .sw-copy > *{max-width:760px;}
+  .sw-live{display:inline-flex; align-items:center; gap:10px; font:500 13px 'DM Mono',monospace; color:#9C9EA3;}
+  .sw-live::before{content:""; width:8px; height:8px; border-radius:50%; background:#FF5A1F; box-shadow:0 0 12px #FF5A1F; animation:pulse 1.4s infinite;}
+  .sw-copy h1{margin:18px 0 0; max-width:11ch;}
+  .sw-copy h1 i{font-style:normal; color:#FF5A1F;}
+  .sw-copy p{margin:22px 0 0; max-width:42ch; font-size:19px; line-height:1.55; color:#C8C9C4;}
+  @media(max-width:600px){.sw-copy p{font-size:17px;} .sw-stats{gap:14px 28px;} .sw-stats b{font-size:26px;}}
+  .sw-stats{margin-top:30px; display:flex; flex-wrap:wrap; gap:16px 44px;}
+  .sw-stats div{font:500 12px 'DM Mono',monospace; color:#9C9EA3; letter-spacing:.06em; text-transform:uppercase;}
+  .sw-stats b{display:block; margin-top:6px; font:800 34px 'Archivo','Arial Black',sans-serif; font-stretch:110%; color:#F2F2EF; letter-spacing:-.02em; text-transform:none; font-variant-numeric:tabular-nums;}
+  .sw-stats b.up{color:#3DDC97;} .sw-stats b.down{color:#FF4D6D;}
+  .sw-cta{margin-top:34px; display:flex; flex-wrap:wrap; gap:12px;}
+  .sw-btn{display:inline-flex; align-items:center; min-height:54px; padding:0 26px; border-radius:999px; background:#FF5A1F; color:#120500; font:700 15px 'Hanken Grotesk',system-ui,sans-serif; text-decoration:none;}
+  .sw-btn:hover{background:#FF8352;}
+  .sw-btn.ghost{background:transparent; color:#F2F2EF; border:1px solid #34363C;}
+  .sw-btn.ghost:hover{border-color:#FF5A1F;}
+  #tracker h2 .z{color:#FF5A1F;}
+  .price{font-family:'Archivo','Arial Black',sans-serif; font-weight:800; font-stretch:110%; color:#F2F2EF;}
+  .sw-rail{margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px;}
+  .sw-card{display:flex; flex-direction:column; text-decoration:none; border-radius:18px; overflow:hidden; background:#0D0E11; border:1px solid #1E2024; transition:transform .25s, border-color .25s;}
+  .sw-card:hover{transform:translateY(-4px); border-color:#FF5A1F;}
+  .sw-card canvas{width:100%; height:160px; display:block; background:#0A0B0D;}
+  .sw-card div{display:flex; flex-direction:column; gap:10px; padding:20px 22px 24px;}
+  .sw-card small{font:500 11px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:#FF5A1F;}
+  .sw-card strong{font:900 26px/1 'Archivo','Arial Black',sans-serif; font-stretch:115%; text-transform:uppercase; letter-spacing:-.01em; color:#F2F2EF;}
+  .sw-card span{color:#9C9EA3; font-size:15.5px; line-height:1.55;}
+  @media (prefers-reduced-motion: reduce){.sw-live::before{animation:none;}}
+  /* ==== END SWARM HOMEPAGE ==== */
 </style>
 </head>
 <body>
@@ -264,7 +336,7 @@
 <!-- SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. -->
 <header class="zh">
   <div class="nav">
-    <a class="logo" href="/"><span class="z">Z</span> ZECTASTIC</a>
+    <a class="logo" href="/">Zec<i>tastic</i></a>
     <nav class="navlinks" aria-label="Main">
       <div class="nb">
         <button type="button" aria-expanded="false">Live <i>▾</i></button>
@@ -354,14 +426,33 @@
 </script>
 <audio id="radioAudio" preload="none" src="https://streams.dancefm.net/mp3-hq"></audio>
 
-<!-- HERO: welcome + live tracker -->
+<!-- SWARM HERO: a globe of live ZEC buys -->
+<section class="sw-hero" id="top">
+  <canvas id="globe" aria-hidden="true"></canvas>
+  <div class="wrap sw-copy">
+    <span class="sw-live">Every flare is a live ZEC buy</span>
+    <h1>The world is buying <i>privacy.</i></h1>
+    <p>Live Zcash data, a world map of buys, a what-if machine and games. The dark patch on the globe is the shielded zone: real activity, no locations.</p>
+    <div class="sw-stats">
+      <div>ZEC / USD<b class="js-p">$–</b></div>
+      <div>24 hours<b class="d js-d">–</b></div>
+      <div>Buys in the last minute<b id="swBuys">0</b></div>
+    </div>
+    <div class="sw-cta">
+      <a class="sw-btn" href="/zecmap.html">Open the ZEC Map</a>
+      <a class="sw-btn ghost" href="#tracker">Live numbers</a>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE TRACKER -->
 <section class="hero" id="tracker">
   <div class="wrap">
     <div class="hero-head">
-      <div class="eyebrow">◈ Welcome to Zectastic</div>
+      <div class="eyebrow">◈ Live tracker</div>
       <div class="live-tag"><span class="live-dot"></span> LIVE</div>
     </div>
-    <h1>Zcash, tracked <span class="z">honestly</span>.</h1>
+    <h2>Zcash, tracked <span class="z">honestly</span>.</h2>
     <p class="lede">The price, how much exists, and what's actually private.</p>
 
     <div class="hero-grid">
@@ -412,16 +503,17 @@
 <section id="explore">
   <div class="wrap">
     <div class="eyebrow">◈ Explore</div>
-    <h2>Pick a door</h2>
-    <div class="doors">
-      <a class="door" href="/zecmap.html"><span class="tag">Live</span><h3>ZEC Map</h3><p>Watch the world buy ZEC in real time, with a hidden zone for shielded swaps.</p><span class="go">Open the map →</span></a>
-      <a class="door" href="/flippening.html"><span class="tag">Live</span><h3>Flippening Party</h3><p>How far is ZEC from passing the coins above it? Party mode included.</p><span class="go">Join the party →</span></a>
-      <a class="door" href="/events.html"><span class="tag">Meet</span><h3>Events</h3><p>Where the Zcash, privacy and Bitcoin crowd meets, by month and region.</p><span class="go">See the events →</span></a>
-      <a class="door" href="/game.html"><span class="tag">Play</span><h3>Encrypt the money</h3><p>One button. Zap the surveillance nodes before they breach your shield.</p><span class="go">Play now →</span></a>
-      <a class="door" href="/backwards.html"><span class="tag">Play</span><h3>Backwards</h3><p>What if we could go backwards? See what an old purchase would be worth in Zcash today.</p><span class="go">Run it backwards →</span></a>
-      <a class="door" href="/duel.html"><span class="tag">Play</span><h3>Card Duel</h3><p>Twenty crypto cards, four stats each. One new card to unlock every day.</p><span class="go">Start a duel →</span></a>
-      <a class="door wide feature" href="/captastic.html"><span class="tag new">New</span><h3>Captastic</h3><p>The top 100 by market cap, live, in USD, EUR or BTC. A watchlist and a portfolio that stay on your device. No ads, no noise.</p><span class="go">Open Captastic →</span></a>
-      <a class="door wide" href="/learn.html"><span class="tag">Learn</span><h3>Learn Zcash</h3><p>Why it exists, how shielding works, wallets to try and where to buy. Plus the live shielded pool dashboard.</p><span class="go">Start learning →</span></a>
+    <h2>Small tools. Big picture.</h2>
+    <p class="lede">Each one does one job, runs in your browser and keeps nothing about you.</p>
+    <div class="sw-rail">
+      <a class="sw-card" href="/captastic.html"><canvas data-art="bars" aria-hidden="true"></canvas><div><small>New · Track</small><strong>Captastic</strong><span>The top 100 by market cap in USD, EUR or BTC, with a watchlist and a portfolio that stay on your device.</span></div></a>
+      <a class="sw-card" href="/zecmap.html"><canvas data-art="map" aria-hidden="true"></canvas><div><small>Live</small><strong>ZEC Map</strong><span>Watch the world buy ZEC in real time, with a hidden zone for shielded swaps.</span></div></a>
+      <a class="sw-card" href="/flippening.html"><canvas data-art="ladder" aria-hidden="true"></canvas><div><small>Live</small><strong>Flippening</strong><span>How far is ZEC from passing the coins above it? Party mode included.</span></div></a>
+      <a class="sw-card" href="/events.html"><canvas data-art="events" aria-hidden="true"></canvas><div><small>Meet</small><strong>Events</strong><span>Where the Zcash, privacy and Bitcoin crowd meets, by month and region.</span></div></a>
+      <a class="sw-card" href="/game.html"><canvas data-art="shield" aria-hidden="true"></canvas><div><small>Play</small><strong>Encrypt the money</strong><span>One button. Zap the surveillance nodes before they breach your shield.</span></div></a>
+      <a class="sw-card" href="/backwards.html"><canvas data-art="rewind" aria-hidden="true"></canvas><div><small>Play</small><strong>Backwards</strong><span>What if we could go backwards? An old purchase, valued in Zcash today.</span></div></a>
+      <a class="sw-card" href="/duel.html"><canvas data-art="cards" aria-hidden="true"></canvas><div><small>Play</small><strong>Card Duel</strong><span>Twenty crypto cards, four stats each. One new card to unlock every day.</span></div></a>
+      <a class="sw-card" href="/learn.html"><canvas data-art="learn" aria-hidden="true"></canvas><div><small>Learn</small><strong>Learn Zcash</strong><span>Why it exists, how shielding works, wallets to try and where to buy.</span></div></a>
     </div>
   </div>
 </section>
@@ -505,11 +597,39 @@
   </div>
 </section>
 
-<footer>
-  <div class="wrap">
-    <div class="foot-note">PRICE, SUPPLY &amp; MARKET DATA: <a href="https://www.coingecko.com" target="_blank" rel="noopener">COINGECKO</a> · SHIELDED POOL DATA: ZKP.BABY · RADIO: DANCE.FM · MAP DATA: EXCHANGE FEEDS, ZECBLOCK · UPDATES EVERY 60S · © 2026 ZECTASTIC</div>
-    <div class="foot-links"><a href="/privacy.html">Privacy</a> · <a href="#" id="footCookieSettings">Cookie Settings</a></div>
+<footer class="zf">
+  <div class="zf-quote">
+    <p>Read the network. <i>Leave no trace.</i></p>
+    <small>No accounts, no ads, no trackers. Your watchlist, portfolio and game progress stay in your own browser.</small>
   </div>
+  <div class="zf-in">
+    <div>
+      <a class="zf-logo" href="/">Zec<i>tastic</i></a>
+      <p class="zf-tag">Small tools for following Zcash. Free, and nothing about you is stored.</p>
+    </div>
+    <div class="zf-col">
+      <h4>Live</h4>
+      <a href="/#tracker">Tracker</a>
+      <a href="/zecmap.html">ZEC Map</a>
+      <a href="/flippening.html">Flippening Party</a>
+      <a href="/captastic.html">Captastic</a>
+      <a href="/events.html">Events</a>
+    </div>
+    <div class="zf-col">
+      <h4>Learn &amp; play</h4>
+      <a href="/learn.html">Learn Zcash</a>
+      <a href="/backwards.html">Backwards</a>
+      <a href="/game.html">Encrypt the money</a>
+      <a href="/duel.html">Card Duel</a>
+    </div>
+    <div class="zf-col">
+      <h4>Fine print</h4>
+      <p>Educational only. Not financial advice. Not affiliated with the Electric Coin Company or the Zcash Foundation.</p>
+      <a href="/privacy.html">Privacy</a>
+      <a href="#" id="footCookieSettings">Cookie settings</a>
+    </div>
+  </div>
+  <div class="zf-credits">PRICE, SUPPLY &amp; MARKET DATA: <a href="https://www.coingecko.com" target="_blank" rel="noopener">COINGECKO</a> · SHIELDED POOL DATA: ZKP.BABY · RADIO: DANCE.FM · MAP DATA: EXCHANGE FEEDS, ZECBLOCK · UPDATES EVERY 60S · © 2026 ZECTASTIC</div>
 </footer>
 
 <div id="consent">
@@ -694,8 +814,8 @@
   }
   (function(){let w=1000;
     function go(){let ws;try{ws=new WebSocket('wss://ws.kraken.com/v2')}catch(e){return}
-      ws.onopen=()=>{w=1000;ws.send(JSON.stringify({method:'subscribe',params:{channel:'ticker',symbol:['ZEC/USD']}}))};
-      ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.channel==='ticker'&&m.data)m.data.forEach(t=>(window.__kr=1,setChip(t.last,t.change_pct)))}catch(_){}};
+      ws.onopen=()=>{w=1000;ws.send(JSON.stringify({method:'subscribe',params:{channel:'ticker',symbol:['ZEC/USD']}}));ws.send(JSON.stringify({method:'subscribe',params:{channel:'trade',symbol:['ZEC/USD','ZEC/EUR'],snapshot:false}}))};
+      ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.channel==='ticker'&&m.data)m.data.forEach(t=>(window.__kr=1,setChip(t.last,t.change_pct)));if(m.channel==='trade'&&m.type==='update'&&m.data)m.data.forEach(t=>{if(t.side==='buy'&&window.zecBuy)window.zecBuy(t.symbol.split('/')[1],+t.qty,+t.price)})}catch(_){}};
       ws.onclose=()=>{setTimeout(go,w);w=Math.min(w*2,30000)};ws.onerror=()=>ws.close();}
     go();})();
 
@@ -763,7 +883,7 @@ function build(){
  function interp(t){let a=series[0];for(const r of series){if(r[0]>t)return a[1]+(r[1]-a[1])*((t-a[0])/(r[0]-a[0]));a=r}return a[1]}
  const defs=el("defs",{});
  const g=el("linearGradient",{id:"arcg",gradientUnits:"userSpaceOnUse",x1:ML,x2:W-MR,y1:0,y2:0},defs);
- el("stop",{offset:"0%","stop-color":"#f4c542"},g);el("stop",{offset:"100%","stop-color":"#00d9c0"},g);
+ el("stop",{offset:"0%","stop-color":"#FF5A1F"},g);el("stop",{offset:"100%","stop-color":"#3DDC97"},g);
  for(let v=yl;v<=yh*1.001;v*=10){
   el("line",{class:"grid",x1:ML,x2:W-MR,y1:Y(v),y2:Y(v)});
   if(real){const t=el("text",{class:"ylab",x:ML-8,y:Y(v)+4,"text-anchor":"end"});t.textContent=v>=1000?"$"+(v/1000)+"k":"$"+v}
@@ -872,5 +992,88 @@ fetch("https://api.kraken.com/0/public/OHLC?pair=ZECUSD&interval=10080").then(r=
 })();
 </script>
 
+
+<script>
+/* SWARM GLOBE: a rotating globe of dots. Every live ZEC buy on Kraken lights a flare where its currency trades.
+   The dark patch in the South Atlantic is the shielded zone, the same place it sits on the ZEC Map. */
+(function(){
+  var cv = document.getElementById('globe'); if(!cv) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ctx, W, H;
+  function fit(){ var r = cv.getBoundingClientRect(), d = Math.min(devicePixelRatio||1, 2); cv.width = Math.max(1, r.width*d); cv.height = Math.max(1, r.height*d); ctx = cv.getContext('2d'); ctx.setTransform(d,0,0,d,0,0); W = r.width; H = r.height; }
+  fit(); addEventListener('resize', fit);
+  function ll(lat, lon){ var a = lat*Math.PI/180, b = lon*Math.PI/180; return [Math.cos(a)*Math.sin(b), -Math.sin(a), Math.cos(a)*Math.cos(b)]; }
+  var N = 1500, pts = [];
+  for (var i = 0; i < N; i++){ var y = 1 - (i/(N-1))*2, r = Math.sqrt(1-y*y), th = i*2.39996; pts.push([Math.cos(th)*r, y, Math.sin(th)*r]); }
+  var ZONE = ll(-35, -20);
+  var HUBS = {
+    USD: [[40.7,-74],[41.9,-87.6],[34,-118.2],[25.8,-80.2],[32.8,-96.8],[37.8,-122.4]],
+    EUR: [[52.5,13.4],[48.9,2.35],[40.4,-3.7],[41.9,12.5],[52.4,4.9],[51.4,5.5]]
+  };
+  var flares = [], buys = [], rot = -1.2, last = performance.now(), el = document.getElementById('swBuys');
+  window.zecBuy = function(cur, qty, price){
+    buys.push(Date.now());
+    if (document.hidden) return;
+    var h = HUBS[cur] || HUBS.USD, p = h[Math.random()*h.length|0];
+    var usd = qty * price * (cur === 'EUR' ? 1.08 : 1);
+    if (flares.length < 60) flares.push({p: ll(p[0] + (Math.random()-.5)*4, p[1] + (Math.random()-.5)*6), t: performance.now(), big: usd >= 1500});
+  };
+  setInterval(function(){ var c = Date.now() - 6e4; while (buys.length && buys[0] < c) buys.shift(); el.textContent = buys.length; }, 1000);
+  var visible = true;
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }, {threshold: 0}).observe(cv);
+  function frame(now){
+    requestAnimationFrame(frame);
+    if (!visible || document.hidden) { last = now; return; }
+    rot += reduce ? 0 : (now - last) * 0.00012; last = now;
+    ctx.clearRect(0, 0, W, H);
+    var cx = W*.5, cy = H*.5, R = Math.min(W, H)*.42, cs = Math.cos(rot), sn = Math.sin(rot);
+    function proj(p){ var x = p[0]*cs - p[2]*sn, z = p[0]*sn + p[2]*cs, s = 1/(1.9 - z*.6); return [cx + x*R*s*1.3, cy + p[1]*R*s*1.3, z, s]; }
+    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R*1.3);
+    g.addColorStop(0, 'rgba(255,90,31,.10)'); g.addColorStop(1, 'rgba(255,90,31,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    for (var i = 0; i < N; i++){
+      var p = pts[i], dx = p[0]-ZONE[0], dy = p[1]-ZONE[1], dz = p[2]-ZONE[2];
+      if (dx*dx + dy*dy + dz*dz < 0.09) continue;
+      var q = proj(p), sz = (q[2] > 0 ? 3 : 1.7) * q[3];
+      ctx.fillStyle = q[2] > 0 ? 'rgba(242,242,239,.9)' : 'rgba(242,242,239,.2)';
+      ctx.fillRect(q[0], q[1], sz, sz);
+    }
+    var zp = proj(ZONE);
+    if (zp[2] > -0.2){
+      ctx.setLineDash([3, 6]); ctx.strokeStyle = 'rgba(255,90,31,.75)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(zp[0], zp[1], R*.32*zp[3], 0, Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#FF5A1F'; ctx.font = '500 12px "DM Mono", monospace'; ctx.textAlign = 'center';
+      ctx.fillText('SHIELDED ZONE', zp[0], zp[1] + R*.32*zp[3] + 18);
+    }
+    for (var k = flares.length - 1; k >= 0; k--){
+      var f = flares[k], age = (now - f.t)/1600;
+      if (age > 1) { flares.splice(k, 1); continue; }
+      var q2 = proj(f.p); if (q2[2] < 0) continue;
+      ctx.strokeStyle = 'rgba(255,90,31,' + (1-age).toFixed(2) + ')'; ctx.lineWidth = f.big ? 2.2 : 1.4;
+      ctx.beginPath(); ctx.arc(q2[0], q2[1], 3 + age*(f.big ? 40 : 18), 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#FF5A1F'; ctx.fillRect(q2[0]-2, q2[1]-2, 4, 4);
+    }
+  }
+  requestAnimationFrame(frame);
+
+  /* Small generated pictures for the Explore cards */
+  function art(){
+    [].forEach.call(document.querySelectorAll('canvas[data-art]'), function(c){
+      var r = c.getBoundingClientRect(), d = Math.min(devicePixelRatio||1, 2); c.width = r.width*d; c.height = r.height*d;
+      var x = c.getContext('2d'); x.setTransform(d,0,0,d,0,0); var w = r.width, h = r.height, E = '#FF5A1F', D = 'rgba(242,242,239,.25)', I = '#F2F2EF', k = c.dataset.art, i;
+      x.clearRect(0,0,w,h); x.lineCap = 'round';
+      if (k === 'bars') for (i = 0; i < 26; i++){ var bh = 18 + Math.abs(Math.sin(i*1.7))*(h-50); x.fillStyle = i === 18 ? E : D; x.fillRect(20 + i*((w-40)/26), h-18-bh, (w-40)/26 - 4, bh); }
+      if (k === 'map'){ for (i = 0; i < 220; i++){ var a = i*2.39996, rr = Math.sqrt(i/220)*Math.min(w,h)*.42; x.fillStyle = i % 17 === 0 ? E : D; x.fillRect(w/2 + Math.cos(a)*rr*1.6, h/2 + Math.sin(a)*rr, 2.5, 2.5); } x.strokeStyle = E; x.setLineDash([3,5]); x.beginPath(); x.arc(w*.7, h*.66, 18, 0, 7); x.stroke(); x.setLineDash([]); }
+      if (k === 'ladder') for (i = 0; i < 7; i++){ x.fillStyle = i === 6 ? E : D; x.fillRect(24 + i*((w-48)/7), h - 26 - i*((h-50)/7), (w-48)/7 - 6, 8); }
+      if (k === 'events') for (i = 0; i < 28; i++){ var cx2 = 30 + (i%7)*((w-60)/6), cy2 = 30 + Math.floor(i/7)*((h-60)/3); x.fillStyle = (i === 9 || i === 22) ? E : D; x.beginPath(); x.arc(cx2, cy2, i === 9 || i === 22 ? 7 : 4, 0, 7); x.fill(); }
+      if (k === 'shield'){ for (i = 0; i < 44; i++){ var a2 = i/44*Math.PI*2; x.fillStyle = i % 9 === 0 ? E : D; x.fillRect(w/2 + Math.cos(a2)*56 - 1.5, h/2 + Math.sin(a2)*56 - 1.5, 3, 3); } x.strokeStyle = I; x.lineWidth = 6; x.beginPath(); x.moveTo(w/2-18,h/2-20); x.lineTo(w/2+18,h/2-20); x.lineTo(w/2-18,h/2+20); x.lineTo(w/2+18,h/2+20); x.stroke(); }
+      if (k === 'rewind'){ for (i = 0; i < 5; i++){ x.strokeStyle = i === 4 ? E : D; x.lineWidth = 3; x.beginPath(); x.arc(w/2, h/2, 14 + i*13, Math.PI*.6, Math.PI*1.9); x.stroke(); } x.fillStyle = E; x.beginPath(); x.moveTo(w/2-22, h/2); x.lineTo(w/2+2, h/2-14); x.lineTo(w/2+2, h/2+14); x.fill(); }
+      if (k === 'cards') for (i = 0; i < 3; i++){ x.save(); x.translate(w/2 + (i-1)*44, h/2 + 6); x.rotate((i-1)*.22); x.strokeStyle = i === 1 ? E : D; x.lineWidth = 2; x.strokeRect(-26, -40, 52, 76); x.restore(); }
+      if (k === 'learn'){ x.strokeStyle = D; x.lineWidth = 2; for (i = 0; i < 5; i++){ x.beginPath(); x.moveTo(w*.22, 34 + i*((h-60)/4)); x.lineTo(w*(i === 2 ? .62 : .78), 34 + i*((h-60)/4)); x.stroke(); } x.strokeStyle = E; x.lineWidth = 3; x.strokeRect(w*.66, h*.38, 34, 28); x.beginPath(); x.arc(w*.66 + 17, h*.38, 11, Math.PI, 0); x.stroke(); }
+    });
+  }
+  art(); addEventListener('resize', art);
+})();
+</script>
 </body>
 </html>

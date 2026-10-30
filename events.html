@@ -9,14 +9,14 @@
 <meta name="description" content="Zcash, privacy and Bitcoin gatherings by month. Filter by region and focus. Every date links to the official event page.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
 /* Layout: one narrow column, a sticky filter bar, then month buckets with a date rail on the left. */
 :root{
   color-scheme:dark;
-  --bg:#0a0b0d; --bg-raised:#111318; --ink:#0a0b0d; --panel:#111318; --line:#22262e;
-  --text:#e8e6e0; --muted:#8b8f98; --gold:#f4c542; --teal:#00d9c0; --red:#ff6b4a; --exposed:#ff6b4a;
-  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --bg:#050608; --bg-raised:#0D0E11; --ink:#050608; --panel:#0D0E11; --line:#1E2024;
+  --text:#F2F2EF; --muted:#9C9EA3; --gold:#FF5A1F; --teal:#3DDC97; --red:#FF4D6D; --exposed:#FF4D6D;
+  --mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--ink);color:var(--text);font:15px/1.55 var(--mono)}
@@ -65,9 +65,8 @@ h1 span{color:var(--gold)}
 }
 
 /* ---- shared with the rest of zectastic.com ---- */
-body{font-family:var(--sans);background-image:repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px)}
-.wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
-::selection{background:var(--gold); color:#0a0b0d;}
+body{font-family:var(--sans); margin:0 auto; padding:0 24px;}
+::selection{background:var(--gold); color:#050608;}
 header a, footer a{color:inherit}
   /* FOOTER */
   footer{padding:32px 0; text-align:center;}
@@ -80,44 +79,76 @@ h1,.month h2,.when,.chip,.tag,.count,.row b,#q,.safe h2,.ev h3{font-family:var(-
 .notes{margin-top:28px;color:var(--muted);font-size:13px;display:grid;gap:8px}
 
   /* ==== SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. ==== */
-  .zh{position:sticky; top:0; z-index:50; flex:0 0 auto; width:100%; background:rgba(10,11,13,0.9); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border-bottom:1px solid #22262e; color:#e8e6e0; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.5; text-align:left;}
+  .zh{position:sticky; top:0; z-index:50; flex:0 0 auto; width:100%; background:rgba(5,6,8,0.86); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border-bottom:1px solid #1E2024; color:#F2F2EF; font-family:'Hanken Grotesk',system-ui,sans-serif; font-size:15px; line-height:1.5; text-align:left;}
   .zh, .zh *{box-sizing:border-box;}
   .zh *{margin:0;}
-  .zh .nav{display:flex; align-items:center; justify-content:flex-start; flex-wrap:nowrap; gap:16px; max-width:1080px; margin:0 auto; padding:14px 24px;}
-  .zh .logo{display:flex; align-items:center; gap:8px; height:30px; font-weight:800; font-size:18px; letter-spacing:0.04em; color:#e8e6e0; text-decoration:none; white-space:nowrap;}
-  .zh .logo .z{color:#f4c542;}
-  .zh .navlinks{display:flex; align-items:center; gap:26px; margin:0 auto 0 28px; font-size:12px; letter-spacing:0.08em; text-transform:uppercase;}
-  .zh .navlinks a{color:#8b8f98; text-decoration:none; transition:color .15s;}
-  .zh .navlinks a:hover, .zh .navlinks > a, .zh .navlinks a[aria-current]{color:#f4c542;}
+  .zh .nav{display:flex; align-items:center; justify-content:flex-start; flex-wrap:nowrap; gap:16px; max-width:1240px; margin:0 auto; padding:14px 24px;}
+  .zh .logo{display:flex; align-items:center; height:34px; font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:125%; font-size:22px; letter-spacing:-0.01em; text-transform:uppercase; color:#F2F2EF; text-decoration:none; white-space:nowrap;}
+  .zh .logo i{font-style:normal; color:#FF5A1F;}
+  .zh .navlinks{display:flex; align-items:center; gap:28px; margin:0 auto 0 40px; font-size:15px; font-weight:500;}
+  .zh .navlinks a{color:#9C9EA3; text-decoration:none; transition:color .15s;}
+  .zh .navlinks a:hover, .zh .navlinks a[aria-current]{color:#F2F2EF;}
+  .zh .navlinks > a{color:#FF5A1F;}
+  .zh .navlinks > a:hover{color:#FF8352;}
   .zh .nb{position:relative;}
-  .zh .nb > button{display:flex; align-items:center; gap:6px; padding:6px 0; background:none; border:0; border-radius:0; color:#8b8f98; font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; transition:color .15s;}
-  .zh .nb > button i{font-style:normal; font-size:9px; transition:transform .15s;}
-  .zh .nb > button:hover, .zh .nb.open > button{color:#f4c542;}
+  .zh .nb > button{display:flex; align-items:center; gap:6px; padding:8px 0; background:none; border:0; border-radius:0; color:#9C9EA3; font:inherit; cursor:pointer; transition:color .15s;}
+  .zh .nb > button i{font-style:normal; font-size:10px; transition:transform .15s;}
+  .zh .nb > button:hover, .zh .nb.open > button{color:#F2F2EF;}
   .zh .nb.open > button i{transform:rotate(180deg);}
-  .zh .nm{display:none; position:absolute; top:100%; left:-14px; z-index:60; min-width:180px; padding:6px 0; background:#111318; border:1px solid #22262e; box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+  .zh .nm{display:none; position:absolute; top:100%; left:-18px; z-index:60; min-width:220px; padding:8px; background:#0D0E11; border:1px solid #1E2024; border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,0.6);}
   .zh .nb.open .nm{display:block;}
-  @media(hover:hover){.zh .nb:hover .nm{display:block;} .zh .nb:hover > button{color:#f4c542;}}
-  .zh .nm a{display:block; padding:9px 14px; white-space:nowrap;}
-  .zh .nm a:hover{background:rgba(255,255,255,0.03);}
+  @media(hover:hover){.zh .nb:hover .nm{display:block;} .zh .nb:hover > button{color:#F2F2EF;}}
+  .zh .nm a{display:block; padding:10px 12px; border-radius:10px; white-space:nowrap; color:#C8C9C4;}
+  .zh .nm a:hover{background:#18191D; color:#F2F2EF;}
+  .zh .nm a[aria-current]{color:#FF5A1F;}
   /* Right side: the live extras (radio, ZEC price). Used on the homepage only. */
   .zh .nav-right{display:flex; align-items:center; gap:10px;}
-  .zh .radio-btn{display:inline-flex; align-items:center; gap:7px; padding:5px 10px; font-family:inherit; font-size:11px; line-height:1.5; letter-spacing:0.08em; text-transform:uppercase; color:#00d9c0; background:rgba(0,217,192,0.08); border:1px solid rgba(0,217,192,0.4); border-radius:2px; cursor:pointer; white-space:nowrap;}
-  .zh .radio-btn:hover{background:rgba(0,217,192,0.16);}
-  .zh .radio-btn .icon{font-size:9px;}
-  .zh .tick{display:inline-flex; align-items:center; gap:8px; padding:5px 10px; font-size:12px; font-weight:700; color:#e8e6e0; text-decoration:none; white-space:nowrap; background:rgba(17,19,24,0.6); border:1px solid #22262e; border-radius:2px;}
-  .zh .tick:hover{border-color:#f4c542;}
-  .zh .tick .lbl{color:#8b8f98; font-weight:400; letter-spacing:0.08em;}
-  .zh .tick .p{color:#f4c542;}
-  .zh .tick .d{font-size:11px; font-weight:600;}
+  .zh .radio-btn{display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:0 14px; font-family:'DM Mono',monospace; font-size:12px; line-height:1.5; letter-spacing:0.06em; text-transform:uppercase; color:#F2F2EF; background:transparent; border:1px solid #34363C; border-radius:999px; cursor:pointer; white-space:nowrap;}
+  .zh .radio-btn:hover{border-color:#FF5A1F;}
+  .zh .radio-btn .icon{font-size:9px; color:#FF5A1F;}
+  .zh .tick{display:inline-flex; align-items:center; gap:8px; min-height:38px; padding:0 14px; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; color:#F2F2EF; text-decoration:none; white-space:nowrap; background:#0D0E11; border:1px solid #1E2024; border-radius:999px;}
+  .zh .tick:hover{border-color:#FF5A1F;}
+  .zh .tick .lbl{color:#9C9EA3;}
+  .zh .tick .p{color:#F2F2EF;}
+  .zh .tick .d{font-size:12px;}
+  .zh .up{color:#3DDC97;} .zh .down{color:#FF4D6D;}
   @media(max-width:520px){.zh .tick .d, .zh .tick .lbl{display:none;}}
   @media(max-width:799px){
-    .zh .nav{flex-wrap:wrap; row-gap:10px;}
+    .zh .nav{flex-wrap:wrap; row-gap:6px;}
     .zh .navlinks{order:3; width:100%; margin:0; gap:22px;}
     .zh .nav-right{margin-left:auto;}
   }
   html{scroll-padding-top:76px;}
   @media(max-width:799px){html{scroll-padding-top:112px;}}
   /* ==== END SITE HEADER ==== */
+
+  /* ==== SITE FOOTER (Swarm) ==== */
+  .zf{border-top:1px solid #1E2024; margin-top:24px; padding:56px 0 36px; text-align:left; font-family:'Hanken Grotesk',system-ui,sans-serif;}
+  .zf-quote{max-width:1240px; margin:0 auto 48px; padding:0 24px; display:flex; flex-wrap:wrap; gap:24px 48px; align-items:flex-end; justify-content:space-between;}
+  .zf-quote p{margin:0; font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:120%; font-size:clamp(34px,5vw,68px); line-height:.92; letter-spacing:-0.03em; text-transform:uppercase; color:#F2F2EF; max-width:14ch;}
+  .zf-quote p i{font-style:normal; color:#FF5A1F;}
+  .zf-quote small{max-width:40ch; font-size:16px; line-height:1.6; color:#9C9EA3;}
+  .zf-in{max-width:1240px; margin:0 auto; padding:32px 24px 0; border-top:1px solid #1E2024; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:32px;}
+  .zf-logo{font-family:'Archivo','Arial Black',sans-serif; font-weight:900; font-stretch:125%; font-size:24px; text-transform:uppercase; color:#F2F2EF; text-decoration:none;}
+  .zf-logo i{font-style:normal; color:#FF5A1F;}
+  .zf p.zf-tag{margin:10px 0 0; font-size:15px; line-height:1.6; color:#9C9EA3; max-width:30ch;}
+  .zf h4{font-family:'DM Mono',monospace; font-weight:500; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#9C9EA3; margin:0 0 12px;}
+  .zf-col{display:flex; flex-direction:column; gap:8px; font-size:15px;}
+  .zf-col a{color:#F2F2EF; text-decoration:none;}
+  .zf-col a:hover{color:#FF5A1F;}
+  .zf-col p{margin:0 0 6px; font-size:14px; line-height:1.6; color:#9C9EA3;}
+  .zf-credits{max-width:1240px; margin:32px auto 0; padding:0 24px; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.04em; line-height:1.8; color:#76787E;}
+  .zf-credits a{color:#9C9EA3;}
+  .zf-credits a:hover{color:#FF5A1F;}
+  /* ==== END SITE FOOTER ==== */
+
+  /* ==== SWARM STYLE ==== */
+  body{background-image:none;}
+  h1{font-family:'Archivo','Arial Black',sans-serif !important; font-weight:900 !important; font-stretch:112%; text-transform:uppercase; letter-spacing:-0.025em !important; line-height:0.95 !important; font-size:clamp(34px,4.4vw,60px) !important; text-wrap:balance;}
+  @media(max-width:600px){h1{font-stretch:100%; letter-spacing:-0.02em !important;}}
+  ::selection{background:#FF5A1F; color:#050608;}
+  .safe{border-radius:18px;} #q{border-radius:999px; padding-inline:18px;}
+  /* ==== END SWARM STYLE ==== */
 </style>
 </head>
 <body>
@@ -125,7 +156,7 @@ h1,.month h2,.when,.chip,.tag,.count,.row b,#q,.safe h2,.ev h3{font-family:var(-
 <!-- SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. -->
 <header class="zh">
   <div class="nav">
-    <a class="logo" href="/"><span class="z">Z</span> ZECTASTIC</a>
+    <a class="logo" href="/">Zec<i>tastic</i></a>
     <nav class="navlinks" aria-label="Main">
       <div class="nb">
         <button type="button" aria-expanded="false">Live <i>▾</i></button>
@@ -242,11 +273,39 @@ h1,.month h2,.when,.chip,.tag,.count,.row b,#q,.safe h2,.ev h3{font-family:var(-
   </div>
 </div>
 
-<footer>
-  <div class="wrap">
-    <div class="foot-note">ZECTASTIC · not affiliated with the Electric Coin Company or the Zcash Foundation.</div>
-    <div class="foot-links"><a href="/index.html">← Back to the live tracker</a> · <a href="/privacy.html">Privacy</a></div>
+<footer class="zf">
+  <div class="zf-quote">
+    <p>Read the network. <i>Leave no trace.</i></p>
+    <small>No accounts, no ads, no trackers. Your watchlist, portfolio and game progress stay in your own browser.</small>
   </div>
+  <div class="zf-in">
+    <div>
+      <a class="zf-logo" href="/">Zec<i>tastic</i></a>
+      <p class="zf-tag">Small tools for following Zcash. Free, and nothing about you is stored.</p>
+    </div>
+    <div class="zf-col">
+      <h4>Live</h4>
+      <a href="/#tracker">Tracker</a>
+      <a href="/zecmap.html">ZEC Map</a>
+      <a href="/flippening.html">Flippening Party</a>
+      <a href="/captastic.html">Captastic</a>
+      <a href="/events.html">Events</a>
+    </div>
+    <div class="zf-col">
+      <h4>Learn &amp; play</h4>
+      <a href="/learn.html">Learn Zcash</a>
+      <a href="/backwards.html">Backwards</a>
+      <a href="/game.html">Encrypt the money</a>
+      <a href="/duel.html">Card Duel</a>
+    </div>
+    <div class="zf-col">
+      <h4>Fine print</h4>
+      <p>Educational only. Not financial advice. Not affiliated with the Electric Coin Company or the Zcash Foundation.</p>
+      <a href="/privacy.html">Privacy</a>
+      
+    </div>
+  </div>
+  <div class="zf-credits">ZECTASTIC · not affiliated with the Electric Coin Company or the Zcash Foundation.</div>
 </footer>
 
 <script>
