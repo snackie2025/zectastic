@@ -250,7 +250,7 @@
       <li><span class="mark">→</span> A few things are stored locally in your browser: your cookie choice, and, if you use them, your Captastic settings, watchlist and portfolio and your game progress. None of it is sent to us or to anyone else, and nothing here is sold or shared.</li>
       <li><span class="mark">→</span> Live prices, supply, rankings and shielded-pool numbers come from third-party services (mainly CoinGecko, Binance, Kraken and zkp.baby) that your browser talks to directly. Their own privacy practices are outside our control, and linked below.</li>
       <li><span class="mark">→</span> The ZEC Map connects your browser to several exchanges at once while it is open, to show their public trades.</li>
-      <li><span class="mark">→</span> Playing the radio opens a direct audio connection to DANCE.FM, which can see your IP address for the duration of playback, same as any internet radio.</li>
+      <li><span class="mark">→</span> Playing the radio asks radio-browser.info, an open directory of internet radio, for stations in the style you picked, then connects to that station's stream. Both can see your IP address, same as any internet radio. Nothing is contacted until you press play.</li>
     </ul>
   </div>
 </section>
@@ -266,6 +266,7 @@
       <li>Your Captastic portfolios (up to three): the names you gave them, and the projects and amounts you typed in.</li>
       <li>A copy of the public top 100 list, so Captastic opens quickly and keeps working when the ranking service is busy.</li>
       <li>Your game progress: the callsign you chose, your best score and level, and whether you have already seen the intro.</li>
+      <li>The radio style you picked last.</li>
       <li>Your Card Duel collection: which cards you have unlocked, and the day you last unlocked one.</li>
     </ul>
     <p>You can remove all of it at any time by clearing this site's data in your browser. Doing so also erases your watchlist and portfolio, since no other copy exists.</p>
@@ -319,9 +320,9 @@
         <div class="cell"><p><a href="https://zkp.baby" target="_blank" rel="noopener">zkp.baby</a></p></div>
       </div>
       <div class="service-row">
-        <div class="cell"><div class="name">DANCE.FM</div><p>The live audio stream behind the radio player and party mode.</p></div>
-        <div class="cell"><p>Only connects when you press play, streaming directly from their server for as long as it plays.</p></div>
-        <div class="cell"><p><a href="https://dance.fm" target="_blank" rel="noopener">dance.fm</a></p></div>
+        <div class="cell"><div class="name">radio-browser.info and radio stations</div><p>Zectastic Radio and party mode: finding stations for the style you pick, and the stations' own live streams.</p></div>
+        <div class="cell"><p>Only contacted when you press play. The directory sees the style you picked; the station streams to your browser for as long as it plays.</p></div>
+        <div class="cell"><p><a href="https://www.radio-browser.info" target="_blank" rel="noopener">radio-browser.info</a> · each station's own policy</p></div>
       </div>
       <div class="service-row">
         <div class="cell"><div class="name">Google Fonts</div><p>The typefaces used on every page.</p></div>
@@ -389,7 +390,7 @@
 <section>
   <div class="wrap">
     <h2><span class="icon">◈</span> The Flippening page</h2>
-    <p>The flippening leaderboard pulls the same CoinGecko market data as the main tracker, plus a broader list of top coins for comparison. Party mode's confetti and screen effects run entirely in your browser and never leave your device. Starting party mode also starts the DANCE.FM stream described above.</p>
+    <p>The flippening leaderboard pulls the same CoinGecko market data as the main tracker, plus a broader list of top coins for comparison. Party mode's confetti and screen effects run entirely in your browser and never leave your device. Starting party mode also starts the radio described above.</p>
   </div>
 </section>
 

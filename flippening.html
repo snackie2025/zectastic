@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.coingecko.com; connect-src https://api.coingecko.com; media-src https:">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.coingecko.com; connect-src https://api.coingecko.com https://*.api.radio-browser.info; media-src https: data:">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zcash Flippening Party · Zectastic</title>
 <meta name="description" content="Live Zcash flippening tracker: how far ZEC is from flipping every coin ranked above it, with party mode, confetti, and DANCE.FM playing.">
@@ -203,6 +203,18 @@
   ::selection{background:#FF5A1F; color:#050608;}
   .ladder-wrap,.radio-panel{border-radius:18px;} .party-btn{border-radius:999px;}
   /* ==== END SWARM STYLE ==== */
+
+  /* ==== RADIO CONTROLS ==== */
+  .radio-genre{appearance:none; -webkit-appearance:none; min-height:38px; padding:0 30px 0 14px; border-radius:999px; border:1px solid #34363C; background:#0D0E11 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%239C9EA3' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center; color:#F2F2EF; font:500 12px 'DM Mono',monospace; letter-spacing:.04em; cursor:pointer;}
+  .radio-genre:hover, .radio-genre:focus{border-color:#FF5A1F; outline:none;}
+  .radio-skip{min-width:38px; justify-content:center; padding:0 12px !important;}
+  .radio-skip[hidden]{display:none !important;}
+  /* ==== END RADIO CONTROLS ==== */
+  .radio-panel{flex-wrap:wrap;}
+  .radio-meta{flex:1 1 160px; min-width:0;}
+  .radio-meta b, .radio-meta span{display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .radio-panel .radio-btn{display:inline-flex; align-items:center; min-height:38px; padding:0 14px; border-radius:999px; border:1px solid #34363C; background:transparent; color:#F2F2EF; font:500 12px 'DM Mono',monospace; cursor:pointer;}
+  .radio-panel .radio-btn:disabled{opacity:.4; cursor:default;}
 </style>
 </head>
 <body>
@@ -324,14 +336,16 @@
   </div>
 
   <div class="radio-panel">
-    <button class="play-btn" id="playBtn" type="button" aria-label="Play DANCE.FM">▶</button>
-    <div class="radio-meta"><b>DANCE.FM, HQ (256kbps)</b><span id="radioState" aria-live="polite">Tap play to tune in</span></div>
-    <audio id="radioAudio" preload="none" src="https://streams.dancefm.net/mp3-hq"></audio>
+    <button class="play-btn" id="playBtn" type="button" aria-label="Play the radio">▶</button>
+    <div class="radio-meta"><b id="radioName">Zectastic Radio</b><span id="radioState" aria-live="polite">Pick a style and press play</span></div>
+    <select class="radio-genre" id="radioGenre" aria-label="Radio style"></select>
+    <button class="radio-btn radio-skip" id="radioNext" type="button" aria-label="Next station" title="Next station" disabled>Next »</button>
+    <audio id="radioAudio" preload="none"></audio>
   </div>
 </main>
 
 <footer class="foot-bar">
-  <div class="foot-note">MARKET DATA: COINGECKO · RADIO: DANCE.FM · UPDATES EVERY 60S · © 2026 ZECTASTIC</div>
+  <div class="foot-note">MARKET DATA: COINGECKO · RADIO: STATIONS VIA RADIO-BROWSER.INFO · UPDATES EVERY 60S · © 2026 ZECTASTIC</div>
   <a class="foot-privacy" href="/privacy.html">Privacy</a>
   <a class="foot-back" href="/">← Back to the Tracker</a>
 </footer>
@@ -341,50 +355,133 @@
   const audio = document.getElementById('radioAudio');
   const playBtn = document.getElementById('playBtn');
 
-  // Radio player. It only says "Playing" once sound is actually coming in, says so
-  // when the stream does not answer within 12 seconds, and drops the connection on
-  // pause so the next play starts live instead of from an old buffer.
+  /* ---------------- Zectastic Radio ----------------
+     Stations come from radio-browser.info, an open directory of internet radio, so a
+     dead stream never breaks the radio: only working https streams are used, Dutch
+     stations are skipped, and a station that does not answer is skipped automatically.
+     The directory is only contacted when someone presses play. */
+  var GENRES = [
+    {id:'dance',      label:'Dance',       tags:['dance','edm','house']},
+    {id:'hardtechno', label:'Hard techno', tags:['hard techno','hardtechno','techno']},
+    {id:'hardstyle',  label:'Hardstyle',   tags:['hardstyle','hard dance']},
+    {id:'hiphop',     label:'Hip-hop',     tags:['hip hop','hiphop','rap']},
+    {id:'top40',      label:'Top 40 (US)', tags:['top 40','top40','hits'], country:'US'}
+  ];
+  var RB = ['https://de1.api.radio-browser.info', 'https://fi1.api.radio-browser.info', 'https://at1.api.radio-browser.info'];
+  var SILENT = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+  function rbGet(path, i){
+    i = i || 0;
+    return fetch(RB[i] + path).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .catch(function(e){ if(i + 1 < RB.length) return rbGet(path, i + 1); throw e; });
+  }
+  var rbFound = {};
+  function stationsFor(g){
+    if(rbFound[g.id]) return rbFound[g.id];
+    var key = 'zr_list_' + g.id;
+    try{
+      var c = JSON.parse(sessionStorage.getItem(key) || 'null');
+      if(c && c.t > Date.now() - 3600000 && c.d && c.d.length) return (rbFound[g.id] = Promise.resolve(c.d));
+    }catch(e){}
+    rbFound[g.id] = Promise.all(g.tags.map(function(t){
+      return rbGet('/json/stations/search?tag=' + encodeURIComponent(t) + '&tagExact=true&hidebroken=true&order=votes&reverse=true&limit=60' +
+        (g.country ? '&countrycode=' + g.country : '')).catch(function(){ return []; });
+    })).then(function(lists){
+      var seen = {}, out = [];
+      lists.forEach(function(list){
+        (Array.isArray(list) ? list : []).forEach(function(s){
+          var u = String(s.url_resolved || s.url || '');
+          if(u.indexOf('https://') !== 0 || seen[u] || +s.lastcheckok !== 1) return;
+          if(String(s.countrycode || '').toUpperCase() === 'NL') return;
+          if(/\.(m3u8?|pls)(\?|$)/i.test(u)) return;
+          var codec = String(s.codec || '').toUpperCase();
+          if(codec && !/MP3|AAC/.test(codec)) return;
+          seen[u] = 1;
+          out.push({name: String(s.name || 'Radio station').replace(/\s+/g, ' ').trim().slice(0, 60), url: u, votes: +s.votes || 0, country: String(s.countrycode || '').toUpperCase()});
+        });
+      });
+      out.sort(function(a, b){ return b.votes - a.votes; });
+      out = out.slice(0, 15);
+      if(!out.length) throw new Error('no stations');
+      try{ sessionStorage.setItem(key, JSON.stringify({t: Date.now(), d: out})); }catch(e){}
+      return out;
+    });
+    rbFound[g.id].catch(function(){ delete rbFound[g.id]; });
+    return rbFound[g.id];
+  }
+  // States: idle, connecting, playing, offline (no station answered), blocked (the browser refused sound).
   function makeRadio(audio, onState){
-    var SRC = 'https://streams.dancefm.net/mp3-hq', state = 'idle', timer = 0;
-    function set(s){ state = s; onState(s); }
+    var state = 'idle', timer = 0, token = 0, genre = GENRES[0], list = [], idx = 0, tries = 0, station = null;
+    try{ var saved = localStorage.getItem('zr_genre'); GENRES.forEach(function(g){ if(g.id === saved) genre = g; }); }catch(e){}
+    function set(s){ state = s; onState(s, {genre: genre, station: station}); }
     function reset(){ clearTimeout(timer); audio.pause(); audio.removeAttribute('src'); try{ audio.load(); }catch(e){} }
-    function fail(){ reset(); set('offline'); }
-    function start(){
+    function tryStation(){
+      if(!list.length || tries >= Math.min(5, list.length)){ reset(); station = null; set('offline'); return; }
+      station = list[idx % list.length];
+      var my = ++token;
       reset();
       set('connecting');
       audio.muted = false; audio.volume = 1;
-      audio.src = SRC;
+      audio.src = station.url;
       var p = audio.play();
-      if (p && p.catch) p.catch(function(err){
-        if (state !== 'connecting') return;
-        if (err && err.name === 'NotAllowedError') { reset(); set('blocked'); } else fail();
+      if(p && p.catch) p.catch(function(err){
+        if(my !== token || state !== 'connecting') return;
+        if(err && err.name === 'NotAllowedError'){ reset(); set('blocked'); } else skip(true);
       });
-      timer = setTimeout(function(){ if (state === 'connecting') fail(); }, 12000);
+      timer = setTimeout(function(){ if(my === token && state === 'connecting') skip(true); }, 9000);
     }
-    function stop(){ reset(); set('idle'); }
-    audio.addEventListener('playing', function(){ if (state === 'connecting' || state === 'playing'){ clearTimeout(timer); set('playing'); } });
-    audio.addEventListener('waiting', function(){ if (state === 'playing') set('connecting'); });
-    audio.addEventListener('error', function(){ if (state === 'connecting' || state === 'playing') fail(); });
-    audio.addEventListener('pause', function(){ if (state === 'playing') set('idle'); });
+    function skip(auto){ tries = auto ? tries + 1 : 0; idx++; tryStation(); }
+    function start(){
+      var my = ++token;
+      reset();
+      station = null; tries = 0;
+      set('connecting');
+      // unlock sound while still inside the tap, then look up the stations
+      audio.src = SILENT;
+      var u = audio.play(); if(u && u.catch) u.catch(function(){});
+      stationsFor(genre).then(function(l){
+        if(my !== token) return;
+        list = l; idx = Math.floor(Math.random() * Math.min(3, l.length));
+        tryStation();
+      }, function(){ if(my !== token) return; reset(); set('offline'); });
+    }
+    function stop(){ ++token; reset(); station = null; set('idle'); }
+    audio.addEventListener('playing', function(){ if(state === 'connecting' && station){ clearTimeout(timer); tries = 0; set('playing'); } });
+    audio.addEventListener('error', function(){ if((state === 'connecting' || state === 'playing') && station) skip(true); });
+    audio.addEventListener('pause', function(){ if(state === 'playing') set('idle'); });
+    set('idle');
     return {
-      toggle: function(){ if (state === 'playing' || state === 'connecting') stop(); else start(); },
-      start: function(){ if (state !== 'playing' && state !== 'connecting') start(); },
+      toggle: function(){ if(state === 'playing' || state === 'connecting') stop(); else start(); },
+      start: function(){ if(state !== 'playing' && state !== 'connecting') start(); },
+      next: function(){ if(state === 'playing' && list.length) skip(false); else start(); },
+      setGenre: function(id){
+        GENRES.forEach(function(g){ if(g.id === id) genre = g; });
+        try{ localStorage.setItem('zr_genre', genre.id); }catch(e){}
+        if(state === 'playing' || state === 'connecting') start(); else set(state);
+      },
+      get genre(){ return genre; },
       get state(){ return state; }
     };
   }
 
-  const radioState = document.getElementById('radioState');
-  var RADIO_UI = {
-    idle:       ['▶', 'Tap play to tune in'],
-    connecting: ['…', 'Tuning in…'],
-    playing:    ['❚❚', 'Live now'],
-    offline:    ['!', 'DANCE.FM did not answer. Tap to try again.'],
-    blocked:    ['▶', 'Your browser blocked the sound. Tap play again.']
-  };
-  const radio = makeRadio(audio, function(s){
-    playBtn.textContent = RADIO_UI[s][0]; radioState.textContent = RADIO_UI[s][1];
-    playBtn.setAttribute('aria-label', s === 'playing' ? 'Stop DANCE.FM' : 'Play DANCE.FM');
+  const radioState = document.getElementById('radioState'), radioName = document.getElementById('radioName');
+  const radioGenre = document.getElementById('radioGenre'), radioNext = document.getElementById('radioNext');
+  radioGenre.innerHTML = GENRES.map(function(g){ return '<option value="' + g.id + '">' + g.label + '</option>'; }).join('');
+  const radio = makeRadio(audio, function(s, info){
+    playBtn.textContent = {idle: '▶', connecting: '…', playing: '❚❚', offline: '!', blocked: '▶'}[s];
+    radioName.textContent = info.station && (s === 'playing' || s === 'connecting') ? info.station.name : 'Zectastic Radio';
+    radioState.textContent = {
+      idle: 'Pick a style and press play',
+      connecting: 'Tuning in to ' + info.genre.label + '…',
+      playing: 'Live · ' + info.genre.label + (info.station && info.station.country ? ' · ' + info.station.country : ''),
+      offline: 'No station answered. Press play to try again.',
+      blocked: 'Your browser blocked the sound. Press play again.'
+    }[s];
+    playBtn.setAttribute('aria-label', s === 'playing' ? 'Stop the radio' : 'Play the radio');
+    radioNext.disabled = s !== 'playing';
   });
+  radioGenre.value = radio.genre.id;
+  radioGenre.addEventListener('change', function(){ radio.setGenre(radioGenre.value); });
+  radioNext.addEventListener('click', function(){ radio.next(); });
   playBtn.addEventListener('click', function(){ radio.toggle(); });
 
   /* ---------------- Party mode: glow + confetti + music ---------------- */
