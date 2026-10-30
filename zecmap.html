@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="referrer" content="no-referrer">
 <!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://api.binance.com https://api.coingecko.com https://api.kraken.com https://api.zecblock.com https://api.mainnet.cipherscan.app wss://ws.kraken.com wss://ws-feed.exchange.coinbase.com wss://api.gemini.com wss://stream.binance.com:9443 wss://api-pub.bitfinex.com wss://ws.okx.com:8443 wss://stream.bybit.com wss://api.gateio.ws wss://ws.bitget.com">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://*.api.radio-browser.info https://cdn.jsdelivr.net https://api.binance.com https://api.coingecko.com https://api.kraken.com https://api.zecblock.com https://api.mainnet.cipherscan.app wss://ws.kraken.com wss://ws-feed.exchange.coinbase.com wss://api.gemini.com wss://stream.binance.com:9443 wss://api-pub.bitfinex.com wss://ws.okx.com:8443 wss://stream.bybit.com wss://api.gateio.ws wss://ws.bitget.com; media-src https: data:">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ZEC Map · Zectastic</title>
 <meta name="description" content="Live ZEC buys on a world map, flying into the price, with swaps into ZEC surfacing in a hidden shielded zone.">
@@ -208,6 +208,19 @@
   .ledger-card, .arc, .embed-frame, .mv-box, .story-card, .concept-box, .grid-stats{border-radius:18px; overflow:hidden;}
   .btn{border-radius:999px;} .btn-ghost{border-radius:999px;}
   /* ==== END SWARM STYLE ==== */
+  /* ==== RADIO CONTROLS ==== */
+  .radio-genre{appearance:none; -webkit-appearance:none; min-height:38px; padding:0 30px 0 14px; border-radius:999px; border:1px solid #34363C; background:#0D0E11 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%239C9EA3' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center; color:#F2F2EF; font:500 12px 'DM Mono',monospace; letter-spacing:.04em; cursor:pointer;}
+  .radio-genre:hover, .radio-genre:focus{border-color:#FF5A1F; outline:none;}
+  .radio-skip{min-width:38px; justify-content:center; padding:0 12px !important;}
+  .radio-skip[hidden]{display:none !important;}
+  /* ==== END RADIO CONTROLS ==== */
+  /* Now-playing label on the map, so a livestream shows what is playing */
+  .np{position:absolute; right:16px; bottom:12px; z-index:2; max-width:min(320px, calc(100% - 32px)); display:flex; align-items:center; gap:10px; padding:8px 14px; border-radius:999px; background:rgba(5,6,8,.78); border:1px solid #1E2024; font-family:'DM Mono',monospace; font-size:12px; color:#F2F2EF; pointer-events:none;}
+  .np[hidden]{display:none !important;}
+  .np i{flex:none; width:8px; height:8px; border-radius:50%; background:#FF5A1F; box-shadow:0 0 10px #FF5A1F; animation:pulse 1.4s infinite;}
+  .np span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  @media(max-width:640px){.np{bottom:64px;}}
+  @media (prefers-reduced-motion: reduce){.np i{animation:none;}}
 </style>
 </head>
 <body>
@@ -268,8 +281,14 @@
       </div>
       <a href="/captastic">Captastic</a>
     </nav>
+    <div class="nav-right">
+      <button class="radio-btn" id="radioBtn" type="button" aria-pressed="false" title="Zectastic Radio"><span class="icon" id="radioIcon">▶</span> <span id="radioLabel">Radio</span></button>
+      <select class="radio-genre" id="radioGenre" aria-label="Radio style"></select>
+      <button class="radio-btn radio-skip" id="radioNext" type="button" aria-label="Next station" title="Next station" hidden>»</button>
+    </div>
   </div>
 </header>
+<audio id="radioAudio" preload="none"></audio>
 <script>
 // SITE HEADER script: identical on every Zectastic page.
 (function(){
@@ -355,6 +374,7 @@
       </div>
     </div>
 
+    <div class="np" id="np" hidden aria-live="polite"><i></i><span id="npText"></span></div>
     <div class="counters">
       <div><b id="bpm">0</b> buys in the last minute</div>
       <div class="t"><b id="shn">0</b> <span id="shl">swaps into ZEC via NEAR Intents</span></div>
@@ -813,6 +833,156 @@ async function pollSwaps(){
 })();
 pollSwaps();setInterval(pollSwaps,30000);
 status();
+})();
+</script>
+<script>
+(function(){
+  /* ---------------- Zectastic Radio ----------------
+     Stations come from radio-browser.info, an open directory of internet radio, so a
+     dead stream never breaks the radio: only working https streams are used, Dutch
+     stations are skipped, and a station that does not answer is skipped automatically.
+     The directory is only contacted when someone presses play. */
+  var GENRES = [
+    {id:'dance',      label:'Dance',       tags:['dance','edm','house']},
+    {id:'hardtechno', label:'Hard techno', tags:['hard techno','hardtechno','techno']},
+    {id:'hardstyle',  label:'Hardstyle',   tags:['hardstyle','hard dance']},
+    {id:'hiphop',     label:'Hip-hop',     tags:['hip hop','hiphop','rap']},
+    {id:'top40',      label:'Top 40 (US)', tags:['top 40','top40','hits'], country:'US'}
+  ];
+  var RB = ['https://de1.api.radio-browser.info', 'https://fi1.api.radio-browser.info', 'https://at1.api.radio-browser.info'];
+  var SILENT = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+  function rbGet(path, i){
+    i = i || 0;
+    return fetch(RB[i] + path).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .catch(function(e){ if(i + 1 < RB.length) return rbGet(path, i + 1); throw e; });
+  }
+  // Keep the music, skip the talk and the ads:
+  // no Dutch, Flemish or Russian-speaking stations (by country, language, name and web address),
+  // and no streams from networks that insert ads based on where the listener is.
+  var SKIP_COUNTRY = {NL:1, BE:1, RU:1, BY:1, UA:1, KZ:1};
+  var SKIP_LANG = /dutch|nederlands|flemish|vlaams|russian|русск|ukrain|belarus/i;
+  var SKIP_HOST = /(\.ru|\.by|\.ua|\.nl|\.be|\.su)(:\d+)?$|hostingradio|radiorecord|101\.ru|streamtheworld|tritondigital|adswizz|zeno\.fm|zenomedia|revma|ihrhls|iheart|audioaddict|securenetsystems|radioplayer\.nl|talpa|qmusic|538|slam|npo/i;
+  var CYRILLIC = /[\u0400-\u04FF]/;
+  function musicOnly(s, u){
+    if(SKIP_COUNTRY[String(s.countrycode || '').toUpperCase()]) return false;
+    if(SKIP_LANG.test(String(s.language || '')) || /\b(nl|ru|uk|be)\b/i.test(String(s.languagecodes || ''))) return false;
+    if(CYRILLIC.test(String(s.name || '')) || CYRILLIC.test(String(s.tags || ''))) return false;
+    var host = '';
+    try{ host = new URL(u).hostname; }catch(e){ return false; }
+    if(SKIP_HOST.test(host)) return false;
+    if(SKIP_HOST.test(String(s.homepage || '').replace(/^https?:\/\//, '').split('/')[0])) return false;
+    return true;
+  }
+  var rbFound = {};
+  function stationsFor(g){
+    if(rbFound[g.id]) return rbFound[g.id];
+    var key = 'zr3_list_' + g.id;
+    try{
+      var c = JSON.parse(sessionStorage.getItem(key) || 'null');
+      if(c && c.t > Date.now() - 3600000 && c.d && c.d.length) return (rbFound[g.id] = Promise.resolve(c.d));
+    }catch(e){}
+    rbFound[g.id] = Promise.all(g.tags.map(function(t){
+      return rbGet('/json/stations/search?tag=' + encodeURIComponent(t) + '&tagExact=true&hidebroken=true&order=votes&reverse=true&limit=150' +
+        (g.country ? '&countrycode=' + g.country : '')).catch(function(){ return []; });
+    })).then(function(lists){
+      var seen = {}, out = [];
+      lists.forEach(function(list){
+        (Array.isArray(list) ? list : []).forEach(function(s){
+          var u = String(s.url_resolved || s.url || '');
+          if(u.indexOf('https://') !== 0 || seen[u] || +s.lastcheckok !== 1) return;
+          if(!musicOnly(s, u)) return;
+          if(/\.(m3u8?|pls)(\?|$)/i.test(u)) return;
+          var codec = String(s.codec || '').toUpperCase();
+          if(codec && !/MP3|AAC/.test(codec)) return;
+          seen[u] = 1;
+          out.push({name: String(s.name || 'Radio station').replace(/\s+/g, ' ').trim().slice(0, 60), url: u, votes: +s.votes || 0, country: String(s.countrycode || '').toUpperCase()});
+        });
+      });
+      out.sort(function(a, b){ return b.votes - a.votes; });
+      out = out.slice(0, 20);
+      if(!out.length) throw new Error('no stations');
+      try{ sessionStorage.setItem(key, JSON.stringify({t: Date.now(), d: out})); }catch(e){}
+      return out;
+    });
+    rbFound[g.id].catch(function(){ delete rbFound[g.id]; });
+    return rbFound[g.id];
+  }
+  // States: idle, connecting, playing, offline (no station answered), blocked (the browser refused sound).
+  function makeRadio(audio, onState){
+    var state = 'idle', timer = 0, token = 0, genre = GENRES[0], list = [], idx = 0, tries = 0, station = null;
+    try{ var saved = localStorage.getItem('zr_genre'); GENRES.forEach(function(g){ if(g.id === saved) genre = g; }); }catch(e){}
+    function set(s){ state = s; onState(s, {genre: genre, station: station}); }
+    function reset(){ clearTimeout(timer); audio.pause(); audio.removeAttribute('src'); try{ audio.load(); }catch(e){} }
+    function tryStation(){
+      if(!list.length || tries >= Math.min(5, list.length)){ reset(); station = null; set('offline'); return; }
+      station = list[idx % list.length];
+      var my = ++token;
+      reset();
+      set('connecting');
+      audio.muted = false; audio.volume = 1;
+      audio.src = station.url;
+      var p = audio.play();
+      if(p && p.catch) p.catch(function(err){
+        if(my !== token || state !== 'connecting') return;
+        if(err && err.name === 'NotAllowedError'){ reset(); set('blocked'); } else skip(true);
+      });
+      timer = setTimeout(function(){ if(my === token && state === 'connecting') skip(true); }, 9000);
+    }
+    function skip(auto){ tries = auto ? tries + 1 : 0; idx++; tryStation(); }
+    function start(){
+      var my = ++token;
+      reset();
+      station = null; tries = 0;
+      set('connecting');
+      // unlock sound while still inside the tap, then look up the stations
+      audio.src = SILENT;
+      var u = audio.play(); if(u && u.catch) u.catch(function(){});
+      stationsFor(genre).then(function(l){
+        if(my !== token) return;
+        list = l; idx = Math.floor(Math.random() * Math.min(3, l.length));
+        tryStation();
+      }, function(){ if(my !== token) return; reset(); set('offline'); });
+    }
+    function stop(){ ++token; reset(); station = null; set('idle'); }
+    audio.addEventListener('playing', function(){ if(state === 'connecting' && station){ clearTimeout(timer); tries = 0; set('playing'); } });
+    audio.addEventListener('error', function(){ if((state === 'connecting' || state === 'playing') && station) skip(true); });
+    audio.addEventListener('pause', function(){ if(state === 'playing') set('idle'); });
+    set('idle');
+    return {
+      toggle: function(){ if(state === 'playing' || state === 'connecting') stop(); else start(); },
+      start: function(){ if(state !== 'playing' && state !== 'connecting') start(); },
+      next: function(){ if(state === 'playing' && list.length) skip(false); else start(); },
+      setGenre: function(id){
+        GENRES.forEach(function(g){ if(g.id === id) genre = g; });
+        try{ localStorage.setItem('zr_genre', genre.id); }catch(e){}
+        if(state === 'playing' || state === 'connecting') start(); else set(state);
+      },
+      get genre(){ return genre; },
+      get state(){ return state; }
+    };
+  }
+
+
+  const audio = document.getElementById('radioAudio'), radioBtn = document.getElementById('radioBtn');
+  const radioIcon = document.getElementById('radioIcon'), radioLabel = document.getElementById('radioLabel');
+  const radioGenre = document.getElementById('radioGenre'), radioNext = document.getElementById('radioNext');
+  const np = document.getElementById('np'), npText = document.getElementById('npText');
+  radioGenre.innerHTML = GENRES.map(function(g){ return '<option value="' + g.id + '">' + g.label + '</option>'; }).join('');
+  const radio = makeRadio(audio, function(s, info){
+    var ui = {idle: ['▶', 'Radio'], connecting: ['…', 'Tuning in'], playing: ['❚❚', info.genre.label], offline: ['!', 'Offline'], blocked: ['▶', 'Tap again']}[s];
+    radioIcon.textContent = ui[0]; radioLabel.textContent = ui[1];
+    radioBtn.title = s === 'playing' && info.station ? 'Now playing: ' + info.station.name + '. Tap to stop.'
+      : s === 'offline' ? 'No station answered. Tap to try again.'
+      : s === 'blocked' ? 'Your browser blocked the sound. Tap again to play.' : 'Zectastic Radio';
+    radioBtn.setAttribute('aria-pressed', s === 'playing' ? 'true' : 'false');
+    radioNext.hidden = s !== 'playing';
+    np.hidden = s !== 'playing' || !info.station;
+    if (info.station) npText.textContent = info.genre.label + ' · ' + info.station.name;
+  });
+  radioGenre.value = radio.genre.id;
+  radioGenre.addEventListener('change', function(){ radio.setGenre(radioGenre.value); });
+  radioNext.addEventListener('click', function(){ radio.next(); });
+  radioBtn.addEventListener('click', function(){ radio.toggle(); });
 })();
 </script>
 </body>
