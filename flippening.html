@@ -324,8 +324,8 @@
   </div>
 
   <div class="radio-panel">
-    <button class="play-btn" id="playBtn">▶</button>
-    <div class="radio-meta"><b>DANCE.FM, HQ (256kbps)</b>streams.dancefm.net/mp3-hq</div>
+    <button class="play-btn" id="playBtn" type="button" aria-label="Play DANCE.FM">▶</button>
+    <div class="radio-meta"><b>DANCE.FM, HQ (256kbps)</b><span id="radioState" aria-live="polite">Tap play to tune in</span></div>
     <audio id="radioAudio" preload="none" src="https://streams.dancefm.net/mp3-hq"></audio>
   </div>
 </main>
@@ -340,12 +340,52 @@
   /* ---------------- Radio, shared play state ---------------- */
   const audio = document.getElementById('radioAudio');
   const playBtn = document.getElementById('playBtn');
-  function setPlayingUI(isPlaying){ playBtn.textContent = isPlaying ? '❚❚' : '▶'; }
-  playBtn.addEventListener('click', () => {
-    if (audio.paused) { audio.play().catch(()=>{}); } else { audio.pause(); }
+
+  // Radio player. It only says "Playing" once sound is actually coming in, says so
+  // when the stream does not answer within 12 seconds, and drops the connection on
+  // pause so the next play starts live instead of from an old buffer.
+  function makeRadio(audio, onState){
+    var SRC = 'https://streams.dancefm.net/mp3-hq', state = 'idle', timer = 0;
+    function set(s){ state = s; onState(s); }
+    function reset(){ clearTimeout(timer); audio.pause(); audio.removeAttribute('src'); try{ audio.load(); }catch(e){} }
+    function fail(){ reset(); set('offline'); }
+    function start(){
+      reset();
+      set('connecting');
+      audio.muted = false; audio.volume = 1;
+      audio.src = SRC;
+      var p = audio.play();
+      if (p && p.catch) p.catch(function(err){
+        if (state !== 'connecting') return;
+        if (err && err.name === 'NotAllowedError') { reset(); set('blocked'); } else fail();
+      });
+      timer = setTimeout(function(){ if (state === 'connecting') fail(); }, 12000);
+    }
+    function stop(){ reset(); set('idle'); }
+    audio.addEventListener('playing', function(){ if (state === 'connecting' || state === 'playing'){ clearTimeout(timer); set('playing'); } });
+    audio.addEventListener('waiting', function(){ if (state === 'playing') set('connecting'); });
+    audio.addEventListener('error', function(){ if (state === 'connecting' || state === 'playing') fail(); });
+    audio.addEventListener('pause', function(){ if (state === 'playing') set('idle'); });
+    return {
+      toggle: function(){ if (state === 'playing' || state === 'connecting') stop(); else start(); },
+      start: function(){ if (state !== 'playing' && state !== 'connecting') start(); },
+      get state(){ return state; }
+    };
+  }
+
+  const radioState = document.getElementById('radioState');
+  var RADIO_UI = {
+    idle:       ['▶', 'Tap play to tune in'],
+    connecting: ['…', 'Tuning in…'],
+    playing:    ['❚❚', 'Live now'],
+    offline:    ['!', 'DANCE.FM did not answer. Tap to try again.'],
+    blocked:    ['▶', 'Your browser blocked the sound. Tap play again.']
+  };
+  const radio = makeRadio(audio, function(s){
+    playBtn.textContent = RADIO_UI[s][0]; radioState.textContent = RADIO_UI[s][1];
+    playBtn.setAttribute('aria-label', s === 'playing' ? 'Stop DANCE.FM' : 'Play DANCE.FM');
   });
-  audio.addEventListener('play', () => setPlayingUI(true));
-  audio.addEventListener('pause', () => setPlayingUI(false));
+  playBtn.addEventListener('click', function(){ radio.toggle(); });
 
   /* ---------------- Party mode: glow + confetti + music ---------------- */
   const partyBtn = document.getElementById('partyBtn');
@@ -359,7 +399,7 @@
     partyIcon.textContent = partyOn ? '🛑' : '🎉';
     partyLabel.textContent = partyOn ? 'Stop the Party' : 'Start the Party';
     if (partyOn) {
-      audio.play().catch(()=>{});
+      radio.start();
       burstConfetti(140);
       startSprinkle();
     } else {

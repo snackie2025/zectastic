@@ -676,18 +676,52 @@
   const radioIcon = document.getElementById('radioIcon');
   const radioLabel = document.getElementById('radioLabel');
 
-  function setPlayingUI(isPlaying){
-    radioIcon.textContent = isPlaying ? '❚❚' : '▶';
-    radioLabel.textContent = isPlaying ? 'Playing' : 'Radio';
-    radioBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+
+  // Radio player. It only says "Playing" once sound is actually coming in, says so
+  // when the stream does not answer within 12 seconds, and drops the connection on
+  // pause so the next play starts live instead of from an old buffer.
+  function makeRadio(audio, onState){
+    var SRC = 'https://streams.dancefm.net/mp3-hq', state = 'idle', timer = 0;
+    function set(s){ state = s; onState(s); }
+    function reset(){ clearTimeout(timer); audio.pause(); audio.removeAttribute('src'); try{ audio.load(); }catch(e){} }
+    function fail(){ reset(); set('offline'); }
+    function start(){
+      reset();
+      set('connecting');
+      audio.muted = false; audio.volume = 1;
+      audio.src = SRC;
+      var p = audio.play();
+      if (p && p.catch) p.catch(function(err){
+        if (state !== 'connecting') return;
+        if (err && err.name === 'NotAllowedError') { reset(); set('blocked'); } else fail();
+      });
+      timer = setTimeout(function(){ if (state === 'connecting') fail(); }, 12000);
+    }
+    function stop(){ reset(); set('idle'); }
+    audio.addEventListener('playing', function(){ if (state === 'connecting' || state === 'playing'){ clearTimeout(timer); set('playing'); } });
+    audio.addEventListener('waiting', function(){ if (state === 'playing') set('connecting'); });
+    audio.addEventListener('error', function(){ if (state === 'connecting' || state === 'playing') fail(); });
+    audio.addEventListener('pause', function(){ if (state === 'playing') set('idle'); });
+    return {
+      toggle: function(){ if (state === 'playing' || state === 'connecting') stop(); else start(); },
+      start: function(){ if (state !== 'playing' && state !== 'connecting') start(); },
+      get state(){ return state; }
+    };
   }
 
-  radioBtn.addEventListener('click', () => {
-    if (audio.paused) { audio.play().catch(()=>{}); }
-    else { audio.pause(); }
+  var RADIO_UI = {
+    idle:       ['▶', 'Radio', 'Zectastic Radio: DANCE.FM, live dance music'],
+    connecting: ['…', 'Tuning in', 'Connecting to DANCE.FM'],
+    playing:    ['❚❚', 'Playing', 'Playing DANCE.FM. Tap to stop.'],
+    offline:    ['!', 'Offline', 'DANCE.FM did not answer. Tap to try again.'],
+    blocked:    ['▶', 'Tap again', 'Your browser blocked the sound. Tap again to play.']
+  };
+  const radio = makeRadio(audio, function(s){
+    var u = RADIO_UI[s];
+    radioIcon.textContent = u[0]; radioLabel.textContent = u[1]; radioBtn.title = u[2];
+    radioBtn.setAttribute('aria-pressed', s === 'playing' ? 'true' : 'false');
   });
-  audio.addEventListener('play', () => setPlayingUI(true));
-  audio.addEventListener('pause', () => setPlayingUI(false));
+  radioBtn.addEventListener('click', function(){ radio.toggle(); });
 
   // ---- Live market data via CoinGecko ----
   const fmtUSD = (n, opts={}) => n == null ? '—' : n.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits: n < 10 ? 4 : 2, ...opts});
