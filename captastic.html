@@ -261,15 +261,36 @@
 </style>
 </head>
 <body data-mode="top">
+<script>
+// Keep the address bar clean: zectastic.com/zecmap instead of /zecmap.html, and no #section left at the end.
+(function(){
+  try {
+    var p = location.pathname, c = p.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+    if (c !== p) history.replaceState(null, '', c + location.search + location.hash);
+  } catch (e) {}
+  addEventListener('load', function(){
+    if (location.hash) setTimeout(function(){ try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }, 400);
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a || a.getAttribute('href').length < 2) return;
+    var t = document.getElementById(a.getAttribute('href').slice(1));
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({behavior: 'smooth'});
+  });
+})();
+</script>
+
 
 <header>
   <div class="nav wrap">
-    <a class="logo" href="captastic.html"><span class="z">C</span> CAPTASTIC</a>
+    <a class="logo" href="/captastic"><span class="z">C</span> CAPTASTIC</a>
     <div class="nav-right">
       <div class="live-tag" id="status"><span class="live-dot"></span><span id="statusText">Connecting</span></div>
-      <a href="captastic.html" data-nav="top">Top 100</a>
-      <a href="watchlist.html" data-nav="watch">Watchlist</a>
-      <a href="portfolio.html" data-nav="port">Portfolio</a>
+      <a href="/captastic" data-nav="top">Top 100</a>
+      <a href="/watchlist" data-nav="watch">Watchlist</a>
+      <a href="/portfolio" data-nav="port">Portfolio</a>
       <a class="home" href="/">Zectastic</a>
     </div>
   </div>
@@ -981,7 +1002,7 @@
         : gone + (gone === 1 ? ' holding is' : ' holdings are') + ' outside the top 500 right now, so hidden and not counted in the total.';
       return;
     }
-    msgEl.innerHTML = view.length ? '' : 'Your watchlist is empty. Tap <b>+</b> next to a project in the <a href="captastic.html">Top 100</a>.';
+    msgEl.innerHTML = view.length ? '' : 'Your watchlist is empty. Tap <b>+</b> next to a project in the <a href="/captastic">Top 100</a>.';
     var ids = {}, out = 0;
     coins.forEach(function(c){ ids[c.id] = 1; });
     watch.forEach(function(id){ if(!ids[id]) out++; });

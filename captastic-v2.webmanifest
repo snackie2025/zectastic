@@ -2,13 +2,23 @@
   "name": "Captastic",
   "short_name": "Captastic",
   "description": "The top 100 crypto projects by market cap, live, with no noise and no ads.",
-  "start_url": "captastic.html",
-  "scope": "./",
+  "start_url": "/captastic",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#050608",
   "theme_color": "#050608",
   "icons": [
-    { "src": "captastic-icon-v2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "captastic-icon-v2.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "/captastic-icon-v2-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/captastic-icon-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

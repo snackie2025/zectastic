@@ -211,6 +211,27 @@
 </style>
 </head>
 <body>
+<script>
+// Keep the address bar clean: zectastic.com/zecmap instead of /zecmap.html, and no #section left at the end.
+(function(){
+  try {
+    var p = location.pathname, c = p.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+    if (c !== p) history.replaceState(null, '', c + location.search + location.hash);
+  } catch (e) {}
+  addEventListener('load', function(){
+    if (location.hash) setTimeout(function(){ try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }, 400);
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a || a.getAttribute('href').length < 2) return;
+    var t = document.getElementById(a.getAttribute('href').slice(1));
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({behavior: 'smooth'});
+  });
+})();
+</script>
+
 
 <!-- SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. -->
 <header class="zh">
@@ -222,30 +243,30 @@
         <div class="nm">
           <a href="/#tracker">Tracker</a>
           <a href="/#supply">Supply</a>
-          <a href="/zecmap.html">ZEC Map</a>
-          <a href="/flippening.html">Flippening Party</a>
-          <a href="/events.html">Events</a>
+          <a href="/zecmap">ZEC Map</a>
+          <a href="/flippening">Flippening Party</a>
+          <a href="/events">Events</a>
         </div>
       </div>
       <div class="nb">
         <button type="button" aria-expanded="false">Learn <i>▾</i></button>
         <div class="nm">
           <a href="/#arc">The Redemption Arc</a>
-          <a href="/learn.html#why">Why Zcash</a>
-          <a href="/learn.html#how">How it works</a>
-          <a href="/learn.html#ux">Using Zcash</a>
-          <a href="/learn.html#ironwood">Shielded dashboard</a>
+          <a href="/learn#why">Why Zcash</a>
+          <a href="/learn#how">How it works</a>
+          <a href="/learn#ux">Using Zcash</a>
+          <a href="/learn#ironwood">Shielded dashboard</a>
         </div>
       </div>
       <div class="nb">
         <button type="button" aria-expanded="false">Play <i>▾</i></button>
         <div class="nm">
-          <a href="/game.html">Encrypt the money</a>
-          <a href="/backwards.html">Backwards</a>
-          <a href="/duel.html">Card Duel</a>
+          <a href="/game">Encrypt the money</a>
+          <a href="/backwards">Backwards</a>
+          <a href="/duel">Card Duel</a>
         </div>
       </div>
-      <a href="/captastic.html">Captastic</a>
+      <a href="/captastic">Captastic</a>
     </nav>
   </div>
 </header>
@@ -293,7 +314,7 @@
       e.preventDefault();
       closeAll();
       target.scrollIntoView();
-      try { history.pushState(null, '', href.slice(i)); } catch (err) {}
+      
     }
   });
 })();
@@ -380,22 +401,22 @@
     <div class="zf-col">
       <h4>Live</h4>
       <a href="/#tracker">Tracker</a>
-      <a href="/zecmap.html">ZEC Map</a>
-      <a href="/flippening.html">Flippening Party</a>
-      <a href="/captastic.html">Captastic</a>
-      <a href="/events.html">Events</a>
+      <a href="/zecmap">ZEC Map</a>
+      <a href="/flippening">Flippening Party</a>
+      <a href="/captastic">Captastic</a>
+      <a href="/events">Events</a>
     </div>
     <div class="zf-col">
       <h4>Learn &amp; play</h4>
-      <a href="/learn.html">Learn Zcash</a>
-      <a href="/backwards.html">Backwards</a>
-      <a href="/game.html">Encrypt the money</a>
-      <a href="/duel.html">Card Duel</a>
+      <a href="/learn">Learn Zcash</a>
+      <a href="/backwards">Backwards</a>
+      <a href="/game">Encrypt the money</a>
+      <a href="/duel">Card Duel</a>
     </div>
     <div class="zf-col">
       <h4>Fine print</h4>
       <p>Educational only. Not financial advice. Not affiliated with the Electric Coin Company or the Zcash Foundation.</p>
-      <a href="/privacy.html">Privacy</a>
+      <a href="/privacy">Privacy</a>
       
     </div>
   </div>

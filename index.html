@@ -11,7 +11,7 @@
 // Old homepage links to sections that moved to the Learn page keep working.
 (function(){
   var h = location.hash.slice(1);
-  if(['why','how','ux','ironwood'].indexOf(h) > -1) location.replace('/learn.html#' + h);
+  if(['why','how','ux','ironwood'].indexOf(h) > -1) location.replace('/learn#' + h);
 })();
 </script>
 <style>
@@ -346,6 +346,27 @@
 </style>
 </head>
 <body>
+<script>
+// Keep the address bar clean: zectastic.com/zecmap instead of /zecmap.html, and no #section left at the end.
+(function(){
+  try {
+    var p = location.pathname, c = p.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+    if (c !== p) history.replaceState(null, '', c + location.search + location.hash);
+  } catch (e) {}
+  addEventListener('load', function(){
+    if (location.hash) setTimeout(function(){ try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }, 400);
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a || a.getAttribute('href').length < 2) return;
+    var t = document.getElementById(a.getAttribute('href').slice(1));
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({behavior: 'smooth'});
+  });
+})();
+</script>
+
 
 <!-- SITE HEADER: identical on every Zectastic page. Change it here, then copy this block to the other pages. -->
 <header class="zh">
@@ -357,30 +378,30 @@
         <div class="nm">
           <a href="/#tracker">Tracker</a>
           <a href="/#supply">Supply</a>
-          <a href="/zecmap.html">ZEC Map</a>
-          <a href="/flippening.html">Flippening Party</a>
-          <a href="/events.html">Events</a>
+          <a href="/zecmap">ZEC Map</a>
+          <a href="/flippening">Flippening Party</a>
+          <a href="/events">Events</a>
         </div>
       </div>
       <div class="nb">
         <button type="button" aria-expanded="false">Learn <i>▾</i></button>
         <div class="nm">
           <a href="/#arc">The Redemption Arc</a>
-          <a href="/learn.html#why">Why Zcash</a>
-          <a href="/learn.html#how">How it works</a>
-          <a href="/learn.html#ux">Using Zcash</a>
-          <a href="/learn.html#ironwood">Shielded dashboard</a>
+          <a href="/learn#why">Why Zcash</a>
+          <a href="/learn#how">How it works</a>
+          <a href="/learn#ux">Using Zcash</a>
+          <a href="/learn#ironwood">Shielded dashboard</a>
         </div>
       </div>
       <div class="nb">
         <button type="button" aria-expanded="false">Play <i>▾</i></button>
         <div class="nm">
-          <a href="/game.html">Encrypt the money</a>
-          <a href="/backwards.html">Backwards</a>
-          <a href="/duel.html">Card Duel</a>
+          <a href="/game">Encrypt the money</a>
+          <a href="/backwards">Backwards</a>
+          <a href="/duel">Card Duel</a>
         </div>
       </div>
-      <a href="/captastic.html">Captastic</a>
+      <a href="/captastic">Captastic</a>
     </nav>
     <!-- Homepage only: radio and live ZEC price -->
     <div class="nav-right">
@@ -435,7 +456,7 @@
       e.preventDefault();
       closeAll();
       target.scrollIntoView();
-      try { history.pushState(null, '', href.slice(i)); } catch (err) {}
+      
     }
   });
 })();
@@ -455,7 +476,7 @@
       <div>Buys in the last minute<b id="swBuys">0</b></div>
     </div>
     <div class="sw-cta">
-      <a class="sw-btn" href="/zecmap.html">Open the ZEC Map</a>
+      <a class="sw-btn" href="/zecmap">Open the ZEC Map</a>
       <a class="sw-btn ghost" href="#tracker">Live numbers</a>
     </div>
   </div>
@@ -522,14 +543,14 @@
     <h2>Small tools. Big picture.</h2>
     <p class="lede">Each one does one job, runs in your browser and keeps nothing about you.</p>
     <div class="sw-rail">
-      <a class="sw-card" href="/captastic.html"><canvas data-art="bars" aria-hidden="true"></canvas><div><small>New · Track</small><strong>Captastic</strong><span>The top 100 by market cap in USD, EUR or BTC, with a watchlist and a portfolio that stay on your device.</span></div></a>
-      <a class="sw-card" href="/zecmap.html"><canvas data-art="map" aria-hidden="true"></canvas><div><small>Live</small><strong>ZEC Map</strong><span>Watch the world buy ZEC in real time, with a hidden zone for shielded swaps.</span></div></a>
-      <a class="sw-card" href="/flippening.html"><canvas data-art="ladder" aria-hidden="true"></canvas><div><small>Live</small><strong>Flippening</strong><span>How far is ZEC from passing the coins above it? Party mode included.</span></div></a>
-      <a class="sw-card" href="/events.html"><canvas data-art="events" aria-hidden="true"></canvas><div><small>Meet</small><strong>Events</strong><span>Where the Zcash, privacy and Bitcoin crowd meets, by month and region.</span></div></a>
-      <a class="sw-card" href="/game.html"><canvas data-art="shield" aria-hidden="true"></canvas><div><small>Play</small><strong>Encrypt the money</strong><span>One button. Zap the surveillance nodes before they breach your shield.</span></div></a>
-      <a class="sw-card" href="/backwards.html"><canvas data-art="rewind" aria-hidden="true"></canvas><div><small>Play</small><strong>Backwards</strong><span>What if we could go backwards? An old purchase, valued in Zcash today.</span></div></a>
-      <a class="sw-card" href="/duel.html"><canvas data-art="cards" aria-hidden="true"></canvas><div><small>Play</small><strong>Card Duel</strong><span>Twenty crypto cards, four stats each. One new card to unlock every day.</span></div></a>
-      <a class="sw-card" href="/learn.html"><canvas data-art="learn" aria-hidden="true"></canvas><div><small>Learn</small><strong>Learn Zcash</strong><span>Why it exists, how shielding works, wallets to try and where to buy.</span></div></a>
+      <a class="sw-card" href="/captastic"><canvas data-art="bars" aria-hidden="true"></canvas><div><small>New · Track</small><strong>Captastic</strong><span>The top 100 by market cap in USD, EUR or BTC, with a watchlist and a portfolio that stay on your device.</span></div></a>
+      <a class="sw-card" href="/zecmap"><canvas data-art="map" aria-hidden="true"></canvas><div><small>Live</small><strong>ZEC Map</strong><span>Watch the world buy ZEC in real time, with a hidden zone for shielded swaps.</span></div></a>
+      <a class="sw-card" href="/flippening"><canvas data-art="ladder" aria-hidden="true"></canvas><div><small>Live</small><strong>Flippening</strong><span>How far is ZEC from passing the coins above it? Party mode included.</span></div></a>
+      <a class="sw-card" href="/events"><canvas data-art="events" aria-hidden="true"></canvas><div><small>Meet</small><strong>Events</strong><span>Where the Zcash, privacy and Bitcoin crowd meets, by month and region.</span></div></a>
+      <a class="sw-card" href="/game"><canvas data-art="shield" aria-hidden="true"></canvas><div><small>Play</small><strong>Encrypt the money</strong><span>One button. Zap the surveillance nodes before they breach your shield.</span></div></a>
+      <a class="sw-card" href="/backwards"><canvas data-art="rewind" aria-hidden="true"></canvas><div><small>Play</small><strong>Backwards</strong><span>What if we could go backwards? An old purchase, valued in Zcash today.</span></div></a>
+      <a class="sw-card" href="/duel"><canvas data-art="cards" aria-hidden="true"></canvas><div><small>Play</small><strong>Card Duel</strong><span>Twenty crypto cards, four stats each. One new card to unlock every day.</span></div></a>
+      <a class="sw-card" href="/learn"><canvas data-art="learn" aria-hidden="true"></canvas><div><small>Learn</small><strong>Learn Zcash</strong><span>Why it exists, how shielding works, wallets to try and where to buy.</span></div></a>
     </div>
   </div>
 </section>
@@ -555,9 +576,9 @@
             <div class="arc-dots" id="arcDots"></div>
           </div>
           <div class="arc-end" id="arcEnd">
-            <a class="solid" href="/learn.html#why">Read why ZEC →</a>
+            <a class="solid" href="/learn#why">Read why ZEC →</a>
             <a href="#tracker">Live numbers ↑</a>
-            <a href="/zecmap.html">Open the map →</a>
+            <a href="/zecmap">Open the map →</a>
           </div>
         </div>
         <div>
@@ -600,7 +621,7 @@
           <div class="legend-item"><span class="swatch" style="background:var(--exposed)"></span> Transparent, <span id="t-pct">70.8%</span>. Balances are public, Bitcoin-style.</div>
           <div class="legend-item"><span class="swatch" style="background:var(--teal)"></span> Shielded, <span id="z-pct">29.2%</span>. Amounts and parties stay hidden.</div>
         </div>
-        <div class="snapshot-note">Snapshot from the zkp.baby dashboard, taken Oct 7, 2026 (4.95M of 16.97M ZEC shielded). For the current number, see <a href="/learn.html#ironwood">the live dashboard</a>.</div>
+        <div class="snapshot-note">Snapshot from the zkp.baby dashboard, taken Oct 7, 2026 (4.95M of 16.97M ZEC shielded). For the current number, see <a href="/learn#ironwood">the live dashboard</a>.</div>
       </div>
     </div>
 
@@ -609,7 +630,7 @@
       <div class="stat-cell"><div class="lbl">Next Halving (Est.)</div><div class="val">Late 2028</div></div>
       <div class="stat-cell"><div class="lbl">Reward After</div><div class="val">0.78125 ZEC</div></div>
     </div>
-    <div class="more"><a href="/learn.html#halvings">How halvings work →</a></div>
+    <div class="more"><a href="/learn#halvings">How halvings work →</a></div>
   </div>
 </section>
 
@@ -626,22 +647,22 @@
     <div class="zf-col">
       <h4>Live</h4>
       <a href="/#tracker">Tracker</a>
-      <a href="/zecmap.html">ZEC Map</a>
-      <a href="/flippening.html">Flippening Party</a>
-      <a href="/captastic.html">Captastic</a>
-      <a href="/events.html">Events</a>
+      <a href="/zecmap">ZEC Map</a>
+      <a href="/flippening">Flippening Party</a>
+      <a href="/captastic">Captastic</a>
+      <a href="/events">Events</a>
     </div>
     <div class="zf-col">
       <h4>Learn &amp; play</h4>
-      <a href="/learn.html">Learn Zcash</a>
-      <a href="/backwards.html">Backwards</a>
-      <a href="/game.html">Encrypt the money</a>
-      <a href="/duel.html">Card Duel</a>
+      <a href="/learn">Learn Zcash</a>
+      <a href="/backwards">Backwards</a>
+      <a href="/game">Encrypt the money</a>
+      <a href="/duel">Card Duel</a>
     </div>
     <div class="zf-col">
       <h4>Fine print</h4>
       <p>Educational only. Not financial advice. Not affiliated with the Electric Coin Company or the Zcash Foundation.</p>
-      <a href="/privacy.html">Privacy</a>
+      <a href="/privacy">Privacy</a>
       <a href="#" id="footCookieSettings">Cookie settings</a>
     </div>
   </div>
@@ -649,7 +670,7 @@
 </footer>
 
 <div id="consent">
-  <p>◈ Zectastic runs on essential storage only: this choice, and, if you use them, your Captastic settings, watchlist and portfolio and your game progress. All of it stays in your browser. We don't connect wallets, collect addresses, or sell data. The shielded dashboard on the Learn page embeds zkp.baby, which may set its own cookies we don't control. Full details on the <a href="/privacy.html" style="color:var(--teal);">privacy page</a>.</p>
+  <p>◈ Zectastic runs on essential storage only: this choice, and, if you use them, your Captastic settings, watchlist and portfolio and your game progress. All of it stays in your browser. We don't connect wallets, collect addresses, or sell data. The shielded dashboard on the Learn page embeds zkp.baby, which may set its own cookies we don't control. Full details on the <a href="/privacy" style="color:var(--teal);">privacy page</a>.</p>
   <div class="actions">
     <button class="btn-ghost" id="essentialOnly">Essential Only</button>
     <button class="btn" id="acceptAll">Accept All</button>
