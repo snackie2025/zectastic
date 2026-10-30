@@ -605,9 +605,20 @@
     var ws, opened = false;
     try{ ws = new WebSocket(WS[wsI % WS.length]); }catch(e){ return retry(); }
     ws.onopen = function(){ opened = true; wsDelay = 2000; status(true, 'Live'); };
+    // Binance sends the whole market every second. Reading every message on a phone
+    // blocks typing, so only the newest one is read, at most every 1.5 seconds,
+    // and every 4 seconds while someone is typing.
+    var raw = null, waitT = 0, first = true;
     ws.onmessage = function(e){
+      raw = e.data;
+      if(!waitT) waitT = setTimeout(take, first ? 0 : busy() ? 4000 : 1500);
+    };
+    function take(){
+      waitT = 0; first = false;
+      var msg = raw; raw = null;
+      if(!msg) return;
       var d;
-      try{ d = JSON.parse(e.data); }catch(err){ return; }
+      try{ d = JSON.parse(msg); }catch(err){ return; }
       if(!Array.isArray(d)) return;
       var now = Date.now();
       for(var i = 0; i < d.length; i++){
@@ -616,14 +627,16 @@
       }
       if(needMap && coins.length){ needMap = false; mapPairs(); charts(false); }
       dirty();
-    };
+    }
     ws.onerror = function(){ try{ ws.close(); }catch(e){} };
     ws.onclose = function(){
+      clearTimeout(waitT); waitT = 0; raw = null;
       if(!opened) wsI++;
       status(false, wsI >= WS.length && !opened ? 'Delayed' : 'Reconnecting');
       retry();
     };
   }
+  function busy(){ var a = document.activeElement; return !!a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA'); }
   function retry(){ setTimeout(connect, wsDelay); wsDelay = Math.min(wsDelay * 2, 30000); }
   function status(on, text){ statusEl.classList.toggle('on', on); statusText.textContent = text; }
 
@@ -932,6 +945,22 @@
     var n = t === '' ? NaN : Number(t);
     return isFinite(n) && n > 0 ? n : null;
   }
+  // The suggestions under the project box are rewritten only when the list of projects
+  // changes, and never while someone is typing in that box.
+  var listKey = '', listLater = false;
+  function fillList(){
+    if(MODE !== 'port') return;
+    var box = document.getElementById('pCoin'), dl = document.getElementById('pList');
+    if(!box || !dl) return;
+    if(document.activeElement === box){ listLater = true; return; }
+    var k = every.map(function(c){ return c.id; }).join(',');
+    listLater = false;
+    if(k === listKey) return;
+    listKey = k;
+    dl.innerHTML = every.map(function(c){
+      return '<option value="' + esc(c.name) + ' (' + esc(String(c.symbol).toUpperCase()) + ')">';
+    }).join('');
+  }
   function build(){
     var key;
     if(MODE === 'port'){
@@ -941,9 +970,7 @@
       if(key !== order) view.sort(function(a, b){ return usd(b) * hold[b.id] - usd(a) * hold[a.id]; });
       else view = orderView.map(function(c){ return every.filter(function(x){ return x.id === c.id; })[0]; });
       orderView = view;
-      document.getElementById('pList').innerHTML = every.map(function(c){
-        return '<option value="' + esc(c.name) + ' (' + esc(String(c.symbol).toUpperCase()) + ')">';
-      }).join('');
+      fillList();
     }else{
       view = MODE === 'watch' ? coins.filter(function(c){ return watch.has(c.id); }) : coins;
       key = (tiles ? 'T:' : 'L:') + view.map(function(c){ return c.id; }).join(',');
@@ -1378,6 +1405,7 @@
     };
     // fetch the longer list the first time someone starts typing a project name
     pCoin.addEventListener('focus', function(){ if(coins.length) loadMore(); });
+    pCoin.addEventListener('blur', function(){ if(listLater) fillList(); });
     document.getElementById('pForm').addEventListener('submit', function(e){
       e.preventDefault();
       pMsg.textContent = '';
