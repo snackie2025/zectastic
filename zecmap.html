@@ -2,15 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
 <!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://api.binance.com https://api.coingecko.com https://api.kraken.com https://api.zecblock.com https://api.mainnet.cipherscan.app wss://ws.kraken.com wss://ws-feed.exchange.coinbase.com wss://api.gemini.com wss://stream.binance.com:9443 wss://api-pub.bitfinex.com wss://ws.okx.com:8443 wss://stream.bybit.com wss://api.gateio.ws wss://ws.bitget.com">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://api.binance.com https://api.coingecko.com https://api.kraken.com https://api.zecblock.com https://api.mainnet.cipherscan.app wss://ws.kraken.com wss://ws-feed.exchange.coinbase.com wss://api.gemini.com wss://stream.binance.com:9443 wss://api-pub.bitfinex.com wss://ws.okx.com:8443 wss://stream.bybit.com wss://api.gateio.ws wss://ws.bitget.com">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ZEC Map · Zectastic</title>
 <meta name="description" content="Live ZEC buys on a world map, flying into the price, with swaps into ZEC surfacing in a hidden shielded zone.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
+  /* Fonts are served from this site, so opening a page tells no font service that you visited. */
+  @font-face{font-family:'Archivo'; src:url('/fonts/archivo.woff2') format('woff2'); font-weight:100 900; font-stretch:62% 125%; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-500.woff2') format('woff2'); font-weight:500; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-600.woff2') format('woff2'); font-weight:600; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-700.woff2') format('woff2'); font-weight:700 900; font-display:swap;}
+  @font-face{font-family:'DM Mono'; src:url('/fonts/dm-mono-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+  @font-face{font-family:'DM Mono'; src:url('/fonts/dm-mono-500.woff2') format('woff2'); font-weight:500 900; font-display:swap;}
+
   :root{
     --bg:#050608;
     --bg-raised:#0D0E11;

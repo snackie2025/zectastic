@@ -2,15 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
 <!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy · Zectastic</title>
 <meta name="description" content="What Zectastic and Captastic do and don't collect, what stays in your browser, and which third-party feeds your browser talks to.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
+  /* Fonts are served from this site, so opening a page tells no font service that you visited. */
+  @font-face{font-family:'Archivo'; src:url('/fonts/archivo.woff2') format('woff2'); font-weight:100 900; font-stretch:62% 125%; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-500.woff2') format('woff2'); font-weight:500; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-600.woff2') format('woff2'); font-weight:600; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-700.woff2') format('woff2'); font-weight:700 900; font-display:swap;}
+  @font-face{font-family:'DM Mono'; src:url('/fonts/dm-mono-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+  @font-face{font-family:'DM Mono'; src:url('/fonts/dm-mono-500.woff2') format('woff2'); font-weight:500 900; font-display:swap;}
+
   :root{
     --bg:#050608;
     --bg-raised:#0D0E11;
@@ -249,6 +256,7 @@
       <li><span class="mark">→</span> Zectastic doesn't have user accounts, doesn't ask for a wallet address, and doesn't run analytics or advertising trackers.</li>
       <li><span class="mark">→</span> A few things are stored locally in your browser: your cookie choice, and, if you use them, your Captastic settings, watchlist and portfolio and your game progress. None of it is sent to us or to anyone else, and nothing here is sold or shared.</li>
       <li><span class="mark">→</span> Live prices, supply, rankings and shielded-pool numbers come from third-party services (mainly CoinGecko, Binance, Kraken and zkp.baby) that your browser talks to directly. Their own privacy practices are outside our control, and linked below.</li>
+      <li><span class="mark">→</span> Fonts are served from this site itself, and pages tell other sites nothing about which page you came from.</li>
       <li><span class="mark">→</span> The ZEC Map connects your browser to several exchanges at once while it is open, to show their public trades.</li>
       <li><span class="mark">→</span> Playing the radio asks radio-browser.info, an open directory of internet radio, for stations in the style you picked, then connects to that station's stream. Both can see your IP address, same as any internet radio. Nothing is contacted until you press play.</li>
     </ul>
@@ -323,11 +331,6 @@
         <div class="cell"><div class="name">radio-browser.info and radio stations</div><p>Zectastic Radio and party mode: finding stations for the style you pick, and the stations' own live streams.</p></div>
         <div class="cell"><p>Only contacted when you press play. The directory sees the style you picked; the station streams to your browser for as long as it plays.</p></div>
         <div class="cell"><p><a href="https://www.radio-browser.info" target="_blank" rel="noopener">radio-browser.info</a> · each station's own policy</p></div>
-      </div>
-      <div class="service-row">
-        <div class="cell"><div class="name">Google Fonts</div><p>The typefaces used on every page.</p></div>
-        <div class="cell"><p>Font files are loaded from Google when a page opens.</p></div>
-        <div class="cell"><p><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></p></div>
       </div>
       <div class="service-row">
         <div class="cell"><div class="name">cdnjs and jsDelivr</div><p>The drawing code and world map outline for the ZEC Map.</p></div>

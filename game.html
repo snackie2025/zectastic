@@ -2,12 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
 <!-- Security rule: this page may only load code, images and data from the addresses listed here. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ENCRYPT THE MONEY — ZCash Shield · zectastic.com</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Archivo:wdth,wght@62..125,400..900&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  /* Fonts are served from this site, so opening a page tells no font service that you visited. */
+  @font-face{font-family:'Archivo'; src:url('/fonts/archivo.woff2') format('woff2'); font-weight:100 900; font-stretch:62% 125%; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-500.woff2') format('woff2'); font-weight:500; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-600.woff2') format('woff2'); font-weight:600; font-display:swap;}
+  @font-face{font-family:'Hanken Grotesk'; src:url('/fonts/hanken-grotesk-700.woff2') format('woff2'); font-weight:700 900; font-display:swap;}
+  @font-face{font-family:'DM Mono'; src:url('/fonts/dm-mono-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+  @font-face{font-family:'DM Mono'; src:url('/fonts/dm-mono-500.woff2') format('woff2'); font-weight:500 900; font-display:swap;}
+  @font-face{font-family:'Orbitron'; src:url('/fonts/orbitron-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+  @font-face{font-family:'Orbitron'; src:url('/fonts/orbitron-700.woff2') format('woff2'); font-weight:500 800; font-display:swap;}
+  @font-face{font-family:'Orbitron'; src:url('/fonts/orbitron-900.woff2') format('woff2'); font-weight:900; font-display:swap;}
+  @font-face{font-family:'Share Tech Mono'; src:url('/fonts/share-tech-mono-400.woff2') format('woff2'); font-weight:400; font-display:swap;}
+
 
 :root {
   --gold: #F4B728;
