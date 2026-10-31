@@ -222,7 +222,47 @@
   .radio-meta b, .radio-meta span{display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .radio-panel .radio-btn{display:inline-flex; align-items:center; min-height:38px; padding:0 14px; border-radius:999px; border:1px solid #34363C; background:transparent; color:#F2F2EF; font:500 12px 'DM Mono',monospace; cursor:pointer;}
   .radio-panel .radio-btn:disabled{opacity:.4; cursor:default;}
+
+  /* ==== HALLOWEEN (only when html has the class "halloween") ==== */
+  html.halloween body{background:#0B0414;}
+  .hw{position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden;}
+  .hw-moon{position:absolute; top:7%; right:6%; width:clamp(64px,9vw,128px); aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle at 34% 32%, #FFF6DE 0 30%, #F4DDA6 62%, #CDA868 100%);
+    box-shadow:0 0 50px 18px rgba(255,214,140,.22), 0 0 140px 40px rgba(255,122,26,.12);}
+  .hw-moon::after{content:""; position:absolute; width:22%; height:22%; left:52%; top:48%; border-radius:50%; background:rgba(180,140,80,.35); box-shadow:-30px -12px 0 -4px rgba(180,140,80,.3);}
+  .hw-fog{position:absolute; left:-25%; right:-25%; bottom:-8%; height:38%;
+    background:radial-gradient(ellipse 40% 60% at 30% 70%, rgba(190,170,235,.16), transparent 70%), radial-gradient(ellipse 35% 55% at 72% 75%, rgba(190,170,235,.12), transparent 70%);
+    filter:blur(10px); animation:hwfog 22s ease-in-out infinite alternate;}
+  .hw-fog.b{bottom:-14%; opacity:.8; animation-duration:30s; animation-direction:alternate-reverse;}
+  @keyframes hwfog{from{transform:translateX(-6%);} to{transform:translateX(6%);}}
+  .hw-bat{position:absolute; left:0; top:var(--t); width:calc(52px * var(--s)); animation:hwfly var(--d) linear infinite; animation-delay:var(--dl);}
+  .hw-bat svg{display:block; width:100%; filter:drop-shadow(0 0 5px rgba(255,122,26,.55));}
+  .hw-bat .w{fill:#07020D; transform-origin:50% 40%; animation:hwflap .22s ease-in-out infinite alternate;}
+  @keyframes hwflap{from{transform:scaleY(1);} to{transform:scaleY(.45);}}
+  @keyframes hwfly{0%{transform:translate(-12vw,0);} 25%{transform:translate(25vw,-28px);} 50%{transform:translate(55vw,14px);} 75%{transform:translate(85vw,-20px);} 100%{transform:translate(115vw,6px);}}
+  @media (prefers-reduced-motion: reduce){.hw-bat,.hw-bat .w,.hw-fog{animation:none;} .hw-bat{display:none;}}
+  @media (max-width:640px){.hw-moon{top:auto; bottom:20%; right:5%; width:52px; opacity:.9;}}
+  /* ==== END HALLOWEEN ==== */
+  html.halloween .party-glow{opacity:.55; background:radial-gradient(circle at 50% 18%, rgba(255,122,26,.24), transparent 55%), radial-gradient(circle at 12% 82%, rgba(139,63,217,.26), transparent 50%), radial-gradient(circle at 88% 76%, rgba(61,220,151,.14), transparent 50%);}
+  html.halloween body.party-on .party-glow{opacity:1;}
+  html.halloween .hw{position:fixed; z-index:0;}
+  html.halloween .hero-price-big{color:#FF7A1A; text-shadow:0 0 30px rgba(255,122,26,.45);}
+  html.halloween .price-eyebrow{color:#FFB37A;}
+  html.halloween .ladder-wrap, html.halloween .radio-panel{background:rgba(20,8,34,.88); border-color:#3B1F55;}
+  html.halloween .ladder-row.closest{background:rgba(255,122,26,.12);}
+  html.halloween .party-btn{background:#FF7A1A;}
+  html.halloween body.party-on .party-btn{background:#8B3FD9; color:#fff;}
 </style>
+<script>
+// HALLOWEEN: on by itself on 31 October (each visitor's own date), off again at midnight.
+// Force it with ?theme=halloween, or turn it off with ?theme=normal.
+(function(){
+  var q = location.search, d = new Date();
+  var on = /[?&]theme=halloween/.test(q) || (!/[?&]theme=normal/.test(q) && d.getMonth() === 9 && d.getDate() === 31);
+  window.ZEC_HALLOWEEN = on;
+  if (on) document.documentElement.classList.add('halloween');
+})();
+</script>
 </head>
 <body>
 <script>
@@ -671,5 +711,34 @@
   setInterval(loadFlippeningBoard, 60000);
 </script>
 
+<script>
+// Halloween decorations: a moon, drifting fog and a few bats. Decoration only, they never block a click.
+(function(){
+  if (!window.ZEC_HALLOWEEN) return;
+  function add(host){
+    var w = document.createElement('div'); w.className = 'hw'; w.setAttribute('aria-hidden', 'true');
+    var bats = '';
+    [[12, 26, 0], [22, 34, -9], [8, 30, -17], [30, 40, -4], [16, 24, -13]].forEach(function(b, i){
+      bats += '<div class="hw-bat" style="--t:' + b[0] + '%;--d:' + b[1] + 's;--dl:' + b[2] + 's;--s:' + (0.7 + (i % 3) * 0.25) + '"><svg viewBox="0 0 64 32" aria-hidden="true"><path class="w" d="M32 12C29 8 27 8 26 11C22 6 14 4 4 6c6 3 8 7 7 12 4-3 8-2 10 1 2-3 6-3 8 0l3-5 3 5c2-3 6-3 8 0 2-3 6-4 10-1-1-5 1-9 7-12-10-2-18 0-22 5-1-3-3-3-6 1z"/></svg></div>';
+    });
+    w.innerHTML = '<div class="hw-moon"></div><div class="hw-fog"></div><div class="hw-fog b"></div>' + bats;
+    host.insertBefore(w, host.firstChild);
+  }
+  document.addEventListener('DOMContentLoaded', function(){ add(document.getElementById('stage') || document.body); });
+})();
+</script>
+<script>
+// Halloween at the flippening party: spooky labels and pumpkin, purple and ghost-white confetti.
+(function(){
+  if (!window.ZEC_HALLOWEEN) return;
+  addEventListener('DOMContentLoaded', function(){
+    var e = document.querySelector('.price-eyebrow'); if (e) e.textContent = 'ZEC / USD · Halloween party';
+    var l = document.getElementById('partyLabel'); if (l) l.textContent = 'Start the spooky party';
+    var b = document.getElementById('partyBtn');
+    if (b && l) b.addEventListener('click', function(){ setTimeout(function(){ l.textContent = document.body.classList.contains('party-on') ? 'Stop the spooky party' : 'Start the spooky party'; }, 0); });
+    try { colors.splice(0, colors.length, '#FF7A1A', '#8B3FD9', '#3DDC97', '#F4F1FF', '#FF7A1A'); } catch (err) {}
+  });
+})();
+</script>
 </body>
 </html>
